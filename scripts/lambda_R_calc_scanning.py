@@ -54,8 +54,8 @@ print ("beta value     " + str(beta) )
 
 #----------------------------------------Read HDF5 files-----------------------------------------
 
-if ('dat'):
-    f = h5py.File('dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
+if ('../dat'):
+    f = h5py.File('../dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
 else:
     sys.exit("No data file")
 

@@ -36,17 +36,17 @@ beta = 10.0
 pi = math.pi
 
 def twopgfupup(i):
-    arr = np.loadtxt("../pomerol_output/datadirname/chi_ph_shift_1111_W%s.dat"%i)
+    arr = np.loadtxt("../pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/chi_ph_shift_1111_W%s.dat"%i)
     return arr
 
 print twopgfupup(0)[:,0]
 
 def twopgfupdo(i):
-    arr1 = np.loadtxt("../pomerol_output/datadirname/chi_ph_shift_1001_W%s.dat"%i)
+    arr1 = np.loadtxt("../pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/chi_ph_shift_1001_W%s.dat"%i)
     return arr1
 
 def filename(i):
-    return '../pomerol_output/datadirname/2pgf_ph_shift_W%s.dat'%i
+    return '../pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/2pgf_ph_shift_W%s.dat'%i
 
 
 index_list = np.array([i for i in range(0,num_bfreq)])
@@ -54,11 +54,11 @@ index_list = np.array([i for i in range(0,num_bfreq)])
 print index_list
 
 for index in index_list:
-    np.savetxt('../pomerol_output/datadirname/2pgf_ph_shift_W%s.dat'%index, np.column_stack((twopgfupup(index)[:,0], twopgfupup(index)[:,1], twopgfupup(index)[:,2], twopgfupup(index)[:,3], twopgfupup(index)[:,4],twopgfupdo(index)[:,3], twopgfupdo(index)[:,4])))
+    np.savetxt('../pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/2pgf_ph_shift_W%s.dat'%index, np.column_stack((twopgfupup(index)[:,0], twopgfupup(index)[:,1], twopgfupup(index)[:,2], twopgfupup(index)[:,3], twopgfupup(index)[:,4],twopgfupdo(index)[:,3], twopgfupdo(index)[:,4])))
 
 filenames=[filename(i) for i in range(0,num_bfreq)] 
 
-with open('../pomerol_output/datadirname/2pgf_ph_shift', 'w') as outfile:
+with open('../pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/2pgf_ph_shift.dat', 'w') as outfile:
      for fname in filenames:
          with open(fname) as infile:
               for line in infile:
