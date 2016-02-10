@@ -45,10 +45,6 @@ from _functools import partial
 
 #---------------------------------------------------------------------------------
 
-U=1.0
-
-beta=10.0
-
 pi = math.pi
 
 #---------------------------------------------------------------------------------
@@ -88,7 +84,7 @@ f = h5py.File('dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'w')   # C
 #---------------------------------------------------------------------------------
 #GF
 
-g_iw  = np.loadtxt('pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/gw_imag00.dat')
+g_iw  = np.loadtxt('pomerol_output/U_0.25_beta_10.0_nbs2_32Wpos_80wfpos/gw_imag00.dat')
 N_fermi_gf = g_iw.shape[0]
 print ("Number of fermionic frequencies for the GF:")
 print N_fermi_gf
@@ -117,7 +113,7 @@ f.create_dataset('Giw/fgrid', data=fgrid_arr, dtype='float64', compression="gzip
 #---------------------------------------------------------------------------------------------------------
 #--------------------------------------- 2PGF PP------------------------------------------------------------
 
-vertex_pp = np.loadtxt("pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/2pgf_pp_shift.dat")
+vertex_pp = np.loadtxt("pomerol_output/U_0.25_beta_10.0_nbs2_32Wpos_80wfpos/2pgf_pp_shift.dat")
 print vertex_pp.shape
 ffreq_pp = int(np.transpose(vertex_pp)[1,:].max()+1)
 print ffreq_pp
@@ -244,7 +240,7 @@ f.create_dataset('VERT/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compressio
 
 #--------------------------------------- 2PGF PH------------------------------------------------------------
 
-vertex_ph = np.loadtxt("pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/2pgf_ph_shift.dat")
+vertex_ph = np.loadtxt("pomerol_output/U_0.25_beta_10.0_nbs2_32Wpos_80wfpos/2pgf_ph_shift.dat")
 ffreq_ph = int(np.transpose(vertex_ph)[1,:].max()+1)
 print ffreq_ph
 bfreq_ph = int(np.transpose(vertex_ph)[0,:].max())
@@ -372,7 +368,7 @@ f.create_dataset('VERT/PH/bgrid', data=bgrid_arr_ph, dtype='float64', compressio
 #---------------------------------------------------------------------------------------------------------
 #--------------------------------------- 2PGF XPH------------------------------------------------------------
 
-vertex_xph = np.loadtxt("pomerol_output/U_2.0_beta_10.0_nbs2_32Wpos_64wfpos/2pgf_xph_shift.dat")
+vertex_xph = np.loadtxt("pomerol_output/U_0.25_beta_10.0_nbs2_32Wpos_80wfpos/2pgf_xph_shift.dat")
 ffreq_xph = int(np.transpose(vertex_xph)[1,:].max()+1)
 print ffreq_xph
 bfreq_xph = int(np.transpose(vertex_xph)[0,:].max())
