@@ -800,7 +800,7 @@ def f_ext_upup_pp(i,j,k):
     if IsInside(i,j,k):
         return f_upup_pp(i,j,k)
     else:
-        return  K_upup_ph(PPtoPH((i,j,k))[0]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_upup_xph(PPtoXPH((i,j,k))[0]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
+        return  K_upup_pp(i) + P_upup_pp(i,j)+ P_upup_pp(i,k)+K_upup_ph(PPtoPH((i,j,k))[0]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_upup_xph(PPtoXPH((i,j,k))[0]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
 
 def f_ext_updo_pp(i,j,k):
     if IsInside(i,j,k):
@@ -867,7 +867,7 @@ def R_updo_ph(i,j,k):
     return phi_ext_updo_fun_ph(i,j,k)-P_updo_ph(i,j)-P_updo_ph(i,k)-K_updo_ph(i)
 
 def R_upup_pp(i,j,k):
-    return phi_ext_upup_fun_pp(i,j,k)
+    return phi_ext_upup_fun_pp(i,j,k)-P_upup_pp(i,j)-P_upup_pp(i,k)-K_upup_pp(i)
 
 def R_updo_pp(i,j,k):
     return phi_ext_updo_fun_pp(i,j,k)-P_updo_pp(i,j)-P_updo_pp(i,k)-K_updo_pp(i)

@@ -123,22 +123,6 @@ imp_updo_xph = np.array(f["/P_func/XPH/IM_P_UPDO"])
 rep_upup_xph =  np.array(f["/P_func/XPH/RE_P_UPUP"])
 imp_upup_xph = np.array(f["/P_func/XPH/IM_P_UPUP"])
 
-#----Read Karrasch
-
-rek_upup_ph =  np.array(f["/K_func/PH/RE_K_UPUP"])
-imk_upup_ph = np.array(f["/K_func/PH/IM_K_UPUP"])
-rek_updo_ph =  np.array(f["/K_func/PH/RE_K_UPDO"])
-imk_updo_ph = np.array(f["/K_func/PH/IM_K_UPDO"])
-bgrid_k = rek_upup_ph.shape[0]
-rek_upup_pp = np.array(f["/K_func/PP/RE_K_UPUP"])
-imk_upup_pp = np.array(f["/K_func/PP/RE_K_UPUP"])
-rek_updo_pp =  np.array(f["/K_func/PP/RE_K_UPDO"])
-imk_updo_pp = np.array(f["/K_func/PP/IM_K_UPDO"])
-rek_updo_xph =  np.array(f["/K_func/XPH/RE_K_UPDO"])
-imk_updo_xph = np.array(f["/K_func/XPH/IM_K_UPDO"])
-rek_upup_xph =  np.array(f["/K_func/XPH/RE_K_UPUP"])
-imk_upup_xph = np.array(f["/K_func/XPH/IM_K_UPUP"])
-
 if fgrid_p <= shift:
     sys.exit("Error: Shift too large for vertex grid"); 
 
@@ -224,8 +208,8 @@ imk_upup_ph = np.array(f["/K_func/PH/IM_K_UPUP"])
 rek_updo_ph =  np.array(f["/K_func/PH/RE_K_UPDO"])
 imk_updo_ph = np.array(f["/K_func/PH/IM_K_UPDO"])
 bgrid_k = rek_upup_ph.shape[0]
-rek_upup_pp = np.zeros( bgrid_k , dtype='float64' )
-imk_upup_pp = np.zeros( bgrid_k , dtype='float64' )
+rek_upup_pp = np.array(f["/K_func/PP/RE_K_UPUP"])
+imk_upup_pp = np.array(f["/K_func/PP/IM_K_UPUP"])
 rek_updo_pp =  np.array(f["/K_func/PP/RE_K_UPDO"])
 imk_updo_pp = np.array(f["/K_func/PP/IM_K_UPDO"])
 rek_updo_xph =  np.array(f["/K_func/XPH/RE_K_UPDO"])
@@ -352,6 +336,12 @@ def K_updo_ph(wb):
         return rek_updo_ph[wb+N_bose_k]+1j*imk_updo_ph[wb+N_bose_k]
     else:
         return 0.0
+
+def K_upup_pp(wb):
+    if (abs(wb) <= N_bose_k):
+        return rek_upup_pp[wb+N_bose_k]+1j*imk_upup_pp[wb+N_bose_k]
+    else:
+
 def K_updo_pp(wb):
     if (abs(wb) <= N_bose_k):
         return rek_updo_pp[wb+N_bose_k]+1j*imk_updo_pp[wb+N_bose_k]
@@ -376,6 +366,12 @@ def P_upup_ph(wb,wf):
 def P_updo_ph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
         return rep_updo_ph[wb+N_bose_p,wf+N_fermi_p]+1j*imp_updo_ph[wb+N_bose_p,wf+N_fermi_p]
+    else:
+        return 0.0
+
+def P_upup_pp(wb,wf):
+    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
+        return rep_upup_pp[wb+N_bose_p,wf+N_fermi_p]+1j*imp_upup_pp[wb+N_bose_p,wf+N_fermi_p]
     else:
         return 0.0
 def P_updo_pp(wb,wf):
@@ -412,7 +408,7 @@ def f_upup_fun_pp(i,j,k):
     if isInside(i,j,k):
         return re_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
     else:
-        return  K_upup_ph(PPtoPH((i,j,k))[0]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_upup_xph(PPtoXPH((i,j,k))[0]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
+        return  K_upup_pp(i) + P_upup_pp(i,j)+ P_upup_pp(i,k)+K_upup_ph(PPtoPH((i,j,k))[0]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_upup_xph(PPtoXPH((i,j,k))[0]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
 
 def f_updo_fun_pp(i,j,k):
     if isInside(i,j,k):
@@ -525,14 +521,9 @@ pl.clf()
 
 N_fermi_plot = N_fermi
 
-#pl.figsize=(13, 7)
-
 def plotVert_ED( use_pl, zarr, string):
-#    use_pl.set_aspect(1.0)
-#    pl.pcolormesh(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]),np.ma.masked_where( np.isnan(zarr), zarr ))
     pl.plot(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), zarr, 'bx', ms=3, mew=0.2) 
     use_pl.set_title( string , fontsize=10)    
-#    pl.colorbar(shrink=0.6)
     return
 
 def plotre_f_upup_ph_cut_1diag( use_pl ):
@@ -728,7 +719,7 @@ def phi_upup_fun_pp(i,j,k):
     if isInside(i,j,k):
         return re_phi_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_phi_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
     else:
-        return 0.0 
+        return K_upup_pp(i) + P_upup_pp(i,j) +P_upup_pp(i,k) 
     
 def phi_updo_fun_pp(i,j,k):
     if isInside(i,j,k):
