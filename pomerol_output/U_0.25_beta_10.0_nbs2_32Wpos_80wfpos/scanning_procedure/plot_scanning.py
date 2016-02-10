@@ -112,10 +112,10 @@ rep_upup_ph =  np.array(f["/P_func/PH/RE_P_UPUP"])
 imp_upup_ph = np.array(f["/P_func/PH/IM_P_UPUP"])
 rep_updo_ph =  np.array(f["/P_func/PH/RE_P_UPDO"])
 imp_updo_ph = np.array(f["/P_func/PH/IM_P_UPDO"])
-bgrid_p = rep_upup_ph.shape[1]
-fgrid_p = rep_upup_ph.shape[0]
-rep_upup_pp = np.zeros( (fgrid_p, bgrid_p) , dtype='float64' )
-imp_upup_pp = np.zeros( (fgrid_p, bgrid_p) , dtype='float64' )
+bgrid_p = rep_upup_ph.shape[0]
+fgrid_p = rep_upup_ph.shape[1]
+rep_upup_pp = np.array(f["/P_func/PP/RE_P_UPUP"])
+imp_upup_pp = np.array(f["/P_func/PP/IM_P_UPUP"])
 rep_updo_pp =  np.array(f["/P_func/PP/RE_P_UPDO"])
 imp_updo_pp = np.array(f["/P_func/PP/IM_P_UPDO"])
 rep_updo_xph =  np.array(f["/P_func/XPH/RE_P_UPDO"])
@@ -123,13 +123,30 @@ imp_updo_xph = np.array(f["/P_func/XPH/IM_P_UPDO"])
 rep_upup_xph =  np.array(f["/P_func/XPH/RE_P_UPUP"])
 imp_upup_xph = np.array(f["/P_func/XPH/IM_P_UPUP"])
 
+#----Read Karrasch
+
+rek_upup_ph =  np.array(f["/K_func/PH/RE_K_UPUP"])
+imk_upup_ph = np.array(f["/K_func/PH/IM_K_UPUP"])
+rek_updo_ph =  np.array(f["/K_func/PH/RE_K_UPDO"])
+imk_updo_ph = np.array(f["/K_func/PH/IM_K_UPDO"])
+bgrid_k = rek_upup_ph.shape[0]
+rek_upup_pp = np.array(f["/K_func/PP/RE_K_UPUP"])
+imk_upup_pp = np.array(f["/K_func/PP/RE_K_UPUP"])
+rek_updo_pp =  np.array(f["/K_func/PP/RE_K_UPDO"])
+imk_updo_pp = np.array(f["/K_func/PP/IM_K_UPDO"])
+rek_updo_xph =  np.array(f["/K_func/XPH/RE_K_UPDO"])
+imk_updo_xph = np.array(f["/K_func/XPH/IM_K_UPDO"])
+rek_upup_xph =  np.array(f["/K_func/XPH/RE_K_UPUP"])
+imk_upup_xph = np.array(f["/K_func/XPH/IM_K_UPUP"])
 
 if fgrid_p <= shift:
     sys.exit("Error: Shift too large for vertex grid"); 
 
-N_bose_p = (rep_upup_ph.shape[1]-1)/2
-N_fermi_p = (rep_upup_ph.shape[0])/2
+N_bose_p = (rep_upup_ph.shape[0]-1)/2
+N_fermi_p = (rep_upup_ph.shape[1])/2
 N_bose_k = (rek_upup_ph.shape[0]-1)/2 
+
+print N_bose_p, N_fermi_p, N_bose_k
 
 def plotP( use_pl, zarr, string ):
     pl.plot( np.arange(-N_fermi_p,N_fermi_p), zarr)
@@ -138,37 +155,37 @@ def plotP( use_pl, zarr, string ):
 
 def plotUpUpPRePH( use_pl ):
     title = r"$\operatorname{Re}P_{2,\uparrow\uparrow}(\Omega_{PH},\omega_n)$"
-    zarr = rep_upup_ph[:,shift+N_bose_p]
+    zarr = rep_upup_ph[shift+N_bose_p,:]
     plotP( use_pl, zarr, title )
     return
 
 def plotUpDoPRePH( use_pl ):
     title = r"$\operatorname{Re}P_{2,\uparrow\downarrow}(\Omega_{PH},\omega_n)$"
-    zarr = rep_updo_ph[:,shift+N_bose_p]
+    zarr = rep_updo_ph[shift+N_bose_p,:]
     plotP( use_pl, zarr, title )
     return
 
 def plotUpUpPRePP( use_pl ):
     title = r"$\operatorname{Re}P_{2,\uparrow\uparrow}(\Omega_{PP},\omega_n)$"
-    zarr = rep_upup_pp[:,shift+N_bose_p]
+    zarr = rep_upup_pp[shift+N_bose_p,:]
     plotP( use_pl, zarr, title )
     return
 
 def plotUpDoPRePP( use_pl ):
     title = r"$\operatorname{Re}P_{2,\uparrow\downarrow}(\Omega_{PP},\omega_n)$"
-    zarr = rep_updo_pp[:,shift+N_bose_p]
+    zarr = rep_updo_pp[shift+N_bose_p,:]
     plotP( use_pl, zarr, title )
     return
 
 def plotUpUpPReXPH( use_pl ):
     title = r"$\operatorname{Re}P_{2,\uparrow\uparrow}(\Omega_{XPH},\omega_n)$"
-    zarr = rep_upup_xph[:,shift+N_bose_p]
+    zarr = rep_upup_xph[shift+N_bose_p,:]
     plotP( use_pl, zarr, title )
     return
 
 def plotUpDoPReXPH( use_pl ):
     title = r"$\operatorname{Re}P_{2,\uparrow\downarrow}(\Omega_{XPH},\omega_n)$"
-    zarr = rep_updo_xph[:,shift+N_bose_p]
+    zarr = rep_updo_xph[shift+N_bose_p,:]
     plotP( use_pl, zarr, title )
     return
 
@@ -353,27 +370,27 @@ def K_updo_xph(wb):
 
 def P_upup_ph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_upup_ph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_upup_ph[wf+N_fermi_p,wb+N_bose_p]
+        return rep_upup_ph[wb+N_bose_p,wf+N_fermi_p]+1j*imp_upup_ph[wb+N_bose_p,wf+N_fermi_p]
     else:
         return 0.0
 def P_updo_ph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_ph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_ph[wf+N_fermi_p,wb+N_bose_p]
+        return rep_updo_ph[wb+N_bose_p,wf+N_fermi_p]+1j*imp_updo_ph[wb+N_bose_p,wf+N_fermi_p]
     else:
         return 0.0
 def P_updo_pp(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_pp[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_pp[wf+N_fermi_p,wb+N_bose_p]
+        return rep_updo_pp[wb+N_bose_p,wf+N_fermi_p]+1j*imp_updo_pp[wb+N_bose_p,wf+N_fermi_p]
     else:
         return 0.0
 def P_upup_xph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_upup_xph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_upup_xph[wf+N_fermi_p,wb+N_bose_p]
+        return rep_upup_xph[wb+N_bose_p,wf+N_fermi_p]+1j*imp_upup_xph[wb+N_bose_p,wf+N_fermi_p]
     else:
         return 0.0
 def P_updo_xph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_xph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_xph[wf+N_fermi_p,wb+N_bose_p]
+        return rep_updo_xph[wb+N_bose_p,wf+N_fermi_p]+1j*imp_updo_xph[wb+N_bose_p,wf+N_fermi_p]
     else:
         return 0.0
 
@@ -511,8 +528,11 @@ N_fermi_plot = N_fermi
 #pl.figsize=(13, 7)
 
 def plotVert_ED( use_pl, zarr, string):
+#    use_pl.set_aspect(1.0)
+#    pl.pcolormesh(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]),np.ma.masked_where( np.isnan(zarr), zarr ))
     pl.plot(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), zarr, 'bx', ms=3, mew=0.2) 
     use_pl.set_title( string , fontsize=10)    
+#    pl.colorbar(shrink=0.6)
     return
 
 def plotre_f_upup_ph_cut_1diag( use_pl ):
