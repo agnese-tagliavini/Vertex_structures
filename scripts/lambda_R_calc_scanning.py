@@ -4,12 +4,8 @@
 #   - The "Rest" function subtracting from the phi the corresponding plus and karrasch functions
 #   - The Fully Irreducible vertex Lam 
 #
-# The Gamma and the Phi exploit the asymptotic structures already obtainend from the self-consistency!
-# In particular the Gamma is calculated using the extended Full vertex (with the asymptotics taken from the plus and the karrash functions)
-# and taken the inversion
 # Everything will be stored in the HDF5 FILE which already contains all the info about the ED calculation of the vertex
 #
-# plotting using plot.py
 ########################################################################################
 #
 # WARNING: modify the path and the filename to load !!
@@ -58,8 +54,8 @@ print ("beta value     " + str(beta) )
 
 #----------------------------------------Read HDF5 files-----------------------------------------
 
-if ('../dat'):
-    f = h5py.File('../dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
+if ('dat'):
+    f = h5py.File('dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
 else:
     sys.exit("No data file")
 
@@ -139,35 +135,6 @@ bgrid = f["VERT/PH/bgrid"][:].shape[0]
 N_bose = (bgrid-1)/2 # to create a bosonic frequency grid from -N_bose to N_bose
 N_fermi= (fgrid)/2   # to create a fermionic frequency grid from -N_fermi to N_fermi
 
-#Plus
-
-rep_upup_ph =  np.array(f["/P_func/PH/RE_P_UPUP"])
-imp_upup_ph = np.array(f["/P_func/PH/IM_P_UPUP"])
-rep_updo_ph =  np.array(f["/P_func/PH/RE_P_UPDO"])
-imp_updo_ph = np.array(f["/P_func/PH/IM_P_UPDO"])
-rep_updo_pp =  np.array(f["/P_func/PP/RE_P_UPDO"])
-imp_updo_pp = np.array(f["/P_func/PP/IM_P_UPDO"])
-rep_updo_xph =  np.array(f["/P_func/XPH/RE_P_UPDO"])
-imp_updo_xph = np.array(f["/P_func/XPH/IM_P_UPDO"])
-rep_upup_xph =  np.array(f["/P_func/XPH/RE_P_UPUP"])
-imp_upup_xph = np.array(f["/P_func/XPH/IM_P_UPUP"])
-
-#Karrasch
-
-rek_upup_ph =  np.array(f["/K_func/PH/RE_K_UPUP"])
-imk_upup_ph = np.array(f["/K_func/PH/IM_K_UPUP"])
-rek_updo_ph =  np.array(f["/K_func/PH/RE_K_UPDO"])
-imk_updo_ph = np.array(f["/K_func/PH/IM_K_UPDO"])
-rek_updo_pp =  np.array(f["/K_func/PP/RE_K_UPDO"])
-imk_updo_pp = np.array(f["/K_func/PP/IM_K_UPDO"])
-rek_updo_xph =  np.array(f["/K_func/XPH/RE_K_UPDO"])
-imk_updo_xph = np.array(f["/K_func/XPH/IM_K_UPDO"])
-rek_upup_xph =  np.array(f["/K_func/XPH/RE_K_UPUP"])
-imk_upup_xph = np.array(f["/K_func/XPH/IM_K_UPUP"])
-
-N_bose_k = (rek_upup_ph.shape[0] -1)/2
-N_bose_p = (rep_upup_ph.shape[1]-1)/2
-N_fermi_p = (rep_upup_ph.shape[0])/2
 
 #GRIDS
 
@@ -218,202 +185,103 @@ def chi_0_xph(wb,wf,wf1):
     else:
         return 0.0
 
-#---------------------------KARRASCH--------------------------
-
-def K_upup_ph(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_upup_ph[wb+N_bose_k]+1j*imk_upup_ph[wb+N_bose_k]
-    else:
-        return 0.0
-
-def K_updo_ph(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_updo_ph[wb+N_bose_k]+1j*imk_updo_ph[wb+N_bose_k]
-    else:
-        return 0.0
-
-def K_updo_pp(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_updo_pp[wb+N_bose_k]+1j*imk_updo_pp[wb+N_bose_k]
-    else:
-        return 0.0
-
-def K_upup_xph(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_upup_xph[wb+N_bose_k]+1j*imk_upup_xph[wb+N_bose_k]
-    else:
-        return 0.0
-
-def K_updo_xph(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_updo_xph[wb+N_bose_k]+1j*imk_updo_xph[wb+N_bose_k]
-    else:
-        return 0.0
-
-#---------------------------P func--------------------------------
-
-def P_upup_ph(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_upup_ph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_upup_ph[wf+N_fermi_p,wb+N_bose_p]
-    else:
-#        print "P_upup_ph out"
-        return 0.0
-def P_updo_ph(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_ph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_ph[wf+N_fermi_p,wb+N_bose_p]
-    else:
-#        print "P_updo_ph out"
-        return 0.0
-def P_updo_pp(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_pp[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_pp[wf+N_fermi_p,wb+N_bose_p]
-    else:
-#        print "P_updo_pp out"
-        return 0.0
-def P_upup_xph(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_upup_xph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_upup_xph[wf+N_fermi_p,wb+N_bose_p]
-    else:
-#        print "P_upup_xph out"
-        return 0.0
-def P_updo_xph(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_xph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_xph[wf+N_fermi_p,wb+N_bose_p]
-    else:
-#        print "K_updo_xph out"
-        return 0.0
-
 # Update the asymptotic structures for the VERTEX IN ALL CHANNELS
 
 def f_upup_fun_ph(i,j,k):
-    if isInside(i,j,k):
-        return re_f_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_upup_ph(i) + P_upup_ph(i,j)+ P_upup_ph(i,k) + K_upup_xph(PHtoXPH((i,j,k))[0]) + P_upup_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[1])+P_upup_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[2])
+    return re_f_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]
            
 def f_updo_fun_ph(i,j,k):
-    if isInside(i,j,k):
-        return re_f_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return - U + K_updo_ph(i) + P_updo_ph(i,j)+P_updo_ph(i,k) + K_updo_xph(PHtoXPH((i,j,k))[0]) + P_updo_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[1]) + P_updo_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[2])+ K_updo_pp(PHtoPP((i,j,k))[0]) + P_updo_pp(PHtoPP((i,j,k))[0],PHtoPP((i,j,k))[1]) + P_updo_pp(PHtoPP((i,j,k))[0],PHtoPP((i,j,k))[2])
+    return re_f_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]
 
 def f_upup_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return re_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return  K_upup_ph(PPtoPH((i,j,k))[0]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_upup_xph(PPtoXPH((i,j,k))[0]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
+    return re_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
 
 def f_updo_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return re_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return - U + K_updo_pp(i) + P_updo_pp(i,j) + P_updo_pp(i,k) + K_updo_ph(PPtoPH((i,j,k))[0]) + P_updo_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_updo_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_updo_xph(PPtoXPH((i,j,k))[0]) + P_updo_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_updo_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
+    return re_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
 
 def f_xupdo_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return re_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]-re_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]-1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return U - K_updo_pp(i) - P_updo_pp(i,j) - P_updo_pp(i,k) - K_updo_xph(PPtoXPH((i,j,-k-mymod_abs(i)-1))[0]) - P_updo_xph(PPtoXPH((i,j,-k-mymod_abs(i)-1))[0],PPtoXPH((i,j,-k-mymod_abs(i)-1))[1]) - P_updo_xph(PPtoXPH((i,j,-k-mymod_abs(i)-1))[0],PPtoXPH((i,j,-k-mymod_abs(i)-1))[2])- K_updo_ph(PPtoPH((i,j,-k-mymod_abs(i)-1))[0]) - P_updo_ph(PPtoPH((i,j,-k-mymod_abs(i)-1))[0],PPtoPH((i,j,-k-mymod_abs(i)-1))[1]) - P_updo_ph(PPtoPH((i,j,-k-mymod_abs(i)-1))[0],PPtoPH((i,j,-k-mymod_abs(i)-1))[2])    
+    return re_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]-re_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]-1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
 
 def f_upup_fun_xph(i,j,k):
-    if isInside(i,j,k):
-        return re_f_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_upup_xph(i) + P_upup_xph(i,j)+P_upup_xph(i,k) + K_upup_ph(XPHtoPH((i,j,k))[0]) + P_upup_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[1])+ P_upup_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[2]) 
+    return re_f_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]
 
 def f_updo_fun_xph(i,j,k):
-    if isInside(i,j,k):
-        return re_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return - U + K_updo_xph(i) + P_updo_xph(i,j)+P_updo_xph(i,k) + K_updo_ph(XPHtoPH((i,j,k))[0]) + P_updo_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[1]) + P_updo_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[2])+ K_updo_pp(XPHtoPP((i,j,k))[0]) + P_updo_pp(XPHtoPP((i,j,k))[0],XPHtoPP((i,j,k))[1]) + P_updo_pp(XPHtoPP((i,j,k))[0],XPHtoPP((i,j,k))[2])
+    return re_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]
 
 #--------------------------------GENCHI FUNC--------------------------------------
 #PP -> chi (singlet, triplet)
 
 def chi_s_pp(wb,wf,wf1):
-    if isInside(wb,wf,wf1):
-        return -re_chi_upup_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi]-1j*im_chi_upup_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi]+ 2*(re_chi_updo_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi] +1j*im_chi_updo_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi])
-    else:
-        return G(wf+myceil_div2(wb))*G(-wf-1+myfloor_div2(wb))*(-f_upup_fun_pp(wb,wf,wf1)+2*f_updo_fun_pp(wb,wf,wf1))*G(wf1+myceil_div2(wb))*G(-wf1-1+myfloor_div2(wb))+chi_0_pp(wb,wf,wf1)
+    return -re_chi_upup_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi]-1j*im_chi_upup_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi]+ 2*(re_chi_updo_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi] +1j*im_chi_updo_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi])
 def chi_t_pp(wb,wf,wf1):
-    if isInside(wb,wf,wf1):
-        return re_chi_upup_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi] + 1j*im_chi_upup_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi] 
-    else:
-        return G(wf+myceil_div2(wb))*G(-wf-1+myfloor_div2(wb))*(f_upup_fun_pp(wb,wf,wf1))*G(wf1+myceil_div2(wb))*G(-wf1-1+myfloor_div2(wb))+chi_0_pp(wb,wf,wf1)
+    return re_chi_upup_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi] + 1j*im_chi_upup_pp[wb+N_bose,wf+N_fermi,wf1+N_fermi] 
 
 #PH -> 2pgf(magnetic, density)
 
 def tpgf_d_ph(wb,wf,wf1):
-    if isInside(wb,wf,wf1):
-        return re_2pgf_upup_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+1j*im_2pgf_upup_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+re_2pgf_updo_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+1j*im_2pgf_updo_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]
-    else:
-        return G(wf+myceil_div2(wb))*G(wf-myfloor_div2(wb))*(f_upup_fun_ph(wb,wf,wf1)+f_updo_fun_ph(wb,wf,wf1))*G(wf1+myceil_div2(wb))*G(wf1-myfloor_div2(wb))+2*chi_0_ph(wb,wf,wf1)+chi_x0_ph(wb,wf,wf1)
+    return re_2pgf_upup_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+1j*im_2pgf_upup_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+re_2pgf_updo_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+1j*im_2pgf_updo_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]
+
 def tpgf_m_ph(wb,wf,wf1):
-    if isInside(wb,wf,wf1):
-        return re_2pgf_upup_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+1j*im_2pgf_upup_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi] -re_2pgf_updo_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]-1j*im_2pgf_updo_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]
-    else:
-        return G(wf+myceil_div2(wb))*G(wf-myfloor_div2(wb))*(f_upup_fun_ph(wb,wf,wf1)-f_updo_fun_ph(wb,wf,wf1))*G(wf1+myceil_div2(wb))*G(wf1-myfloor_div2(wb))+chi_x0_ph(wb,wf,wf1)
+    return re_2pgf_upup_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+1j*im_2pgf_upup_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi] -re_2pgf_updo_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]-1j*im_2pgf_updo_ph[wb+N_bose,wf+N_fermi,wf1+N_fermi]
 
 #-----------------------------GAMMA BETHE SALPETER INVERSION
 
 
 def chis_chi0_arr(wb):
-    return np.array([[chi_s_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1) for wf in range(-2*N_fermi,2*N_fermi)] for wf1 in range(-2*N_fermi,2*N_fermi)])
+    return np.array([[chi_s_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1) for wf in range(-N_fermi,N_fermi)] for wf1 in range(-N_fermi,N_fermi)])
 
 def chit_chi0_arr(wb):
-    return np.array([[chi_t_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1) for wf in range(-2*N_fermi,2*N_fermi)] for wf1 in range(-2*N_fermi,2*N_fermi)])
+    return np.array([[chi_t_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1) for wf in range(-N_fermi,N_fermi)] for wf1 in range(-N_fermi,N_fermi)])
 
 def chi_0_pp_arr(wb):
-    return np.array([[chi_0_pp(wb,wf,wf1) for wf in range(-2*N_fermi,2*N_fermi)] for wf1 in range(-2*N_fermi,2*N_fermi)])
+    return np.array([[chi_0_pp(wb,wf,wf1) for wf in range(-N_fermi,N_fermi)] for wf1 in range(-N_fermi,N_fermi)])
 
 gamma_t_arr = np.array([beta*beta*(2*inv(chi_0_pp_arr(wb))- 4*inv(chit_chi0_arr(wb))) for wb in range (-N_bose,N_bose+1)])
 gamma_s_arr = np.array([beta*beta*(2*inv(chi_0_pp_arr(wb)) - 4*inv(chis_chi0_arr(wb))) for wb in range (-N_bose,N_bose+1)])
 
-gamma_upup_pp_arr = gamma_t_arr[:,N_fermi:3*N_fermi,N_fermi:3*N_fermi] 
-gamma_updo_pp_arr = 0.5*(gamma_t_arr[:,N_fermi:3*N_fermi,N_fermi:3*N_fermi] + gamma_s_arr[:,N_fermi:3*N_fermi,N_fermi:3*N_fermi]) 
+gamma_upup_pp_arr = gamma_t_arr
+gamma_updo_pp_arr = 0.5*(gamma_t_arr + gamma_s_arr) 
 
 #PH
 
 def m_d_arr_ph(wb):
-    return np.array([[tpgf_d_ph(wb,wf,wf1)-2*chi_0_ph(wb,wf,wf1) for wf in range(-2*N_fermi,2*N_fermi)] for wf1 in range(-2*N_fermi,2*N_fermi)])
+    return np.array([[tpgf_d_ph(wb,wf,wf1)-2*chi_0_ph(wb,wf,wf1) for wf in range(-N_fermi,N_fermi)] for wf1 in range(-N_fermi,N_fermi)])
 
 def m_m_arr_ph(wb):
-    return np.array([[tpgf_m_ph(wb,wf,wf1) for wf in range(-2*N_fermi,2*N_fermi)] for wf1 in range(-2*N_fermi,2*N_fermi)])
+    return np.array([[tpgf_m_ph(wb,wf,wf1) for wf in range(-N_fermi,N_fermi)] for wf1 in range(-N_fermi,N_fermi)])
 
 def chi_x0_ph_arr(wb):
-    return np.array([[chi_x0_ph(wb,wf,wf1) for wf in range(-2*N_fermi,2*N_fermi)] for wf1 in range(-2*N_fermi,2*N_fermi)])
+    return np.array([[chi_x0_ph(wb,wf,wf1) for wf in range(-N_fermi,N_fermi)] for wf1 in range(-N_fermi,N_fermi)])
 
 
 gamma_d_arr = np.array([beta*beta*(inv(chi_x0_ph_arr(wb))-inv(m_d_arr_ph(wb))) for wb in range (-N_bose,N_bose+1)])
 gamma_m_arr = np.array([beta*beta*(inv(chi_x0_ph_arr(wb))-inv(m_m_arr_ph(wb))) for wb in range (-N_bose,N_bose+1)])
 
-gamma_upup_ph_arr = 0.5*(gamma_d_arr[:,N_fermi:3*N_fermi,N_fermi:3*N_fermi] + gamma_m_arr[:,N_fermi:3*N_fermi,N_fermi:3*N_fermi])
-gamma_updo_ph_arr = 0.5*(gamma_d_arr[:,N_fermi:3*N_fermi,N_fermi:3*N_fermi] - gamma_m_arr[:,N_fermi:3*N_fermi,N_fermi:3*N_fermi])
+gamma_upup_ph_arr = 0.5*(gamma_d_arr + gamma_m_arr)
+gamma_updo_ph_arr = 0.5*(gamma_d_arr - gamma_m_arr)
 
 #XPH
 
 def m_updo_fun_xph(wb,wf,wf1):
-    if isInside(wb,wf,wf1):
-        return re_2pgf_updo_xph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+1j*im_2pgf_updo_xph[wb+N_bose,wf+N_fermi,wf1+N_fermi]
-    else:
-        return G(wf+myceil_div2(wb))*G(wf-myfloor_div2(wb))*(f_updo_fun_xph(wb,wf,wf1))*G(wf1+myceil_div2(wb))*G(wf1-myfloor_div2(wb))+chi_0_xph(wb,wf,wf1)
+    return re_2pgf_updo_xph[wb+N_bose,wf+N_fermi,wf1+N_fermi]+1j*im_2pgf_updo_xph[wb+N_bose,wf+N_fermi,wf1+N_fermi]
 
 def m_updo_arr_xph(wb):
-    return np.array([[m_updo_fun_xph(wb,wf,wf1) for wf in range(-2*N_fermi,2*N_fermi)] for wf1 in range(-2*N_fermi,2*N_fermi)])
+    return np.array([[m_updo_fun_xph(wb,wf,wf1) for wf in range(-N_fermi,N_fermi)] for wf1 in range(-N_fermi,N_fermi)])
 
 
 def chi_0_xph_arr(wb):
-    return np.array([[chi_0_xph(wb,wf,wf1) for wf in range(-2*N_fermi,2*N_fermi)] for wf1 in range(-2*N_fermi,2*N_fermi)])
+    return np.array([[chi_0_xph(wb,wf,wf1) for wf in range(-N_fermi,N_fermi)] for wf1 in range(-N_fermi,N_fermi)])
 
 
+gamma_upup_xph_arr = - gamma_upup_ph_arr
 gamma_updo_xph_arr_big = np.array([beta*beta*(+inv(chi_0_xph_arr(wb))-inv(m_updo_arr_xph(wb))) for wb in range (-N_bose,N_bose+1)])
-gamma_updo_xph_arr = gamma_updo_xph_arr_big[:,N_fermi:3*N_fermi,N_fermi:3*N_fermi]
+gamma_updo_xph_arr = gamma_updo_xph_arr_big
 
 #-------------------------------Plotting Vertex-----------------
 
 print "Plotting Vertex extended"
 
-N_fermi_plot = 2*N_fermi
+N_fermi_plot = N_fermi
 
 pl.rc('xtick', labelsize=9) 
 pl.rc('ytick', labelsize=9) 
@@ -717,44 +585,26 @@ gamma_subgrp_xph.create_dataset('bgrid', data=bgrid_arr, dtype='float64', compre
 
 #PHIS FUNCTIONS
 
-
 def phi_upup_fun_ph(i,j,k):
-    if isInside(i,j,k):
-        return f_upup_fun_ph(i,j,k)-gamma_upup_ph_arr[i + N_bose, j+N_fermi, k + N_fermi] 
-    else:
-       return K_upup_ph(i) + P_upup_ph(i,j) + P_upup_ph(i,k) 
+    return f_upup_fun_ph(i,j,k)-gamma_upup_ph_arr[i + N_bose, j+N_fermi, k + N_fermi] 
     
 def phi_updo_fun_ph(i,j,k):
-    if isInside(i,j,k):
-        return f_updo_fun_ph(i,j,k)-gamma_updo_ph_arr[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_updo_ph(i) + P_updo_ph(i,j)+P_updo_ph(i,k)
+    return f_updo_fun_ph(i,j,k)-gamma_updo_ph_arr[i + N_bose, j+N_fermi, k + N_fermi]
     
 def phi_upup_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return f_upup_fun_pp(i,j,k)-gamma_upup_pp_arr[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return 0.0 
+    return f_upup_fun_pp(i,j,k)-gamma_upup_pp_arr[i + N_bose, j+N_fermi, k + N_fermi]
     
 def phi_updo_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return f_updo_fun_pp(i,j,k)-gamma_updo_pp_arr[i + N_bose, j+N_fermi, k + N_fermi] 
-    else:
-        return K_updo_pp(i) + P_updo_pp(i,j) + P_updo_pp(i,k)
+    return f_updo_fun_pp(i,j,k)-gamma_updo_pp_arr[i + N_bose, j+N_fermi, k + N_fermi] 
     
 def phi_upup_fun_xph(i,j,k):
-    if isInside(i,j,k):
-        return f_upup_fun_xph(i,j,k)-gamma_upup_xph_arr[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_upup_xph(i) + P_upup_xph(i,j)  + P_upup_xph(i,k)
+    return f_upup_fun_xph(i,j,k)-gamma_upup_xph_arr[i + N_bose, j+N_fermi, k + N_fermi]
     
 def phi_updo_fun_xph(i,j,k):
-    if isInside(i,j,k):
-        return f_updo_fun_xph(i,j,k)-gamma_updo_xph_arr[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_updo_xph(i) + P_updo_xph(i,j)+ P_updo_xph(i,k)
+    return f_updo_fun_xph(i,j,k)-gamma_updo_xph_arr[i + N_bose, j+N_fermi, k + N_fermi]
 
 #---------------------Store phi on hdf5 file-----------------------------------------
+
 phi_upup_ph_arr = np.array([[[phi_upup_fun_ph(i,j,k) for j in range(-N_fermi,N_fermi)] for k in range(-N_fermi,N_fermi)] for i in range(-N_bose, N_bose+1)])
 phi_updo_ph_arr = np.array([[[phi_updo_fun_ph(i,j,k) for j in range(-N_fermi,N_fermi)] for k in range(-N_fermi,N_fermi)] for i in range(-N_bose, N_bose+1)])
 phi_upup_pp_arr = np.array([[[phi_upup_fun_pp(i,j,k) for j in range(-N_fermi,N_fermi)] for k in range(-N_fermi,N_fermi)] for i in range(-N_bose, N_bose+1)])
@@ -792,45 +642,261 @@ phi_subgrp_xph.create_dataset('IM_PHI_UPDO', data= phi_updo_xph_arr.imag, dtype=
 phi_subgrp_xph.create_dataset('fgrid', data=fgrid_arr, dtype='float64', compression="gzip", compression_opts=4)
 phi_subgrp_xph.create_dataset('bgrid', data=bgrid_arr, dtype='float64', compression="gzip", compression_opts=4)
 
+#---------------------------KARRASCH--------------------------
+
+def K_upup_ph(wb):
+    if (abs(wb) <= N_bose):
+        return phi_upup_ph_arr[wb+N_bose,1,1]
+    else:
+        return 0.0
+
+def K_updo_ph(wb):
+    if (abs(wb) <= N_bose):
+        return phi_updo_ph_arr[wb+N_bose,1,1]
+    else:
+        return 0.0
+
+def K_upup_pp(wb):
+    if (abs(wb) <= N_bose):
+        return phi_upup_pp_arr[wb+N_bose,1,1]
+    else:
+        return 0.0
+
+def K_updo_pp(wb):
+    if (abs(wb) <= N_bose):
+        return phi_updo_pp_arr[wb+N_bose,1,1]
+    else:
+        return 0.0
+
+def K_upup_xph(wb):
+    if (abs(wb) <= N_bose):
+        return phi_upup_xph_arr[wb+N_bose,1,1]
+    else:
+        return 0.0
+
+def K_updo_xph(wb):
+    if (abs(wb) <= N_bose):
+        return phi_updo_xph_arr[wb+N_bose,1,1]
+    else:
+        return 0.0
+
+#---------------------------P func--------------------------------
+
+def P_upup_ph(wb,wf):
+    if (abs(wb) <= N_bose and wf >= -N_fermi and wf < N_fermi):
+        return  phi_upup_fun_ph(wb,wf,-N_fermi+1)- K_upup_ph(wb)
+    else:
+#        print "P_upup_ph out"
+        return 0.0
+def P_updo_ph(wb,wf):
+    if (abs(wb) <= N_bose and wf >= -N_fermi and wf < N_fermi):
+        return phi_updo_fun_ph(wb,wf,-N_fermi+1)- K_updo_ph(wb)
+    else:
+#        print "P_updo_ph out"
+        return 0.0
+def P_upup_pp(wb,wf):
+    if (abs(wb) <= N_bose and wf >= -N_fermi and wf < N_fermi):
+        return phi_upup_fun_pp(wb,wf,-N_fermi+1)- K_upup_pp(wb)
+    else:
+#        print "P_updo_pp out"
+        return 0.0
+def P_updo_pp(wb,wf):
+    if (abs(wb) <= N_bose and wf >= -N_fermi and wf < N_fermi):
+        return phi_updo_fun_pp(wb,wf,-N_fermi+1)- K_updo_pp(wb)
+    else:
+#        print "P_updo_pp out"
+        return 0.0
+def P_upup_xph(wb,wf):
+    if (abs(wb) <= N_bose and wf >= -N_fermi and wf < N_fermi):
+        return phi_upup_fun_xph(wb,wf,-N_fermi+1)- K_upup_xph(wb)
+    else:
+#        print "P_upup_xph out"
+        return 0.0
+
+def P_updo_xph(wb,wf):
+    if (abs(wb) <= N_bose and wf >= -N_fermi and wf < N_fermi):
+        return phi_updo_fun_xph(wb,wf,-N_fermi+1)- K_updo_xph(wb)
+    else:
+#        print "K_updo_xph out"
+        return 0.0
+ 
+ #Save Karrasch and Plus extarcted via scanning
+
+K_upup_ph_arr = np.array([K_upup_ph(i) for i in range(-N_bose, N_bose+1)])
+K_updo_ph_arr = np.array([K_updo_ph(i) for i in range(-N_bose, N_bose+1)])
+K_upup_pp_arr = np.array([K_upup_pp(i) for i in range(-N_bose, N_bose+1)])
+K_updo_pp_arr = np.array([K_updo_pp(i) for i in range(-N_bose, N_bose+1)])
+K_upup_xph_arr = np.array([K_upup_xph(i) for i in range(-N_bose, N_bose+1)])
+K_updo_xph_arr = np.array([K_updo_xph(i) for i in range(-N_bose, N_bose+1)])
+
+P_upup_ph_arr = np.array([[P_upup_ph(i,j) for j in range (-N_fermi, N_fermi)] for i in range(-N_bose, N_bose+1)])
+P_updo_ph_arr = np.array([[P_updo_ph(i,j) for j in range (-N_fermi, N_fermi)] for i in range(-N_bose, N_bose+1)])
+P_upup_pp_arr = np.array([[P_upup_pp(i,j) for j in range (-N_fermi, N_fermi)] for i in range(-N_bose, N_bose+1)])
+P_updo_pp_arr = np.array([[P_updo_pp(i,j) for j in range (-N_fermi, N_fermi)] for i in range(-N_bose, N_bose+1)])
+P_upup_xph_arr = np.array([[P_upup_xph(i,j) for j in range (-N_fermi, N_fermi)] for i in range(-N_bose, N_bose+1)])
+P_updo_xph_arr = np.array([[P_updo_xph(i,j) for j in range (-N_fermi, N_fermi)] for i in range(-N_bose, N_bose+1)])
+
+# HDF5 NEW GROUP CREATION
+
+if (('P_func' in f) or ('K_func' in f)):
+    del f['P_func']
+    del f['K_func']
+
+p_grp = f.require_group("P_func")
+p_subgrp_ph = p_grp.require_group("PH")
+p_subgrp_pp = p_grp.require_group("PP")
+p_subgrp_xph = p_grp.require_group("XPH")
+
+# HDF5 NEW SUBGROUP CREATION
+
+k_grp = f.require_group("K_func")
+k_subgrp_ph = k_grp.require_group("PH")
+k_subgrp_pp = k_grp.require_group("PP")
+k_subgrp_xph = k_grp.require_group("XPH")
+
+# HDF5 NEW DATASET CREATION
+
+p_subgrp_ph.create_dataset("RE_P_UPUP", data= P_upup_ph_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_ph.create_dataset("IM_P_UPUP", data= P_upup_ph_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_ph.create_dataset("RE_P_UPDO", data= P_updo_ph_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_ph.create_dataset("IM_P_UPDO", data= P_updo_ph_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_pp.create_dataset("RE_P_UPUP", data= P_upup_pp_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_pp.create_dataset("IM_P_UPUP", data= P_upup_pp_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_pp.create_dataset("RE_P_UPDO", data= P_updo_pp_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_pp.create_dataset("IM_P_UPDO", data= P_updo_pp_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_xph.create_dataset("RE_P_UPUP", data= P_upup_xph_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_xph.create_dataset("IM_P_UPUP", data= P_upup_xph_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_xph.create_dataset("RE_P_UPDO", data= P_updo_xph_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+p_subgrp_xph.create_dataset("IM_P_UPDO", data= P_updo_xph_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+
+k_subgrp_ph.create_dataset("RE_K_UPUP", data= K_upup_ph_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_ph.create_dataset("IM_K_UPUP", data= K_upup_ph_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_ph.create_dataset("RE_K_UPDO", data= K_updo_ph_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_ph.create_dataset("IM_K_UPDO", data= K_updo_ph_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_pp.create_dataset("RE_K_UPUP", data= K_upup_pp_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_pp.create_dataset("IM_K_UPUP", data= K_upup_pp_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_pp.create_dataset("RE_K_UPDO", data= K_updo_pp_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_pp.create_dataset("IM_K_UPDO", data= K_updo_pp_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_xph.create_dataset("RE_K_UPUP", data= K_upup_xph_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_xph.create_dataset("IM_K_UPUP", data= K_upup_xph_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_xph.create_dataset("RE_K_UPDO", data= K_updo_xph_arr.real, dtype='float64', compression="gzip", compression_opts=4)
+k_subgrp_xph.create_dataset("IM_K_UPDO", data= K_updo_xph_arr.imag, dtype='float64', compression="gzip", compression_opts=4)
+
+#---------------------------------------NOW EXTEND PLUS AND F WITH THE EXTRACTED ASYPTOTICS -------------------------------
+
+def f_ext_upup_ph(i,j,k):
+    if IsInside(i,j,k):
+        return f_upup_ph(i,j,k)
+    else:
+        return K_upup_ph(i) + P_upup_ph(i,j)+ P_upup_ph(i,k) + K_upup_xph(PHtoXPH((i,j,k))[0]) + P_upup_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[1])+P_upup_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[2])
+           
+def f_ext_updo_ph(i,j,k):
+    if IsInside(i,j,k):
+        return f_updo_ph(i,j,k)
+    else:
+        return - U + K_updo_ph(i) + P_updo_ph(i,j)+P_updo_ph(i,k) + K_updo_xph(PHtoXPH((i,j,k))[0]) + P_updo_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[1]) + P_updo_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[2])+ K_updo_pp(PHtoPP((i,j,k))[0]) + P_updo_pp(PHtoPP((i,j,k))[0],PHtoPP((i,j,k))[1]) + P_updo_pp(PHtoPP((i,j,k))[0],PHtoPP((i,j,k))[2])
+
+def f_ext_upup_pp(i,j,k):
+    if IsInside(i,j,k):
+        return f_upup_pp(i,j,k)
+    else:
+        return  K_upup_ph(PPtoPH((i,j,k))[0]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_upup_xph(PPtoXPH((i,j,k))[0]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
+
+def f_ext_updo_pp(i,j,k):
+    if IsInside(i,j,k):
+        return f_updo_pp(i,j,k)
+    else:
+        return - U + K_updo_pp(i) + P_updo_pp(i,j) + P_updo_pp(i,k) + K_updo_ph(PPtoPH((i,j,k))[0]) + P_updo_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_updo_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_updo_xph(PPtoXPH((i,j,k))[0]) + P_updo_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_updo_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
+
+def f_ext_upup_xph(i,j,k):
+    if IsInside(i,j,k):
+        return f_upup_xph(i,j,k)
+    else:
+        return K_upup_xph(i) + P_upup_xph(i,j)+P_upup_xph(i,k) + K_upup_ph(XPHtoPH((i,j,k))[0]) + P_upup_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[1])+ P_upup_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[2]) 
+
+def f_ext_updo_xph(i,j,k):
+    if IsInside(i,j,k):
+        return f_updo_xph(i,j,k)
+    else:
+        return - U + K_updo_xph(i) + P_updo_xph(i,j)+P_updo_xph(i,k) + K_updo_ph(XPHtoPH((i,j,k))[0]) + P_updo_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[1]) + P_updo_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[2])+ K_updo_pp(XPHtoPP((i,j,k))[0]) + P_updo_pp(XPHtoPP((i,j,k))[0],XPHtoPP((i,j,k))[1]) + P_updo_pp(XPHtoPP((i,j,k))[0],XPHtoPP((i,j,k))[2])
+
+#PHIs
+
+def phi_ext_upup_fun_ph(i,j,k):
+    if isInside(i,j,k):
+        return phi_upup_fun_ph(i,j,k) 
+    else:
+       return K_upup_ph(i) + P_upup_ph(i,j) + P_upup_ph(i,k) 
+    
+def phi_ext_updo_fun_ph(i,j,k):
+    if isInside(i,j,k):
+        return phi_updo_fun_ph(i,j,k)
+    else:
+        return K_updo_ph(i) + P_updo_ph(i,j)+P_updo_ph(i,k)
+    
+def phi_ext_upup_fun_pp(i,j,k):
+    if isInside(i,j,k):
+        return phi_upup_fun_pp(i,j,k)
+    else:
+        return K_upup_pp(i) + P_upup_pp(i,j)+P_upup_pp(i,k)
+    
+def phi_ext_updo_fun_pp(i,j,k):
+    if isInside(i,j,k):
+        return phi_updo_fun_pp(i,j,k) 
+    else:
+        return K_updo_pp(i) + P_updo_pp(i,j) + P_updo_pp(i,k)
+    
+def phi_ext_upup_fun_xph(i,j,k):
+    if isInside(i,j,k):
+        return phi_upup_fun_xph(i,j,k)
+    else:
+        return K_upup_xph(i) + P_upup_xph(i,j)  + P_upup_xph(i,k)
+    
+def phi_ext_updo_fun_xph(i,j,k):
+    if isInside(i,j,k):
+        return phi_updo_fun_xph(i,j,k) 
+    else:
+        return K_updo_xph(i) + P_updo_xph(i,j)+ P_updo_xph(i,k)
+
 #-----------------------------------REST FUNCTION----------------------------------------
 
 def R_upup_ph(i,j,k):
-    return phi_upup_fun_ph(i,j,k)-P_upup_ph(i,j)-P_upup_ph(i,k)-K_upup_ph(i)
+    return phi_ext_upup_fun_ph(i,j,k)-P_upup_ph(i,j)-P_upup_ph(i,k)-K_upup_ph(i)
 
 def R_updo_ph(i,j,k):
-    return phi_updo_fun_ph(i,j,k)-P_updo_ph(i,j)-P_updo_ph(i,k)-K_updo_ph(i)
+    return phi_ext_updo_fun_ph(i,j,k)-P_updo_ph(i,j)-P_updo_ph(i,k)-K_updo_ph(i)
 
 def R_upup_pp(i,j,k):
-    return phi_upup_fun_pp(i,j,k)
+    return phi_ext_upup_fun_pp(i,j,k)
 
 def R_updo_pp(i,j,k):
-    return phi_updo_fun_pp(i,j,k)-P_updo_pp(i,j)-P_updo_pp(i,k)-K_updo_pp(i)
+    return phi_ext_updo_fun_pp(i,j,k)-P_updo_pp(i,j)-P_updo_pp(i,k)-K_updo_pp(i)
 
 def R_upup_xph(i,j,k):
-    return phi_upup_fun_xph(i,j,k)-P_upup_xph(i,j)-P_upup_xph(i,k)-K_upup_xph(i)
+    return phi_ext_upup_fun_xph(i,j,k)-P_upup_xph(i,j)-P_upup_xph(i,k)-K_upup_xph(i)
 
 def R_updo_xph(i,j,k):
-    return phi_updo_fun_xph(i,j,k)-P_updo_xph(i,j)-P_updo_xph(i,k)-K_updo_xph(i)
+    return phi_ext_updo_fun_xph(i,j,k)-P_updo_xph(i,j)-P_updo_xph(i,k)-K_updo_xph(i)
 
 #---------------------------------------LAMBDA--------------------------------------------
 
 def Lam_upup_ph(wb,wf,wf1):
-    return f_upup_fun_ph(wb,wf,wf1) - phi_upup_fun_ph(wb,wf,wf1) - phi_upup_fun_pp(PHtoPP((wb,wf,wf1))[0],PHtoPP((wb,wf,wf1))[1],PHtoPP((wb,wf,wf1))[2]) - phi_upup_fun_xph(PHtoXPH((wb,wf,wf1))[0], PHtoXPH((wb,wf,wf1))[1], PHtoXPH((wb,wf,wf1))[2])
+    return f_upup_fun_ph(wb,wf,wf1) - phi_ext_upup_fun_ph(wb,wf,wf1) - phi_ext_upup_fun_pp(PHtoPP((wb,wf,wf1))[0],PHtoPP((wb,wf,wf1))[1],PHtoPP((wb,wf,wf1))[2]) - phi_ext_upup_fun_xph(PHtoXPH((wb,wf,wf1))[0], PHtoXPH((wb,wf,wf1))[1], PHtoXPH((wb,wf,wf1))[2])
 
 def Lam_updo_ph(wb,wf,wf1):
-    return f_updo_fun_ph(wb,wf,wf1) - phi_updo_fun_ph(wb,wf,wf1) - phi_updo_fun_pp(PHtoPP((wb,wf,wf1))[0],PHtoPP((wb,wf,wf1))[1],PHtoPP((wb,wf,wf1))[2]) - phi_updo_fun_xph(PHtoXPH((wb,wf,wf1))[0], PHtoXPH((wb,wf,wf1))[1], PHtoXPH((wb,wf,wf1))[2])
+    return f_updo_fun_ph(wb,wf,wf1) - phi_ext_updo_fun_ph(wb,wf,wf1) - phi_ext_updo_fun_pp(PHtoPP((wb,wf,wf1))[0],PHtoPP((wb,wf,wf1))[1],PHtoPP((wb,wf,wf1))[2]) - phi_ext_updo_fun_xph(PHtoXPH((wb,wf,wf1))[0], PHtoXPH((wb,wf,wf1))[1], PHtoXPH((wb,wf,wf1))[2])
 
 def Lam_upup_pp(wb,wf,wf1):
-    return f_upup_fun_pp(wb,wf,wf1) - phi_upup_fun_pp(wb,wf,wf1) - phi_upup_fun_ph(PPtoPH((wb,wf,wf1))[0],PPtoPH((wb,wf,wf1))[1],PPtoPH((wb,wf,wf1))[2]) - phi_upup_fun_xph(PPtoXPH((wb,wf,wf1))[0], PPtoXPH((wb,wf,wf1))[1], PPtoXPH((wb,wf,wf1))[2])
+    return f_upup_fun_pp(wb,wf,wf1) - phi_ext_upup_fun_pp(wb,wf,wf1) - phi_ext_upup_fun_ph(PPtoPH((wb,wf,wf1))[0],PPtoPH((wb,wf,wf1))[1],PPtoPH((wb,wf,wf1))[2]) - phi_ext_upup_fun_xph(PPtoXPH((wb,wf,wf1))[0], PPtoXPH((wb,wf,wf1))[1], PPtoXPH((wb,wf,wf1))[2])
 
 def Lam_updo_pp(wb,wf,wf1):
-    return f_updo_fun_pp(wb,wf,wf1) - phi_updo_fun_pp(wb,wf,wf1) - phi_updo_fun_ph(PPtoPH((wb,wf,wf1))[0],PPtoPH((wb,wf,wf1))[1],PPtoPH((wb,wf,wf1))[2]) - phi_updo_fun_xph(PPtoXPH((wb,wf,wf1))[0], PPtoXPH((wb,wf,wf1))[1], PPtoXPH((wb,wf,wf1))[2])
+    return f_updo_fun_pp(wb,wf,wf1) - phi_ext_updo_fun_pp(wb,wf,wf1) - phi_ext_updo_fun_ph(PPtoPH((wb,wf,wf1))[0],PPtoPH((wb,wf,wf1))[1],PPtoPH((wb,wf,wf1))[2]) - phi_ext_updo_fun_xph(PPtoXPH((wb,wf,wf1))[0], PPtoXPH((wb,wf,wf1))[1], PPtoXPH((wb,wf,wf1))[2])
 
 def Lam_upup_xph(wb,wf,wf1):
-    return f_upup_fun_xph(wb,wf,wf1) - phi_upup_fun_xph(wb,wf,wf1) - phi_upup_fun_ph(XPHtoPH((wb,wf,wf1))[0],XPHtoPH((wb,wf,wf1))[1],XPHtoPH((wb,wf,wf1))[2]) - phi_upup_fun_pp(XPHtoPP((wb,wf,wf1))[0], XPHtoPP((wb,wf,wf1))[1], XPHtoPP((wb,wf,wf1))[2])
+    return f_upup_fun_xph(wb,wf,wf1) - phi_ext_upup_fun_xph(wb,wf,wf1) - phi_ext_upup_fun_ph(XPHtoPH((wb,wf,wf1))[0],XPHtoPH((wb,wf,wf1))[1],XPHtoPH((wb,wf,wf1))[2]) - phi_ext_upup_fun_pp(XPHtoPP((wb,wf,wf1))[0], XPHtoPP((wb,wf,wf1))[1], XPHtoPP((wb,wf,wf1))[2])
 
 def Lam_updo_xph(wb,wf,wf1):
-    return f_updo_fun_xph(wb,wf,wf1) - phi_updo_fun_xph(wb,wf,wf1) - phi_updo_fun_ph(XPHtoPH((wb,wf,wf1))[0],XPHtoPH((wb,wf,wf1))[1],XPHtoPH((wb,wf,wf1))[2]) - phi_updo_fun_pp(XPHtoPP((wb,wf,wf1))[0], XPHtoPP((wb,wf,wf1))[1], XPHtoPP((wb,wf,wf1))[2])
+    return f_updo_fun_xph(wb,wf,wf1) - phi_ext_updo_fun_xph(wb,wf,wf1) - phi_ext_updo_fun_ph(XPHtoPH((wb,wf,wf1))[0],XPHtoPH((wb,wf,wf1))[1],XPHtoPH((wb,wf,wf1))[2]) - phi_ext_updo_fun_pp(XPHtoPP((wb,wf,wf1))[0], XPHtoPP((wb,wf,wf1))[1], XPHtoPP((wb,wf,wf1))[2])
 
 #----------------------------------------ARRAY CREATION------------------------------------
 
