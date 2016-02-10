@@ -1,13 +1,9 @@
 #!/usr/bin/python
 #------------------------------------------------------------------------------------
 # CONTENTS:
-#           The script plots the output from the pomerol 2pgf calculation (in all channels
-#           and calculates the full vertex, the 2PI vertex gamma, the 2PR vertex phi,
-#           and plots all the results
-#       
-#NOTE:      No data are stored at this stage..just plot quick check!!
-#           To read the imput ASCII files, replace "datadirname" with the correspondent
-#           directory in ../pomerol_output/
+# The script loads and shiftes the vert_centralized back in order to compare with the original one.
+# From a vimdiff comparison the two vertices should be the same
+#
 #------------------------------------IMPORTS------------------------------------
 
 import numpy as np
@@ -23,7 +19,8 @@ from numpy.linalg import inv
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 from agneselib.mymath import *                          # mylibrary check in ~/usr/include/agneselib
-
+from agneselib.inf_Msum import * 
+from _functools import partial
 print myfloor_div2(3)
 #---------------------------------------------------------------------------------
 
@@ -33,6 +30,7 @@ beta=10.0
 
 pi = math.pi
 
+print math.log10(1.0)
 #---------------------------------------------------------------------------------
 
 def run(command):
@@ -42,7 +40,7 @@ def run(command):
 #---------------------------------------------------------------------------------
 #GF
 
-g_iw  = np.loadtxt('../pomerol_output/datadirname/gw_imag00.dat')
+g_iw  = np.loadtxt('../pomerol_output/U_1.0_beta_10.0_2bs/gw_imag00.dat')
 N_fermi_gf = g_iw.shape[0]
 print ("Number of fermionic frequencies for the GF:")
 print N_fermi_gf
@@ -52,39 +50,42 @@ def G(w):                           # imaginary part of the GF
      return g_iw[w,1]+1j*g_iw[w,2]
  else:
      return g_iw[-w-1,1]-1j*g_iw[-w-1,2]
+
 #--------------------------------------- 2PGF PP------------------------------------------------------------
 
-vertex_pp = np.loadtxt("../pomerol_output/datadirname/2pgf_pp_shift")
+vertex_pp = np.loadtxt("../pomerol_output/U_1.0_beta_10.0_2bs/2pgf_pp_shift.dat")
 print vertex_pp.shape
-ffreq_pp = int(np.transpose(vertex_pp)[1,:].max()+1)
-print ffreq_pp
-bfreq_pp = int(np.transpose(vertex_pp)[0,:].max())
-print bfreq_pp
+ffreq_original_pp = int(np.transpose(vertex_pp)[1,:].max()+1)
+print ffreq_original_pp
+bfreq_original_pp = int(np.transpose(vertex_pp)[0,:].max())
+print bfreq_original_pp
 
-#g_arr = np.array([G(i) for i in range(-N_fermi_gf,N_fermi_gf)])
+Nl =3
+#wNum = int(ffreq_original_pp/100.0*10.0)
+wNum = 1
+iMin = ffreq_original_pp-wNum
+
+inv_fit = generate_invfit_func(iMin,wNum,Nl)
 
 def re_2pgf_upup_pp(wb,wf,wf1):
-	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 3]
+	return 	vertex_pp[(2*ffreq_original_pp)*(2*ffreq_original_pp)*(wb+bfreq_original_pp)+(2*ffreq_original_pp)*(wf+ffreq_original_pp) + (wf1+ffreq_original_pp), 3]
 
 def re_2pgf_updo_pp(wb,wf,wf1):
-	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 5]
-
-#def re_2pgf_xupdo_pp(wb,wf,wf1):
-#	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 7]
+	return 	vertex_pp[(2*ffreq_original_pp)*(2*ffreq_original_pp)*(wb+bfreq_original_pp)+(2*ffreq_original_pp)*(wf+ffreq_original_pp)+ (wf1+ffreq_original_pp), 5]
 
 def im_2pgf_upup_pp(wb,wf,wf1):
-	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 4]
+	return 	vertex_pp[(2*ffreq_original_pp)*(2*ffreq_original_pp)*(wb+bfreq_original_pp)+(2*ffreq_original_pp)*(wf+ffreq_original_pp) + (wf1+ffreq_original_pp), 4]
 
 def im_2pgf_updo_pp(wb,wf,wf1):
-	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 6]
+	return 	vertex_pp[(2*ffreq_original_pp)*(2*ffreq_original_pp)*(wb+bfreq_original_pp)+(2*ffreq_original_pp)*(wf+ffreq_original_pp)+ (wf1+ffreq_original_pp), 6]
 
-#def im_2pgf_xupdo_pp(wb,wf,wf1):
-#	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 8]
+# ----------define arrays to store in hdf5 file
+#We need to throw away wNum frequencies from the original 2pgf (because of the gamma fitting) -> we store all quantities in this new range 
 
-#------------------------------------- GENERALIZED SUSCEPTIBILITY CHI PP --------------------------------------------
+ffreq_pp = ffreq_original_pp-wNum
+bfreq_pp = bfreq_original_pp
 
 # Cutting one disconnected diagram the crossed one -> generalized susceptibility
-
 
 def chi_upup_pp(wb,wf,wf1):
     if (wf == -wf1-1-mymod_abs(wb)):
@@ -122,24 +123,25 @@ def f_updo_pp(wb,wf,wf1):
 
 #---------------------------------- 2PI VERTEX GAMMA PP ----------------------------------------------------------
 
-def chis_chi0_arr(wb):
-    return np.array([[chi_s_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1) for wf in range(-ffreq_pp,ffreq_pp)] for wf1 in range(-ffreq_pp,ffreq_pp)])
+def chis_chi0_arr(wb,wf,wf1):
+    return chi_s_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1)
 
 
-def chit_chi0_arr(wb):
-    return np.array([[chi_t_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1) for wf in range(-ffreq_pp,ffreq_pp)] for wf1 in range(-ffreq_pp,ffreq_pp)])
+def chit_chi0_arr(wb,wf,wf1):
+    return chi_t_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1)
 
 
-def chi_0_pp_arr(wb):
-    return np.array([[chi_0_pp(wb,wf,wf1) for wf in range(-ffreq_pp,ffreq_pp)] for wf1 in range(-ffreq_pp,ffreq_pp)])
+def chi_0_pp_arr(wb,wf,wf1):
+    return chi_0_pp(wb,wf,wf1)
 
-gamma_t_arr = np.array([beta*beta*(2*inv(chi_0_pp_arr(wb)) - 4*inv(chit_chi0_arr(wb))) for wb in range (-bfreq_pp,bfreq_pp+1)])
-gamma_s_arr = np.array([beta*beta*(2*inv(chi_0_pp_arr(wb)) - 4*inv(chis_chi0_arr(wb))) for wb in range (-bfreq_pp,bfreq_pp+1)])
+gamma_t_arr = np.array([beta*beta*(2*inv_fit(partial(chi_0_pp_arr,wb)) - 4*inv_fit(partial(chit_chi0_arr,wb))) for wb in range (-bfreq_pp,bfreq_pp+1)])
+gamma_s_arr = np.array([beta*beta*(2*inv_fit(partial(chi_0_pp_arr,wb)) - 4*inv_fit(partial(chis_chi0_arr,wb))) for wb in range (-bfreq_pp,bfreq_pp+1)])
+
 gamma_upup_pp_arr = gamma_t_arr 
 gamma_updo_pp_arr = 0.5*(gamma_t_arr + gamma_s_arr) 
-
 print gamma_upup_pp_arr.shape
-print gamma_updo_pp_arr[0+bfreq_pp,:,:].max()
+print  gamma_updo_pp_arr[0+bfreq_pp,:,:].max()
+
 #----------------------------------2PR VERTEX PHI----------------------------------------------------------------------------------------
 
 f_upup_pp_arr = np.array([[[f_upup_pp(wb,wf,wf1) for wf in range (-ffreq_pp,ffreq_pp)] for wf1 in range(-ffreq_pp,ffreq_pp)] for wb in range (-bfreq_pp,bfreq_pp+1)])
@@ -490,27 +492,38 @@ pl.clf()
 
 #--------------------------------------- 2PGF PH------------------------------------------------------------
 
-vertex_ph = np.loadtxt("../pomerol_output/datadirname/2pgf_ph_shift")
-ffreq_ph = int(np.transpose(vertex_ph)[1,:].max()+1)
-print ffreq_ph
-bfreq_ph = int(np.transpose(vertex_ph)[0,:].max())
-print bfreq_ph
+vertex_ph = np.loadtxt("../pomerol_output/U_1.0_beta_10.0_2bs/2pgf_ph_shift.dat")
+ffreq_original_ph = int(np.transpose(vertex_ph)[1,:].max()+1)
+print ffreq_original_ph
+bfreq_original_ph = int(np.transpose(vertex_ph)[0,:].max())
+print bfreq_original_ph
 
+Nl =3
+#wNum = int(ffreq_original_ph/100.0*10.0)
+wNum = 1
+iMin = ffreq_original_ph-wNum
+
+inv_fit = generate_invfit_func(iMin,wNum,Nl)
 #g_arr = np.array([G(i) for i in range(-N_fermi_gf,N_fermi_gf)])
 
 def re_2pgf_upup_ph(wb,wf,wf1):
-	return 	vertex_ph[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 3]
+	return 	vertex_ph[(2*ffreq_original_ph)*(2*ffreq_original_ph)*(wb+bfreq_original_ph)+(2*ffreq_original_ph)*(wf+ffreq_original_ph) + (wf1+ffreq_original_ph), 3]
 
 def re_2pgf_updo_ph(wb,wf,wf1):
-	return 	vertex_ph[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 5]
+	return 	vertex_ph[(2*ffreq_original_ph)*(2*ffreq_original_ph)*(wb+bfreq_original_ph)+(2*ffreq_original_ph)*(wf+ffreq_original_ph)+ (wf1+ffreq_original_ph), 5]
 
 def im_2pgf_upup_ph(wb,wf,wf1):
-	return 	vertex_ph[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 4]
+	return 	vertex_ph[(2*ffreq_original_ph)*(2*ffreq_original_ph)*(wb+bfreq_original_ph)+(2*ffreq_original_ph)*(wf+ffreq_original_ph) + (wf1+ffreq_original_ph), 4]
 
 def im_2pgf_updo_ph(wb,wf,wf1):
-	return 	vertex_ph[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 6]
+	return 	vertex_ph[(2*ffreq_original_ph)*(2*ffreq_original_ph)*(wb+bfreq_original_ph)+(2*ffreq_original_ph)*(wf+ffreq_original_ph)+ (wf1+ffreq_original_ph), 6]
 
 #------------------------------------- GENERALIZED SUSCEPTIBILITY CHI PH --------------------------------------------
+
+#We need to throw away wNum frequencies from the original 2pgf (because of the gamma fitting) -> we store all quantities in this new range 
+
+ffreq_ph = ffreq_original_ph - wNum 
+bfreq_ph = bfreq_original_ph
 
 # Cutting one disconnected diagram -> generalized susceptibility
 
@@ -522,6 +535,12 @@ def chi_upup_ph(wb,wf,wf1):
 
 def chi_updo_ph(wb,wf,wf1):
     return re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)
+
+def tpgf_d_ph(wb,wf,wf1):
+    return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1)+re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)
+
+def tpgf_m_ph(wb,wf,wf1):
+    return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1) -re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)
 
 #----------------------------------- FULL VERTEX PH -----------------------------------------------------------
 
@@ -548,26 +567,20 @@ def f_updo_ph(wb,wf,wf1):
 
 #---------------------------------- 2PI VERTEX GAMMA PH ----------------------------------------------------------
 
-def m_d_arr_ph(wb):
-    return np.array([[chi_l_ph(wb,wf,wf)*f_d_ph(wb,wf,wf1)-( beta if (wf==wf1) else 0.0) for wf in range(-ffreq_pp,ffreq_pp)] for wf1 in range(-ffreq_pp,ffreq_pp)])
+def m_d_arr_ph(wb,wf,wf1):
+    return tpgf_d_ph(wb,wf,wf1)-2*chi_0_ph(wb,wf,wf1)
 
-def f_d_arr(wb):
-    return np.array([[f_d_ph(wb,wf,wf1) for wf1 in range(-ffreq_pp,ffreq_pp)] for wf in range(-ffreq_pp,ffreq_pp)])
+def m_m_arr_ph(wb,wf,wf1):
+    return tpgf_m_ph(wb,wf,wf1)
 
-def m_m_arr_ph(wb):
-    return np.array([[chi_l_ph(wb,wf,wf)*(f_m_ph(wb,wf,wf1))-( beta if (wf==wf1) else 0.0) for wf in range(-ffreq_pp,ffreq_pp)] for wf1 in range(-ffreq_pp,ffreq_pp)])
-
-def f_m_arr(wb):
-    return np.array([[f_m_ph(wb,wf,wf1) for wf1 in range(-ffreq_pp,ffreq_pp)] for wf in range(-ffreq_pp,ffreq_pp)])
-
-gamma_d_arr = np.array([-beta*f_d_arr(wb).dot(inv(m_d_arr_ph(wb)).T) for wb in range (-bfreq_ph,bfreq_ph+1)])
-gamma_m_arr = np.array([-beta*f_m_arr(wb).dot(inv(m_m_arr_ph(wb)).T) for wb in range (-bfreq_ph,bfreq_ph+1)])
+gamma_d_arr = np.array([beta*beta*(inv_fit(partial(chi_x0_ph,wb))-inv_fit(partial(m_d_arr_ph,wb))) for wb in range (-bfreq_ph,bfreq_ph+1)])
+gamma_m_arr = np.array([beta*beta*(inv_fit(partial(chi_x0_ph,wb))-inv_fit(partial(m_m_arr_ph,wb))) for wb in range (-bfreq_ph,bfreq_ph+1)])
 
 gamma_upup_ph_arr = 0.5*(gamma_d_arr + gamma_m_arr)
 gamma_updo_ph_arr = 0.5*(gamma_d_arr - gamma_m_arr)
 
 print gamma_upup_ph_arr.shape
-print gamma_upup_ph_arr[0+bfreq_pp,0+ffreq_pp,2*ffreq_pp-1], gamma_updo_ph_arr[0+bfreq_ph,0+ffreq_ph,2*ffreq_ph-1]
+print gamma_upup_ph_arr[0+bfreq_pp,:,:].max() ,gamma_updo_ph_arr[0+bfreq_pp,0+ffreq_pp,2*ffreq_pp-1]
 #----------------------------------2PR VERTEX PHI----------------------------------------------------------------------------------------
 
 f_upup_ph_arr = np.array([[[f_upup_ph(wb,wf,wf1) for wf in range (-ffreq_ph,ffreq_ph)] for wf1 in range(-ffreq_ph,ffreq_ph)] for wb in range (-bfreq_ph,bfreq_ph+1)])
@@ -591,6 +604,8 @@ bos = 0
 def plotVert_ED( use_pl, zarr, string):
     use_pl.set_aspect(1.0)
     pl.pcolormesh(np.array([(2*i+1)*pi/beta for i in range(-ffreq_ph,ffreq_ph)]), np.array([(2*i+1)*pi/beta for i in range(-ffreq_ph,ffreq_ph)]),np.ma.masked_where( np.isnan(zarr), zarr ))
+#    ax.set_yscale('log')
+#    ax.set_xscale('log')
     use_pl.set_title( string , fontsize=10)    
     pl.colorbar(shrink=0.6)
     return
@@ -610,7 +625,7 @@ def plotre_2pgf_upup_ph( use_pl ):
 
 def plotim_2pgf_upup_ph( use_pl ):
     title=r"$ImG^{PH}_{2\uparrow \uparrow}$"
-    zarr = np.array([[ im_2pgf_upup_ph(bos,n,m)  for n in range(-ffreq_ph,ffreq_ph)] for m in range(-ffreq_ph,ffreq_ph)])
+    zarr = np.array([[im_2pgf_upup_ph(bos,n,m)  for n in range(-ffreq_ph,ffreq_ph)] for m in range(-ffreq_ph,ffreq_ph)])
     plotVert_ED( use_pl, zarr, title ) 
     return
 
@@ -622,7 +637,7 @@ def plotre_2pgf_updo_ph( use_pl ):
 
 def plotim_2pgf_updo_ph( use_pl ):
     title=r"$ImG^{PH}_{2\uparrow \downarrow}$"
-    zarr = np.array([[ im_2pgf_updo_ph(bos,n,m)  for n in range(-ffreq_ph,ffreq_ph)] for m in range(-ffreq_ph,ffreq_ph)])
+    zarr = np.array([[im_2pgf_updo_ph(bos,n,m)  for n in range(-ffreq_ph,ffreq_ph)] for m in range(-ffreq_ph,ffreq_ph)])
     plotVert_ED( use_pl, zarr, title ) 
     return
 
@@ -916,27 +931,38 @@ pl.clf()
 
 #--------------------------------------- 2PGF XPH------------------------------------------------------------
 
-vertex_xph = np.loadtxt("../pomerol_output/datadirname/2pgf_xph_shift")
-ffreq_xph = int(np.transpose(vertex_xph)[1,:].max()+1)
-print ffreq_xph
-bfreq_xph = int(np.transpose(vertex_xph)[0,:].max())
-print bfreq_xph
+vertex_xph = np.loadtxt("../pomerol_output/U_1.0_beta_10.0_2bs/2pgf_xph_shift.dat")
+ffreq_original_xph = int(np.transpose(vertex_xph)[1,:].max()+1)
+print ffreq_original_xph
+bfreq_original_xph = int(np.transpose(vertex_xph)[0,:].max())
+print bfreq_original_xph
 
+Nl =3
+#wNum = int(ffreq_original_pp/100.0*10.0)
+wNum = 1
+iMin = ffreq_original_xph-wNum
 #g_arr = np.array([G(i) for i in range(-N_fermi_gf,N_fermi_gf)])
+inv_fit = generate_invfit_func(iMin,wNum,Nl)
+
 
 def re_2pgf_upup_xph(wb,wf,wf1):
-	return 	vertex_xph[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 3]
+	return 	vertex_xph[(2*ffreq_original_xph)*(2*ffreq_original_xph)*(wb+bfreq_original_xph)+(2*ffreq_original_xph)*(wf+ffreq_original_xph) + (wf1+ffreq_original_xph), 3]
 
 def re_2pgf_updo_xph(wb,wf,wf1):
-	return 	vertex_xph[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 5]
+	return 	vertex_xph[(2*ffreq_original_xph)*(2*ffreq_original_xph)*(wb+bfreq_original_xph)+(2*ffreq_original_xph)*(wf+ffreq_original_xph)+ (wf1+ffreq_original_xph), 5]
 
 def im_2pgf_upup_xph(wb,wf,wf1):
-	return 	vertex_xph[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 4]
+	return 	vertex_xph[(2*ffreq_original_xph)*(2*ffreq_original_xph)*(wb+bfreq_original_xph)+(2*ffreq_original_xph)*(wf+ffreq_original_xph) + (wf1+ffreq_original_xph), 4]
 
 def im_2pgf_updo_xph(wb,wf,wf1):
-	return 	vertex_xph[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 6]
+	return 	vertex_xph[(2*ffreq_original_xph)*(2*ffreq_original_xph)*(wb+bfreq_original_xph)+(2*ffreq_original_xph)*(wf+ffreq_original_xph)+ (wf1+ffreq_original_xph), 6]
 
 #------------------------------------- GENERALIZED SUSCEPTIBILITY CHI XPH --------------------------------------------
+
+#We need to throw away wNum frequencies from the original 2pgf (because of the gamma fitting) -> we store all quantities in this new range 
+
+ffreq_xph = ffreq_original_xph - wNum 
+bfreq_xph = bfreq_original_xph
 
 # Cutting one disconnected diagram -> generalized susceptibility
 
@@ -960,6 +986,12 @@ def chi_0_xph(wb,wf,wf1):
     else:
         return 0.0
 
+def chi_x0_xph(wb,wf,wf1):
+    if (wb == 0):
+        return -beta*G(wf)*G(wf1)
+    else:
+        return 0.0
+
 def f_upup_xph(wb,wf,wf1):
     return (1.0/chi_l_xph(wb,wf,wf1))*(chi_upup_xph(wb,wf,wf1)-chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
 
@@ -969,18 +1001,15 @@ def f_updo_xph(wb,wf,wf1):
 
 #---------------------------------- 2PI VERTEX GAMMA XPH ----------------------------------------------------------
 
-def m_updo_arr_xph(wb):
-    return np.array([[chi_l_xph(wb,wf,wf)*f_updo_xph(wb,wf,wf1)+( beta if (wf==wf1) else 0.0) for wf in range(-ffreq_pp,ffreq_pp)] for wf1 in range(-ffreq_pp,ffreq_pp)])
+def m_updo_arr_xph(wb,wf,wf1):
+    return re_2pgf_updo_xph(wb,wf,wf1)+1j*im_2pgf_updo_xph(wb,wf,wf1)
 
-def f_updo_xph_arr(wb):
-    return np.array([[f_updo_xph(wb,wf,wf1) for wf in range(-ffreq_pp,ffreq_pp)] for wf1 in range(-ffreq_pp,ffreq_pp)])
-
-gamma_updo_xph_arr = np.array([beta*f_updo_xph_arr(wb).dot(inv(m_updo_arr_xph(wb)).T) for wb in range (-bfreq_xph,bfreq_xph+1)])
+gamma_updo_xph_arr = np.array([beta*beta*(+inv_fit(partial(chi_0_xph,wb))-inv_fit(partial(m_updo_arr_xph,wb))) for wb in range (-bfreq_xph,bfreq_xph+1)])
 
 gamma_upup_xph_arr = -gamma_upup_ph_arr
 
 print gamma_upup_xph_arr.shape
-print gamma_updo_xph_arr[0+bfreq_pp,0+ffreq_pp,2*ffreq_pp-1]
+print gamma_updo_xph_arr[0+bfreq_xph,0+ffreq_xph,2*ffreq_xph-1]
 #----------------------------------2PR VERTEX XPHI----------------------------------------------------------------------------------------
 
 f_upup_xph_arr = np.array([[[f_upup_xph(wb,wf,wf1) for wf in range (-ffreq_xph,ffreq_xph)] for wf1 in range(-ffreq_xph,ffreq_xph)] for wb in range (-bfreq_xph,bfreq_xph+1)])
