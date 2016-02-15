@@ -24,7 +24,7 @@ from _functools import partial
 print myfloor_div2(3)
 #---------------------------------------------------------------------------------
 
-U=1.0
+U=2.0
 
 beta=10.0
 
@@ -40,7 +40,7 @@ def run(command):
 #---------------------------------------------------------------------------------
 #GF
 
-g_iw  = np.loadtxt('../pomerol_output/U_1.0_beta_10.0_2bs/gw_imag00.dat')
+g_iw  = np.loadtxt('../pomerol_output/U_2.0_beta_10.0_smallmatrixtol/gw_imag00.dat')
 N_fermi_gf = g_iw.shape[0]
 print ("Number of fermionic frequencies for the GF:")
 print N_fermi_gf
@@ -53,7 +53,7 @@ def G(w):                           # imaginary part of the GF
 
 #--------------------------------------- 2PGF PP------------------------------------------------------------
 
-vertex_pp = np.loadtxt("../pomerol_output/U_1.0_beta_10.0_2bs/2pgf_pp_shift.dat")
+vertex_pp = np.loadtxt("../pomerol_output/U_2.0_beta_10.0_smallmatrixtol/2pgf_pp_shift.dat")
 print vertex_pp.shape
 ffreq_original_pp = int(np.transpose(vertex_pp)[1,:].max()+1)
 print ffreq_original_pp
@@ -492,7 +492,7 @@ pl.clf()
 
 #--------------------------------------- 2PGF PH------------------------------------------------------------
 
-vertex_ph = np.loadtxt("../pomerol_output/U_1.0_beta_10.0_2bs/2pgf_ph_shift.dat")
+vertex_ph = np.loadtxt("../pomerol_output/U_2.0_beta_10.0_smallmatrixtol/2pgf_ph_shift.dat")
 ffreq_original_ph = int(np.transpose(vertex_ph)[1,:].max()+1)
 print ffreq_original_ph
 bfreq_original_ph = int(np.transpose(vertex_ph)[0,:].max())
@@ -931,7 +931,7 @@ pl.clf()
 
 #--------------------------------------- 2PGF XPH------------------------------------------------------------
 
-vertex_xph = np.loadtxt("../pomerol_output/U_1.0_beta_10.0_2bs/2pgf_xph_shift.dat")
+vertex_xph = np.loadtxt("../pomerol_output/U_2.0_beta_10.0_smallmatrixtol/2pgf_xph_shift.dat")
 ffreq_original_xph = int(np.transpose(vertex_xph)[1,:].max()+1)
 print ffreq_original_xph
 bfreq_original_xph = int(np.transpose(vertex_xph)[0,:].max())
