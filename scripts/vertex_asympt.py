@@ -66,7 +66,7 @@ else:
 
 sign = -1.0
 pi = math.pi
-N_iter_max = 2
+N_iter_max = 8
 accuracy = 10**(-12)
 
 #---------------------- Read objects involved in the calculation from HDF5 file -------------------------------
@@ -120,12 +120,12 @@ print bgrid
 #N_bose_big = 2*N_bose
 
 #Karrasch function box:
-N_bose_big_k = 4*N_bose
+N_bose_big_k = 2*N_bose
 #N_bose_big_k = 100
 bgrid_big_k = 2*N_bose_big_k + 1
 
 #Plus function box
-N_bose_big_p = N_fermi
+N_bose_big_p = 2*N_bose
 #N_bose_big_p = 100
 bgrid_big_p = 2*N_bose_big_p + 1
 
