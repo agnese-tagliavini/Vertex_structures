@@ -32,6 +32,20 @@ toferm['XPH_shift'] = lambda (i,j,k):(j-myfloor_div2(i),k+myceil_div2(i), k-myfl
 
 fromferm['XPH_shift'] = lambda (i,j,k):(j-k,i+myfloor_div2(j-k),j-myceil_div2(j-k))
 
+
+#-------- PP georg..the vertex has an additional minus sign-------------------------
+
+toferm['PP_georg'] = lambda (i,j,k):(i-j-1,j,k)
+
+fromferm['PP_georg'] = lambda (i,j,k):(i+j+1,j,k)
+
+
+#-------- PH georg..the vertex has an additional minus sign-------------------------
+
+toferm['PH_georg'] = lambda (i,j,k):(i+j,k,j)
+
+fromferm['PH_georg'] = lambda (i,j,k):(i-k,j,k)
+
 #--------------- TRANSLATION FUNCTION -----------------------------
 
 def translate( notout, notin ):
@@ -48,8 +62,17 @@ XPHtoPP = translate('PP_shift', 'XPH_shift')
 PHtoXPH = translate('XPH_shift','PH_shift')
 XPHtoPH = translate('PH_shift','XPH_shift')
 
+PPtoPPg = translate('PP_georg','PP_shift')
+PPgtoPP = translate('PP_shift','PP_georg')
+
+PHtoPHg = translate('PH_georg','PH_shift')
+PHgtoPH = translate('PH_shift','PH_georg')
+
 PHtoPH = translate('PH_shift','PH_shift')
 XPHtoXPH = translate('XPH_shift','XPH_shift')
 PPtoPP = translate('PP_shift','PP_shift')
+PPgtoPPg = translate('PP_georg','PP_georg')
+PHgtoPHg = translate('PH_georg','PH_georg')
 
+#print PHgtoPH((39,40,40)), PPgtoPP((0,20,40))
 #print PPtoPP((1,2,3)), PHtoPH((1,2,3)), XPHtoXPH((1,2,3))
