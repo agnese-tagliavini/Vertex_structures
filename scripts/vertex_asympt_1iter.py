@@ -58,7 +58,7 @@ print ("beta value     " + str(beta) )
 #----------------------------------------Read HDF5 files-----------------------------------------
 
 if ('../dat'):
-    f = h5py.File('../dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
+    f = h5py.File('../dat/0loop/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
 else:
     sys.exit("No data file")
 
@@ -150,32 +150,17 @@ dblsum_fit = generate_dblsum_func(iMin,wNum,Nl) #It returns double Matsubara sum
 #
 # Initial condition for asymptotics
 #
-
-if (('P_func' in f) or ('K_func' in f)):
-    print "P and K already exist!!"
-    K_upup_ph_loop  = np.array(f["/K_func/PH/RE_K_UPUP"])
-    K_upup_xph_loop = np.array(f["/K_func/XPH/RE_K_UPUP"])
-    K_updo_pp_loop  = np.array(f["/K_func/PP/RE_K_UPDO"])
-    K_updo_ph_loop  = np.array(f["/K_func/PH/RE_K_UPDO"])
-    K_updo_xph_loop = np.array(f["/K_func/XPH/RE_K_UPDO"])
-    P_upup_ph_loop    = np.array(f["/P_func/PH/RE_P_UPUP"])
-    P_upup_xph_loop   = np.array(f["/P_func/XPH/RE_P_UPUP"])
-    P_updo_pp_loop    = np.array(f["/P_func/PP/RE_P_UPDO"])
-    P_updo_ph_loop    = np.array(f["/P_func/PH/RE_P_UPDO"])
-    P_updo_xph_loop   = np.array(f["/P_func/XPH/RE_P_UPDO"])
-    
-else:
-    print " P and K do not exist yet!!"
-    K_upup_ph_loop  = np.zeros ( bgrid_big_k , dtype='float64' )
-    K_upup_xph_loop = np.zeros ( bgrid_big_k , dtype='float64' )
-    K_updo_pp_loop  = np.zeros ( bgrid_big_k , dtype='float64' )
-    K_updo_ph_loop  = np.zeros ( bgrid_big_k , dtype='float64' )
-    K_updo_xph_loop = np.zeros ( bgrid_big_k , dtype='float64' )
-    P_upup_ph_loop    = np.zeros ( (fgrid_big, bgrid_big_p) , dtype='float64' )
-    P_upup_xph_loop   = np.zeros ( (fgrid_big,bgrid_big_p) , dtype='float64' )
-    P_updo_pp_loop    = np.zeros ( (fgrid_big,bgrid_big_p) , dtype='float64' )
-    P_updo_ph_loop    = np.zeros ( (fgrid_big,bgrid_big_p) , dtype='float64' )
-    P_updo_xph_loop   = np.zeros ( (fgrid_big,bgrid_big_p) , dtype='float64' )
+print " P and K do not exist yet!!"
+K_upup_ph_loop  = np.zeros ( bgrid_big_k , dtype='float64' )
+K_upup_xph_loop = np.zeros ( bgrid_big_k , dtype='float64' )
+K_updo_pp_loop  = np.zeros ( bgrid_big_k , dtype='float64' )
+K_updo_ph_loop  = np.zeros ( bgrid_big_k , dtype='float64' )
+K_updo_xph_loop = np.zeros ( bgrid_big_k , dtype='float64' )
+P_upup_ph_loop    = np.zeros ( (fgrid_big, bgrid_big_p) , dtype='float64' )
+P_upup_xph_loop   = np.zeros ( (fgrid_big,bgrid_big_p) , dtype='float64' )
+P_updo_pp_loop    = np.zeros ( (fgrid_big,bgrid_big_p) , dtype='float64' )
+P_updo_ph_loop    = np.zeros ( (fgrid_big,bgrid_big_p) , dtype='float64' )
+P_updo_xph_loop   = np.zeros ( (fgrid_big,bgrid_big_p) , dtype='float64' )
 
 
 #-----------GF------------------------------------------------
@@ -294,7 +279,8 @@ for ind in range(N_iter_max):
             return re_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]
         else:
             return - U + K_updo_xph_old(i) + P_updo_xph_old(i,j)+P_updo_xph_old(i,k) + K_updo_ph_old(XPHtoPH((i,j,k))[0]) + P_updo_ph_old(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[1]) + P_updo_ph_old(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[2])+ K_updo_pp_old(XPHtoPP((i,j,k))[0]) + P_updo_pp_old(XPHtoPP((i,j,k))[0],XPHtoPP((i,j,k))[1]) + P_updo_pp_old(XPHtoPP((i,j,k))[0],XPHtoPP((i,j,k))[2])
-
+    
+    break
     # Update of the new asymptotic structures (go to "END")
     
     #-----------------------------------------------------------------------------------------------------------------------------
@@ -578,6 +564,7 @@ cmap = pl.get_cmap('jet') # Bianconiglio
 
 pl.figsize=(13, 7)
 
+N_fermi_sum = N_fermi_big 
 bos = 0
 
 def plotVert_ED( use_pl, zarr, string):
@@ -626,29 +613,22 @@ def plotre_f_updo_xph( use_pl ):
 pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))) + r"     $\Omega_{\rm PP}=$" + str(bos) + r"$*2\pi/\beta$")
 
 plotre_f_xupdo_pp(pl.subplot(2,3,1))
-pl.xlabel(r"$\omega_n$", fontsize=20)
-pl.ylabel(r"$\omega_m$", fontsize=20)
-pl.grid()
+pl.ylabel(r"$\omega_m$", fontsize=9)
+#pl.grid()
 plotre_f_upup_ph(pl.subplot(2,3,2))
-pl.xlabel(r"$\omega_n$", fontsize=20)
-pl.ylabel(r"$\omega_m$", fontsize=20)
-pl.grid()
+#pl.grid()
 plotre_f_upup_xph(pl.subplot(2,3,3))
-pl.xlabel(r"$\omega_n$", fontsize=20)
-pl.ylabel(r"$\omega_m$", fontsize=20)
-pl.grid()
+#pl.grid()
 plotre_f_updo_pp(pl.subplot(2,3,4))
-pl.xlabel(r"$\omega_n$", fontsize=20)
-pl.ylabel(r"$\omega_m$", fontsize=20)
-pl.grid()
+pl.xlabel(r"$\omega_n$", fontsize=9)
+pl.ylabel(r"$\omega_m$", fontsize=9)
+#pl.grid()
 plotre_f_updo_ph(pl.subplot(2,3,5))
-pl.xlabel(r"$\omega_n$", fontsize=20)
-pl.ylabel(r"$\omega_m$", fontsize=20)
-pl.grid()
+pl.xlabel(r"$\omega_n$", fontsize=9)
+#pl.grid()
 plotre_f_updo_xph(pl.subplot(2,3,6))
-pl.xlabel(r"$\omega_n$", fontsize=20)
-pl.ylabel(r"$\omega_m$", fontsize=20)
-pl.grid()
+pl.xlabel(r"$\omega_n$", fontsize=9)
+#pl.grid()
 
 pl.tight_layout()
 #pl.show()

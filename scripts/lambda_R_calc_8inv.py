@@ -44,7 +44,7 @@ beta = 10.0
 #----------------------------------------Read HDF5 files-----------------------------------------
 
 if ('../dat'):
-    f = h5py.File('../dat/0loop/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
+    f = h5py.File('../dat/8inv/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
 else:
     sys.exit("No data file")
 
@@ -341,7 +341,7 @@ def tpgf_m_ph(wb,wf,wf1):
 
 #-----------------------------GAMMA BETHE SALPETER INVERSION
 
-N_fermi_inv = N_fermi
+N_fermi_inv = 8*N_fermi
 
 def chis_chi0_arr(wb):
     return np.array([[chi_s_pp(wb,wf,wf1) + chi_0_pp(wb,wf,wf1) for wf in range(-N_fermi_inv,N_fermi_inv)] for wf1 in range(-N_fermi_inv,N_fermi_inv)])
