@@ -84,3 +84,37 @@ def create_palette_georg():
                     (violetpos,violet[2],violet[2])),
                     }
     return cdict
+
+
+def create_interactive_palette(x):
+    cdict = {'red': ((x['color1'][0],x['color1'][1],x['color1'][1]),
+                    (x['color2'][0],x['color2'][1],x['color2'][1]),
+                    (x['color3'][0],x['color3'][1],x['color3'][1]),
+                    (x['color4'][0],x['color4'][1],x['color4'][1]),
+                    (x['color5'][0],x['color5'][1],x['color5'][1]),
+                    (x['color6'][0],x['color6'][1],x['color6'][1]),
+                    (x['color7'][0],x['color7'][1],x['color7'][1]),
+                    (x['color8'][0],x['color8'][1],x['color8'][1]),
+                    (x['color9'][0],x['color9'][1],x['color9'][1])),
+                    
+          'green': ((x['color1'][0],x['color1'][2],x['color1'][2]),
+                    (x['color2'][0],x['color2'][2],x['color2'][2]),
+                    (x['color3'][0],x['color3'][2],x['color3'][2]),
+                    (x['color4'][0],x['color4'][2],x['color4'][2]),
+                    (x['color5'][0],x['color5'][2],x['color5'][2]),
+                    (x['color6'][0],x['color6'][2],x['color6'][2]),
+                    (x['color7'][0],x['color7'][2],x['color7'][2]),
+                    (x['color8'][0],x['color8'][2],x['color8'][2]),
+                    (x['color9'][0],x['color9'][2],x['color9'][2])),
+
+          'blue': ((x['color1'][0],x['color1'][3],x['color1'][3]),
+                    (x['color2'][0],x['color2'][3],x['color2'][3]),
+                    (x['color3'][0],x['color3'][3],x['color3'][3]),
+                    (x['color4'][0],x['color4'][3],x['color4'][3]),
+                    (x['color5'][0],x['color5'][3],x['color5'][3]),
+                    (x['color6'][0],x['color6'][3],x['color6'][3]),
+                    (x['color7'][0],x['color7'][3],x['color7'][3]),
+                    (x['color8'][0],x['color8'][3],x['color8'][3]),
+                    (x['color9'][0],x['color9'][3],x['color9'][3])),
+                  }
+    return cdict

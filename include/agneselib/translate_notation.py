@@ -12,6 +12,12 @@ from mymath import *
 toferm ={ };
 fromferm ={ };
 
+#-------- Purely fermionic-> Identity-------------------------
+
+toferm['Ferm'] = lambda (i,j,k):(i,j,k)
+
+fromferm['Ferm'] = lambda (i,j,k):(i,j,k)
+
 #-------- PP shifted-------------------------
 
 toferm['PP_shift'] = lambda (i,j,k):(j+myceil_div2(i),-j+myfloor_div2(i)-1,k+myceil_div2(i))
@@ -33,16 +39,16 @@ toferm['XPH_shift'] = lambda (i,j,k):(j-myfloor_div2(i),k+myceil_div2(i), k-myfl
 fromferm['XPH_shift'] = lambda (i,j,k):(j-k,i+myfloor_div2(j-k),j-myceil_div2(j-k))
 
 
-#-------- PP georg..the vertex has an additional minus sign-------------------------
+#-------- PP georg -> time reversal symmetry assumed-------------------------
 
-toferm['PP_georg'] = lambda (i,j,k):(i-j-1,j,k)
+toferm['PP_georg'] = lambda (i,j,k):(i-k-1,k,j)
 
-fromferm['PP_georg'] = lambda (i,j,k):(i+j+1,j,k)
+fromferm['PP_georg'] = lambda (i,j,k):(i+j+1,k,j)
 
 
-#-------- PH georg..the vertex has an additional minus sign-------------------------
+#-------- PH georg -> time reversal symmetry assumed-------------------------
 
-toferm['PH_georg'] = lambda (i,j,k):(i+j,k,j)
+toferm['PH_georg'] = lambda (i,j,k):(i+k,j,k)
 
 fromferm['PH_georg'] = lambda (i,j,k):(i-k,j,k)
 
@@ -68,11 +74,19 @@ PPgtoPP = translate('PP_shift','PP_georg')
 PHtoPHg = translate('PH_georg','PH_shift')
 PHgtoPH = translate('PH_shift','PH_georg')
 
+PFtoPHg = translate('PH_georg','Ferm')
+PHgtoPF = translate('Ferm','PH_georg')
+
+PFtoPPg = translate('PP_georg','Ferm')
+PPgtoPF = translate('Ferm','PP_georg')
+
 PHtoPH = translate('PH_shift','PH_shift')
 XPHtoXPH = translate('XPH_shift','XPH_shift')
 PPtoPP = translate('PP_shift','PP_shift')
 PPgtoPPg = translate('PP_georg','PP_georg')
 PHgtoPHg = translate('PH_georg','PH_georg')
 
+#print PPgtoPP((0,-114,0))
+#print PPgtoPPg((0,0,0))
 #print PHgtoPH((39,40,40)), PPgtoPP((0,20,40))
 #print PPtoPP((1,2,3)), PHtoPH((1,2,3)), XPHtoXPH((1,2,3))

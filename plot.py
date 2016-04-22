@@ -22,7 +22,7 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-fname = "dat/dat_U4.0_beta10.0_EDpomerol.h5"
+fname = "dat/dat_U1.0_beta10.0_EDpomerol.h5"
 
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
@@ -55,11 +55,11 @@ os.system('mv plots/R.png plots/prev_R.png 2> log/plot.log')
 #--------------------------------------READ PARAMETERS FROM FILE ------------------------------------------
 print "Check UINT and BETA in plot.py!"
 
-U =  4.0          # follows order in script_conversion_hdf5_demetrio.py
+U =  1.0          # follows order in script_conversion_hdf5_demetrio.py
 beta = 10.0
 pi = math.pi
 
-shift=3
+shift=0
 
 #-----------------------------------GREEN'S FUNCTION--------------------------
 
@@ -114,10 +114,10 @@ rep_upup_ph =  np.array(f["/P_func/PH/RE_P_UPUP"])
 imp_upup_ph = np.array(f["/P_func/PH/IM_P_UPUP"])
 rep_updo_ph =  np.array(f["/P_func/PH/RE_P_UPDO"])
 imp_updo_ph = np.array(f["/P_func/PH/IM_P_UPDO"])
-bgrid_p = rep_upup_ph.shape[0]
-fgrid_p = rep_upup_ph.shape[1]
-rep_upup_pp = np.zeros( (bgrid_p,fgrid_p) , dtype='float64' )
-imp_upup_pp = np.zeros( (bgrid_p,fgrid_p) , dtype='float64' )
+bgrid_p = rep_upup_ph.shape[1]
+fgrid_p = rep_upup_ph.shape[0]
+rep_upup_pp = np.zeros( (fgrid_p, bgrid_p) , dtype='float64' )
+imp_upup_pp = np.zeros( (fgrid_p, bgrid_p) , dtype='float64' )
 rep_updo_pp =  np.array(f["/P_func/PP/RE_P_UPDO"])
 imp_updo_pp = np.array(f["/P_func/PP/IM_P_UPDO"])
 rep_updo_xph =  np.array(f["/P_func/XPH/RE_P_UPDO"])
@@ -144,8 +144,8 @@ imk_upup_xph = np.array(f["/K_func/XPH/IM_K_UPUP"])
 if fgrid_p <= shift:
     sys.exit("Error: Shift too large for vertex grid"); 
 
-N_bose_p = (rep_upup_ph.shape[0]-1)/2
-N_fermi_p = (rep_upup_ph.shape[1])/2
+N_bose_p = (rep_upup_ph.shape[1]-1)/2
+N_fermi_p = (rep_upup_ph.shape[0])/2
 N_bose_k = (rek_upup_ph.shape[0]-1)/2 
 
 pl.rc('xtick', labelsize=9) 
@@ -158,56 +158,56 @@ maxp = N_fermi_p+50
 
 def plotUpUpPRePH( use_pl ):
     use_pl.set_title( r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\uparrow}(\Omega_{PH},\omega_n)$" , fontsize=10)
-    pl.plot( X, rep_upup_ph[0+N_bose_p,minp:maxp], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_ph[4+N_bose_p,minp:maxp], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_ph[8+N_bose_p,minp:maxp], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_ph[16+N_bose_p,minp:maxp], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_ph[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_ph[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_ph[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_ph[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
     pl.legend(loc=4,prop={'size':6})
     return
 
 def plotUpDoPRePH( use_pl ):
     use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\downarrow}(\Omega_{PH},\omega_n)$" , fontsize=10)
-    pl.plot( X, rep_updo_ph[0+N_bose_p,minp:maxp], color="red", linewidth=1.0, linestyle="-",label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_ph[4+N_bose_p,minp:maxp], color="blue", linewidth=1.0, linestyle="-",label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_ph[8+N_bose_p,minp:maxp], color="orange", linewidth=1.0, linestyle="-",label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_ph[16+N_bose_p,minp:maxp], color="green", linewidth=1.0, linestyle="-",label=r"$\Omega = 16 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_ph[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-",label=r"$\Omega = 0 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_ph[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-",label=r"$\Omega = 4 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_ph[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-",label=r"$\Omega = 8 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_ph[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-",label=r"$\Omega = 16 \ 2\pi/\beta$")
     pl.legend(loc=1,prop={'size':6})
     return
 
 def plotUpUpPRePP( use_pl ):
     use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\uparrow}(\Omega_{PP},\omega_n)$", fontsize=10)
-    pl.plot( X, rep_upup_pp[0+N_bose_p,minp:maxp], color="red", linewidth=1.0, linestyle="-",label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_pp[4+N_bose_p,minp:maxp], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_pp[8+N_bose_p,minp:maxp], color="orange", linewidth=1.0, linestyle="-",label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_pp[16+N_bose_p,minp:maxp], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_pp[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-",label=r"$\Omega = 0 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_pp[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_pp[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-",label=r"$\Omega = 8 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_pp[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
     pl.legend(loc=1,prop={'size':6})
     return
 
 def plotUpDoPRePP( use_pl ):
-    use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\uparrow}(\Omega_{PP},\omega_n)$", fontsize=10)
-    pl.plot( X, rep_updo_pp[0+N_bose_p,minp:maxp], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_pp[4+N_bose_p,minp:maxp], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_pp[8+N_bose_p,minp:maxp], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_pp[16+N_bose_p,minp:maxp], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
+    use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\downarrow}(\Omega_{PP},\omega_n)$", fontsize=10)
+    pl.plot( X, rep_updo_pp[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_pp[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_pp[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_pp[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
     pl.xticks(np.arange(min(X), max(X)+1, 20))
     pl.legend(loc=1,prop={'size':6})
     return
 
 def plotUpUpPReXPH( use_pl ):
     use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\uparrow}(\Omega_{XPH},\omega_n)$" , fontsize=10)
-    pl.plot( X, rep_upup_xph[0+N_bose_p,minp:maxp], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_xph[4+N_bose_p,minp:maxp], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_xph[8+N_bose_p,minp:maxp], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_xph[16+N_bose_p,minp:maxp], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_xph[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_xph[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_xph[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
+    pl.plot( X, rep_upup_xph[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
     pl.legend(loc=1,prop={'size':6})
     return
 
 def plotUpDoPReXPH( use_pl ):
     use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\downarrow}(\Omega_{XPH},\omega_n)$" , fontsize=10)
-    pl.plot( X, rep_updo_xph[0+N_bose_p,minp:maxp], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_xph[4+N_bose_p,minp:maxp], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_xph[8+N_bose_p,minp:maxp], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_xph[16+N_bose_p,minp:maxp], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_xph[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_xph[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_xph[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
+    pl.plot( X, rep_updo_xph[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
     pl.legend(loc=1,prop={'size':6})
     return
 
@@ -361,8 +361,6 @@ bgrid = f["VERT/PH/bgrid"][:].shape[0]
 N_bose = (bgrid-1)/2 # to create a bosonic frequency grid from -N_bose to N_bose
 N_fermi= (fgrid)/2   # to create a fermionic frequency grid from -N_fermi to N_fermi
 
-print N_bose,N_fermi
-
 def isInside(i,j,k):
     return abs(i) <= N_bose and j >= -N_fermi and j < N_fermi and k >= -N_fermi and k < N_fermi
 
@@ -398,27 +396,27 @@ def K_updo_xph(wb):
 
 def P_upup_ph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_upup_ph[wb+N_bose_p, wf+N_fermi_p]+1j*imp_upup_ph[wb+N_bose_p,wf+N_fermi_p]
+        return rep_upup_ph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_upup_ph[wf+N_fermi_p,wb+N_bose_p]
     else:
         return 0.0
 def P_updo_ph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_ph[wb+N_bose_p,wf+N_fermi_p]+1j*imp_updo_ph[wb+N_bose_p,wf+N_fermi_p]
+        return rep_updo_ph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_ph[wf+N_fermi_p,wb+N_bose_p]
     else:
         return 0.0
 def P_updo_pp(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_pp[wb+N_bose_p,wf+N_fermi_p]+1j*imp_updo_pp[wb+N_bose_p,wf+N_fermi_p]
+        return rep_updo_pp[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_pp[wf+N_fermi_p,wb+N_bose_p]
     else:
         return 0.0
 def P_upup_xph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_upup_xph[wb+N_bose_p,wf+N_fermi_p]+1j*imp_upup_xph[wb+N_bose_p,wf+N_fermi_p]
+        return rep_upup_xph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_upup_xph[wf+N_fermi_p,wb+N_bose_p]
     else:
         return 0.0
 def P_updo_xph(wb,wf):
     if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_xph[wb+N_bose_p,wf+N_fermi_p]+1j*imp_updo_xph[wb+N_bose_p,wf+N_fermi_p]
+        return rep_updo_xph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_xph[wf+N_fermi_p,wb+N_bose_p]
     else:
         return 0.0
 
@@ -462,7 +460,7 @@ def f_updo_fun_xph(i,j,k):
 #-------------------------------Plotting Vertex-----------------
 
 
-N_fermi_plot = N_fermi
+N_fermi_plot = 2*N_fermi
 
 pl.rc('xtick', labelsize=9) 
 pl.rc('ytick', labelsize=9) 
@@ -517,27 +515,27 @@ pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('
 
 plotre_f_upup_pp(pl.subplot(2,3,1))
 pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
+pl.xticks([-40,-20,0,20,40])
+pl.yticks([-40,-20,0,20,40])
 plotre_f_upup_ph(pl.subplot(2,3,2))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
+pl.xticks([-40,-20,0,20,40])
+pl.yticks([-40,-20,0,20,40])
 plotre_f_upup_xph(pl.subplot(2,3,3))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
+pl.xticks([-40,-20,0,20,40])
+pl.yticks([-40,-20,0,20,40])
 plotre_f_updo_pp(pl.subplot(2,3,4))
 pl.xlabel(r"$\omega_n$",fontsize=10)
 pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
+pl.xticks([-40,-20,0,20,40])
+pl.yticks([-40,-20,0,20,40])
 plotre_f_updo_ph(pl.subplot(2,3,5))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
+pl.xticks([-40,-20,0,20,40])
+pl.yticks([-40,-20,0,20,40])
 pl.xlabel(r"$\omega_n$",fontsize=10)
 plotre_f_updo_xph(pl.subplot(2,3,6))
 pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
+pl.xticks([-40,-20,0,20,40])
+pl.yticks([-40,-20,0,20,40])
 
 pl.tight_layout()
 
