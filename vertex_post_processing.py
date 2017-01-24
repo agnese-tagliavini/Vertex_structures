@@ -39,15 +39,17 @@ import matplotlib.cm as cm
 from numpy.linalg import inv
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-from agneselib.mymath import *                          # mylibrary check in ~/usr/include/agneselib
-from agneselib.inf_Msum import *
+from agneselibrary.mymath import *                          # mylibrary check in ~/usr/include/agneselib
 from _functools import partial
 
 #---------------------------------------------------------------------------------
 
 U=1.0
 
-beta=10.0
+beta=26.0
+
+FFREQ = 20 #fermionic frequencies in the mixed notation
+BFREQ = 10 #bosonic frequency transfer in the mixed notation
 
 pi = math.pi
 
@@ -57,46 +59,25 @@ def run(command):
         output = subprocess.check_output(command, shell=True)
         return output
 
-#-----------------------------------Read parameters----------------------------------------------
-# ------U---------
-
-a=raw_input('Enter the interaction value:') 
-try:
-    U=float(a)
-except ValueError:
-    sys.exit("Invalid interaction")
-
-print ("Uhub value     " + str(U) )
-
-#-------BETA-------
-
-a = raw_input('Enter the value of beta:') 
-try:
-    beta=float(a) 
-except ValueError:
-    sys.exit("Invalid beta")
-
-print ("beta value     " + str(beta) )
-
 #----------------------------------------Create HDF5 files-----------------------------------------
-if ('dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5'):
-    os.system('rm -r dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5')
 
-f = h5py.File('dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'w')   # Create the datafile.h5
+if ('dat/U'+ str(U)+'_beta'+ str(beta)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5'):
+    os.system('rm -r dat/U'+ str(U)+'_beta'+ str(beta)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5')
+
+f = h5py.File('dat/U'+ str(U)+'_beta'+ str(beta)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5', 'w')   # Create the datafile.h5
 
 #---------------------------------------------------------------------------------
 #GF
-
-g_iw  = np.loadtxt('pomerol_output/gw_imag00.dat')
-N_fermi_gf = g_iw.shape[0]
+g_iw  = np.loadtxt('dat/pomerol/U_1.0_beta_26.0_FFREQ_20/BFREQ_10_NO_SHIFT/gw_imfreq_00.dat')
+N_fermi_gf = g_iw.shape[0]-20
 print ("Number of fermionic frequencies for the GF:")
 print N_fermi_gf
 
 def G(w):                           # imaginary part of the GF
  if (w >= 0):
-     return g_iw[w,1]+1j*g_iw[w,2]
+     return g_iw[w+20,2]+1j*g_iw[w+20,3]
  else:
-     return g_iw[-w-1,1]-1j*g_iw[-w-1,2]
+     return g_iw[-w+20-1,2]-1j*g_iw[-w+20-1,3]
 
 g_arr_re = np.array([G(n).real for n in range (-N_fermi_gf,N_fermi_gf)])
 g_arr_im = np.array([G(n).imag for n in range (-N_fermi_gf,N_fermi_gf)])
@@ -116,25 +97,26 @@ f.create_dataset('Giw/fgrid', data=fgrid_arr, dtype='float64', compression="gzip
 #---------------------------------------------------------------------------------------------------------
 #--------------------------------------- 2PGF PP------------------------------------------------------------
 
-vertex_pp = np.loadtxt("pomerol_output/2pgf_pp_shift.dat")
-print vertex_pp.shape
-ffreq_pp = int(np.transpose(vertex_pp)[1,:].max()+1)
+twopgf_updo = np.loadtxt('dat/pomerol/U_1.0_beta_26.0_FFREQ_20/BFREQ_10_NO_SHIFT/PP/2pgf_updo_pp.dat')
+twopgf_xupdo = np.loadtxt('dat/pomerol/U_1.0_beta_26.0_FFREQ_20/BFREQ_10_NO_SHIFT/PP/2pgf_xupdo_pp.dat')
+print twopgf_updo.shape
+ffreq_pp = int(0.5*(np.transpose(twopgf_updo)[1,:].max()*beta/pi-1))+1
 print ffreq_pp
-bfreq_pp = int(np.transpose(vertex_pp)[0,:].max())
+bfreq_pp = int(0.5*np.transpose(twopgf_updo)[0,:].max()*beta/pi)
 print bfreq_pp
 
 
 def re_2pgf_upup_pp(wb,wf,wf1):
-	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 3]
+	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 3]-twopgf_xupdo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 3]
 
 def re_2pgf_updo_pp(wb,wf,wf1):
-	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 5]
+	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 3]
 
 def im_2pgf_upup_pp(wb,wf,wf1):
-	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 4]
 
+	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 4]-twopgf_xupdo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 4]
 def im_2pgf_updo_pp(wb,wf,wf1):
-	return 	vertex_pp[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 6]
+	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 4]
 
 # ----------define arrays to store in hdf5 file
 
@@ -160,17 +142,20 @@ f.create_dataset('2PGF/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compressio
 
 #------------------------------------- GENERALIZED SUSCEPTIBILITY CHI PP --------------------------------------------
 
-# Cutting one disconnected diagram the crossed one -> generalized susceptibility
+# Cutting one disconnected diagram -> generalized susceptibility
 
 
 def chi_upup_pp(wb,wf,wf1):
-    if (wf == -wf1-1-mymod_abs(wb)):
-        return re_2pgf_upup_pp(wb,wf,wf1)+1j*im_2pgf_upup_pp(wb,wf,wf1)+beta*(G(wf+myceil_div2(wb))*G(myfloor_div2(wb)-wf-1))
+    if (wf == wb-wf1-1):
+        return re_2pgf_upup_pp(wb,wf,wf1)+1j*im_2pgf_upup_pp(wb,wf,wf1)+beta*(G(wf)*G(wb-wf1-1))
     else:
         return re_2pgf_upup_pp(wb,wf,wf1)+1j*im_2pgf_upup_pp(wb,wf,wf1)
 
 def chi_updo_pp(wb,wf,wf1):
-    return re_2pgf_updo_pp(wb,wf,wf1)+1j*im_2pgf_updo_pp(wb,wf,wf1)
+    if (wf == wb-wf1-1):
+        return re_2pgf_updo_pp(wb,wf,wf1)+1j*im_2pgf_updo_pp(wb,wf,wf1)+beta*(G(wf)*G(wb-wf1-1))
+    else:
+        return re_2pgf_updo_pp(wb,wf,wf1)+1j*im_2pgf_updo_pp(wb,wf,wf1)
 
 def chi_s_pp(wb,wf,wf1):
     return -chi_upup_pp(wb,wf,wf1) + 2*chi_updo_pp(wb,wf,wf1)
@@ -202,11 +187,11 @@ f.create_dataset('GENCHI/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compress
 #----------------------------------- FULL VERTEX PP -----------------------------------------------------------
 
 def chi_l_pp(wb,wf,wf1):  # Legs on one side of the diagram
-    return beta*G(wf+myceil_div2(wb))*G(myfloor_div2(wb)-wf1-1)
+    return beta*G(wf)*G(wb-wf1-1)
 
 def chi_0_pp(wb,wf,wf1):
     if (wf == wf1):
-        return beta*G(wf+myceil_div2(wb))*G(myfloor_div2(wb)-wf-1)
+        return beta*G(wf)*G(wb-wf1-1)
     else:
         return 0.0
 
@@ -214,7 +199,7 @@ def f_upup_pp(wb,wf,wf1):
     return beta*beta*(1.0/(chi_l_pp(wb,wf,wf)))*(chi_upup_pp(wb,wf,wf1)-chi_0_pp(wb,wf,wf1))*(1.0/(chi_l_pp(wb,wf1,wf1)))
 
 def f_updo_pp(wb,wf,wf1):
-    return beta*beta*(1.0/(chi_l_pp(wb,wf,wf)))*(chi_updo_pp(wb,wf,wf1)-chi_0_pp(wb,wf,wf1))*(1.0/(chi_l_pp(wb,wf1,wf1)))
+    return beta*beta*(1.0/(chi_l_pp(wb,wf,wf)))*(chi_updo_pp(wb,wf,wf1))*(1.0/(chi_l_pp(wb,wf1,wf1)))
 
 # ----------define arrays to store in hdf5 file
 
@@ -243,23 +228,24 @@ f.create_dataset('VERT/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compressio
 
 #--------------------------------------- 2PGF PH------------------------------------------------------------
 
-vertex_ph = np.loadtxt("pomerol_output/2pgf_ph_shift.dat")
-ffreq_ph = int(np.transpose(vertex_ph)[1,:].max()+1)
+twopgf_updo_ph_l = np.loadtxt('dat/pomerol/U_1.0_beta_26.0_FFREQ_20/BFREQ_10_NO_SHIFT/PH/2pgf_updo_ph.dat')
+twopgf_updo_xph_l = np.loadtxt('dat/pomerol/U_1.0_beta_26.0_FFREQ_20/BFREQ_10_NO_SHIFT/XPH/2pgf_updo_xph.dat')
+ffreq_ph = int(0.5*(np.transpose(twopgf_updo_ph_l)[1,:].max()*beta/pi-1))+1
 print ffreq_ph
-bfreq_ph = int(np.transpose(vertex_ph)[0,:].max())
+bfreq_ph = int(0.5*np.transpose(twopgf_updo_ph_l)[0,:].max()*beta/pi)
 print bfreq_ph
 
 def re_2pgf_upup_ph(wb,wf,wf1):
-	return 	vertex_ph[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 3]
+	return 	twopgf_updo_ph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 3]-twopgf_updo_xph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 3]
 
 def re_2pgf_updo_ph(wb,wf,wf1):
-	return 	vertex_ph[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 5]
+	return 	twopgf_updo_ph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 3]
 
 def im_2pgf_upup_ph(wb,wf,wf1):
-	return 	vertex_ph[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 4]
+	return 	twopgf_updo_ph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 4]-twopgf_updo_xph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 4]
 
 def im_2pgf_updo_ph(wb,wf,wf1):
-	return 	vertex_ph[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 6]
+	return 	twopgf_updo_ph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 4]
 
 # ----------define arrays to store in hdf5 file
 
@@ -288,13 +274,16 @@ f.create_dataset('2PGF/PH/bgrid', data=bgrid_arr_ph, dtype='float64', compressio
 # Cutting one disconnected diagram -> generalized susceptibility
 
 def chi_upup_ph(wb,wf,wf1):
-    if (wf == wf1):
-        return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1)+beta*(G(wf-myfloor_div2(wb))*G(wf1+myceil_div2(wb)))
+    if (wb== 0):
+        return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1)+beta*(G(wf)*G(wf1))
     else:
         return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1)
 
 def chi_updo_ph(wb,wf,wf1):
-    return re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)
+    if (wb== 0):
+        return re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)+beta*(G(wf)*G(wf1))
+    else:
+        return re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)
 
 def tpgf_d_ph(wb,wf,wf1):
     return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1)+re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)
@@ -323,26 +312,21 @@ f.create_dataset('GENCHI/PH/bgrid', data=bgrid_arr_ph, dtype='float64', compress
 
 #----------------------------------- FULL VERTEX PH -----------------------------------------------------------
 
-def chi_l_ph(wb,wf,wf1):
-    return G(wf-myfloor_div2(wb))*G(wf1+myceil_div2(wb))
+def chi_lup_ph(wb,wf,wf1):
+    return beta*G(wf)*G(wf1+wb)
 
 def chi_0_ph(wb,wf,wf1):
-    if (wb == 0):
-        return beta*G(wf)*G(wf1)
+    if (wf == wf1):
+        return beta*G(wf)*G(wf1+wb)
     else:
         return 0.0
 
-def chi_x0_ph(wb,wf,wf1):
-    if (wf == wf1):
-        return -beta*G(wf-myfloor_div2(wb))*G(wf1+myceil_div2(wb))
-    else:
-        return 0.0
 
 def f_upup_ph(wb,wf,wf1):
-    return (1.0/chi_l_ph(wb,wf,wf1))*(chi_upup_ph(wb,wf,wf1)-chi_0_ph(wb,wf,wf1))*(1.0/chi_l_ph(wb,wf1,wf))
+    return beta*beta*(1.0/chi_lup_ph(wb,wf,wf))*(chi_upup_ph(wb,wf,wf1)-chi_0_ph(wb,wf,wf1))*(1.0/chi_lup_ph(wb,wf1,wf1))
 
 def f_updo_ph(wb,wf,wf1):
-    return (1.0/chi_l_ph(wb,wf,wf1))*(chi_updo_ph(wb,wf,wf1)-chi_0_ph(wb,wf,wf1))*(1.0/chi_l_ph(wb,wf1,wf))
+    return beta*beta*(1.0/chi_lup_ph(wb,wf,wf))*(chi_updo_ph(wb,wf,wf1))*(1.0/chi_lup_ph(wb,wf1,wf1))
 
 
 # ----------define arrays to store in hdf5 file
@@ -371,23 +355,22 @@ f.create_dataset('VERT/PH/bgrid', data=bgrid_arr_ph, dtype='float64', compressio
 #---------------------------------------------------------------------------------------------------------
 #--------------------------------------- 2PGF XPH------------------------------------------------------------
 
-vertex_xph = np.loadtxt("pomerol_output/2pgf_xph_shift.dat")
-ffreq_xph = int(np.transpose(vertex_xph)[1,:].max()+1)
+ffreq_xph = int(0.5*(np.transpose(twopgf_updo_xph_l)[1,:].max()*beta/pi-1))+1
 print ffreq_xph
-bfreq_xph = int(np.transpose(vertex_xph)[0,:].max())
+bfreq_xph = int(0.5*np.transpose(twopgf_updo_xph_l)[0,:].max()*beta/pi)
 print bfreq_xph
 
 def re_2pgf_upup_xph(wb,wf,wf1):
-	return 	vertex_xph[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 3]
+    return 	twopgf_updo_xph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 3]-twopgf_updo_ph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 3]
 
 def re_2pgf_updo_xph(wb,wf,wf1):
-	return 	vertex_xph[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 5]
+	return 	twopgf_updo_xph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 3]
 
 def im_2pgf_upup_xph(wb,wf,wf1):
-	return 	vertex_xph[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 4]
+	return  twopgf_updo_xph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 4]-twopgf_updo_ph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 4]
 
 def im_2pgf_updo_xph(wb,wf,wf1):
-	return 	vertex_xph[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 6]
+	return 	 twopgf_updo_xph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 4]
 
 # ----------define arrays to store in hdf5 file
 
@@ -417,7 +400,7 @@ f.create_dataset('2PGF/XPH/bgrid', data=bgrid_arr_xph, dtype='float64', compress
 
 def chi_upup_xph(wb,wf,wf1):
     if (wb == 0):
-        return re_2pgf_upup_xph(wb,wf,wf1)+1j*im_2pgf_upup_xph(wb,wf,wf1)+beta*G(wf)*G(wf1)
+        return re_2pgf_upup_xph(wb,wf,wf1)+1j*im_2pgf_upup_xph(wb,wf,wf1)-beta*G(wf)*G(wf1)
     else:
         return re_2pgf_upup_xph(wb,wf,wf1)+1j*im_2pgf_upup_xph(wb,wf,wf1)
 
@@ -445,25 +428,19 @@ f.create_dataset('GENCHI/XPH/bgrid', data=bgrid_arr_xph, dtype='float64', compre
 #----------------------------------- FULL VERTEX XPH -----------------------------------------------------------
 
 def chi_l_xph(wb,wf,wf1):
-    return G(wf-myfloor_div2(wb))*G(wf1+myceil_div2(wb))
+    return G(wf)*G(wf1+wb)
 
 def chi_0_xph(wb,wf,wf1):
     if (wf == wf1):
-        return beta*G(wf-myfloor_div2(wb))*G(wf+myceil_div2(wb))
-    else:
-        return 0.0
-
-def chi_x0_xph(wb,wf,wf1):
-    if (wb == 0):
-        return -beta*G(wf)*G(wf1)
+        return beta*G(wf)*G(wf+wb)
     else:
         return 0.0
 
 def f_upup_xph(wb,wf,wf1):
-    return (1.0/chi_l_xph(wb,wf,wf1))*(chi_upup_xph(wb,wf,wf1)-chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
+    return (1.0/chi_l_xph(wb,wf,wf1))*(chi_upup_xph(wb,wf,wf1)+chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
 
 def f_updo_xph(wb,wf,wf1):
-    return (1.0/chi_l_xph(wb,wf,wf1))*(chi_updo_xph(wb,wf,wf1)-chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
+    return (1.0/chi_l_xph(wb,wf,wf1))*(chi_updo_xph(wb,wf,wf1)+chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
 
 
 # ----------define arrays to store in hdf5 file
