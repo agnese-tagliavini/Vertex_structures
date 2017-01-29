@@ -29,36 +29,39 @@ from matplotlib.ticker import MaxNLocator
 from os.path import isfile, join
 import math
 import numpy 
-from agneselib.mymath import *
-from agneselib.translate_notation import *
-from agneselib.inf_Msum import *
+from agneselibrary.mymath import *
+from agneselibrary.translate_notation import *
+from agneselibrary.inf_Msum import *
 from _functools import partial
 
 #-----------------------------------Read parameters----------------------------------------------
 # ------U---------
 
-a=raw_input('Enter the interaction value:') 
-try:
-    U=float(a)
-except ValueError:
-    sys.exit("Invalid interaction")
+#a=raw_input('Enter the interaction value:') 
+#try:
+#    U=float(a)
+#except ValueError:
+#    sys.exit("Invalid interaction")
+#
+#print ("Uhub value     " + str(U) )
+#
+##-------BETA-------
+#
+#a = raw_input('Enter the value of beta:') 
+#try:
+#    beta=float(a) 
+#except ValueError:
+#    sys.exit("Invalid beta")
+#
+#print ("beta value     " + str(beta) )
 
-print ("Uhub value     " + str(U) )
-
-#-------BETA-------
-
-a = raw_input('Enter the value of beta:') 
-try:
-    beta=float(a) 
-except ValueError:
-    sys.exit("Invalid beta")
-
-print ("beta value     " + str(beta) )
+U = 1.0
+beta = 26.0
 
 #----------------------------------------Read HDF5 files-----------------------------------------
 
 if ('../dat'):
-    f = h5py.File('../dat/dat_U'+ str(U)+'_beta'+ str(beta)+'_EDpomerol.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
+    f = h5py.File('../dat/U'+ str(U)+'_beta'+ str(beta)+'_FFREQ_20_BFREQ_20.h5', 'r+')   # Read (and write) the hdf5 file in the directory "dat" if existing
 else:
     sys.exit("No data file")
 
@@ -66,7 +69,7 @@ else:
 
 sign = -1.0
 pi = math.pi
-N_iter_max = 1
+N_iter_max = 20
 accuracy = 10**(-12)
 
 #---------------------- Read objects involved in the calculation from HDF5 file -------------------------------
