@@ -9,10 +9,11 @@ import os
 import sys
 import subprocess
 import math
-from agneselib.mymath import *
-from agneselib.plot_tools import *
-from agneselib.translate_notation import *
-from matplotlib.colors import LinearSegmentedColormap
+
+#--------------------------------------SETTINGS ------------------------------------------
+#if -1, change overall vertex sign (switch definition)
+vert_mul = 1
+
 
 #--------------------------------------MANAGING FILES ------------------------------------------
 
@@ -22,7 +23,7 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-fname = "dat/dat_U1.0_beta10.0_EDpomerol.h5"
+fname = "dat/" + most_recently_edited
 
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
@@ -33,35 +34,75 @@ f = h5py.File(fname, "r")
 os.system('mkdir -p log')
 os.system('mkdir -p plots')
 
-os.system('rm plots/prev_Sig.png 2> log/plot.log')
-os.system('rm plots/prev_Giw.png 2> log/plot.log')
-os.system('rm plots/prev_Vert.png 2> log/plot.log')
-os.system('rm plots/prev_Phi.png 2> log/plot.log')
-os.system('rm plots/prev_P.png 2> log/plot.log')
-os.system('rm plots/prev_K.png 2> log/plot.log')
-os.system('rm plots/prev_Trileg.png 2> log/plot.log')
-os.system('rm plots/prev_Chi.png 2> log/plot.log')
-os.system('rm plots/prev_R.png 2> log/plot.log')
-os.system('mv plots/Sig.png plots/prev_Sig.png 2> log/plot.log')
-os.system('mv plots/Giw.png plots/prev_Giw.png 2> log/plot.log') 
-os.system('mv plots/Vert.png plots/prev_Vert.png 2> log/plot.log')
-os.system('mv plots/Phi.png plots/prev_Phi.png 2> log/plot.log')
-os.system('mv plots/P.png plots/prev_P.png 2> log/plot.log')
-os.system('mv plots/K.png plots/prev_K.png 2> log/plot.log')
-os.system('mv plots/Trileg.png plots/prev_Trileg.png 2> log/plot.log')
-os.system('mv plots/Chi.png plots/prev_Chi.png 2> log/plot.log')
-os.system('mv plots/R.png plots/prev_R.png 2> log/plot.log')
+#os.system('rm plots/prev_Vert.png 2> log/plot.log')
+#os.system('rm plots/prev_phi.png 2> log/plot.log')
+#os.system('rm plots/prev_P_func.png 2> log/plot.log')
+#os.system('rm plots/prev_R_func.png 2> log/plot.log')
+
+#os.system('mv plots/Vert.png plots/prev_Vert.png 2> log/plot.log')
+#os.system('mv plots/phi.png plots/prev_phi.png 2> log/plot.log')
+#os.system('mv plots/P_func.png plots/prev_P_func.png 2> log/plot.log')
+#os.system('mv plots/R_func.png plots/prev_R_func.png 2> log/plot.log')
+
 
 #--------------------------------------READ PARAMETERS FROM FILE ------------------------------------------
-print "Check UINT and BETA in plot.py!"
 
-U =  1.0          # follows order in script_conversion_hdf5_demetrio.py
-beta = 10.0
-pi = math.pi
+parVals = f["/Params"].attrs.values()
+
+UINT =  parVals[0] # follows order in output.cpp
+BETA =  parVals[1]
+B =     parVals[2]
+GAM_L = parVals[3]
+DEL =   parVals[4]
+EPS =   parVals[5]
+PHI =   parVals[6]
 
 shift=0
 
-#-----------------------------------GREEN'S FUNCTION--------------------------
+#--------------------------------------GENERAL PLOT SETTINGS------------------------------------------
+
+pl.rc('xtick', labelsize=9) 
+pl.rc('ytick', labelsize=9) 
+#pl.rc('text', usetex=True)
+#pl.rc('text.latex', preamble='\usepackage{amsmath}')
+
+RE = r"$\operatorname{Re}"
+IM = r"$\operatorname{Im}"
+
+#--------------------------------------SELF ENERGY PLOTTING ------------------------------------------
+
+print("Plotting self-energy ...")
+
+
+#--- Read
+siggrid = np.array(f["/Sig/fgrid"])
+vertgrid = np.array(f["/Vert/fgrid"])
+resig = f["/Sig/RE"]
+imsig = f["/Sig/IM"]
+fdim = resig.shape[0]
+
+
+#--- Helper functions
+def plotSig( use_pl, arr, string ):
+    pl.plot( siggrid, arr[:,0,0,0], 'bx', ms=3, mew=0.2)
+    pl.xlim([min(siggrid),max(siggrid)])
+    use_pl.set_title(string)
+    return
+
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS))
+
+#--- Plot physical
+plotSig( pl.subplot(2,2,1), resig, RE + "\Sigma(i\omega)$" ) 
+plotSig( pl.subplot(2,2,2), imsig, IM + "\Sigma(i\omega)$" ) 
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/Sig.png", dpi=150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+#--------------------------------------G(iw) PLOTTING ------------------------------------------
 
 print("Plotting Green function ...")
 
@@ -74,27 +115,19 @@ fdim = reGiw.shape[0]
 
 
 #--- Helper functions
-
 def plotGiw( use_pl, arr, string ):
-    pl.plot( Giwgrid, arr, 'bx', ms=3, mew=0.2)
-#    pl.xlim([1.2*min(vertgrid),1.2*max(vertgrid)])
+    pl.plot( Giwgrid, arr[:,0,0,0], 'bx', ms=3, mew=0.2)
+    pl.xlim([min(Giwgrid),max(Giwgrid)])
     use_pl.set_title(string)
     return
 
-def plotGiwRe( use_pl ):
-    plotGiw( use_pl, reGiw[:], r"$\operatorname{Re}G(i\omega)$")
-    return
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS))
 
-def plotGiwIm( use_pl ):
-    plotGiw( use_pl, imGiw[:], r"$\operatorname{Im}G(i\omega)$")
-    return
-
-pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))))
-
-plotGiwRe( pl.subplot(1,2,1) ) 
-pl.xlabel(r"$\omega_n$",fontsize=8)
-plotGiwIm( pl.subplot(1,2,2) ) 
-pl.xlabel(r"$\omega_n$",fontsize=8)
+#--- Plot physical
+plotGiw( pl.subplot(2,2,1), reGiw, RE + "G(i\omega)$" ) 
+pl.xlabel(r"$\omega_n$")
+plotGiw( pl.subplot(2,2,2), imGiw, IM + "G(i\omega)$" ) 
+pl.xlabel(r"$\omega_n$")
 
 pl.tight_layout()
 
@@ -103,440 +136,161 @@ pl.savefig("plots/Giw.png", dpi=150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
+#--------------------------------------FLOW OBSERVABLES ------------------------------------------
 
-#--------------------------------------PLUS  PLOTTING ------------------------------------------
+#print("Plotting flowing observables ...")
 
-print("Plotting P ...")
+##--- Read
+#Lam_arr = np.array(f["/Flow_obs/LAM"])
+#meff_arr = np.array(f["/Flow_obs/EFF_MASS"])
+#meff_err_arr = np.array(f["/Flow_obs/ERR_EFF_MASS"])
+#maxCpl_arr = np.array(f["/Flow_obs/ABS_MAX_CPL"])
 
+#def TK( U ):
+    #return np.sqrt(U/2.0)*np.exp(-math.pi*U/8.0)
 
-#--- Read
-rep_upup_ph =  np.array(f["/P_func/PH/RE_P_UPUP"])
-imp_upup_ph = np.array(f["/P_func/PH/IM_P_UPUP"])
-rep_updo_ph =  np.array(f["/P_func/PH/RE_P_UPDO"])
-imp_updo_ph = np.array(f["/P_func/PH/IM_P_UPDO"])
-bgrid_p = rep_upup_ph.shape[1]
-fgrid_p = rep_upup_ph.shape[0]
-rep_upup_pp = np.zeros( (fgrid_p, bgrid_p) , dtype='float64' )
-imp_upup_pp = np.zeros( (fgrid_p, bgrid_p) , dtype='float64' )
-rep_updo_pp =  np.array(f["/P_func/PP/RE_P_UPDO"])
-imp_updo_pp = np.array(f["/P_func/PP/IM_P_UPDO"])
-rep_updo_xph =  np.array(f["/P_func/XPH/RE_P_UPDO"])
-imp_updo_xph = np.array(f["/P_func/XPH/IM_P_UPDO"])
-rep_upup_xph =  np.array(f["/P_func/XPH/RE_P_UPUP"])
-imp_upup_xph = np.array(f["/P_func/XPH/IM_P_UPUP"])
+#nrg_x = [ 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
+#nrg_y = [ 1, 1.01, 1.06, 1.14, 1.26, 1.42, 1.62, 1.88, 2.18, 2.56, 3.03, 4.32, 6.14, 8.74, 12.47, 17.78, 25.5, 36.5, 52.3, 74.9, 109.4, 158, 228, 328, 474, 681]
 
-#----Read Karrasch
+#def plotEffM( use_pl ):
+    #pl.plot( Lam_arr, meff_arr, 'bx', ms=3, mew=0.2)
+    #use_pl.set_title( r"$m^*$" )
+    ##pl.plot( Lam_arr**2 * UINT, meff_arr, 'bx', ms=3, mew=0.2)
+    ##pl.plot( nrg_x, nrg_y, 'r--', ms=3, mew=0.2 )
+    ##pl.xlim([0,UINT])
+    ##pl.ylim([1.0,1.0/TK(UINT)])
+    ##pl.yscale('log')
+    #return
 
-rek_upup_ph =  np.array(f["/K_func/PH/RE_K_UPUP"])
-imk_upup_ph = np.array(f["/K_func/PH/IM_K_UPUP"])
-rek_updo_ph =  np.array(f["/K_func/PH/RE_K_UPDO"])
-imk_updo_ph = np.array(f["/K_func/PH/IM_K_UPDO"])
-bgrid_k = rek_upup_ph.shape[0]
-rek_upup_pp = np.zeros( bgrid_k , dtype='float64' )
-imk_upup_pp = np.zeros( bgrid_k , dtype='float64' )
-rek_updo_pp =  np.array(f["/K_func/PP/RE_K_UPDO"])
-imk_updo_pp = np.array(f["/K_func/PP/IM_K_UPDO"])
-rek_updo_xph =  np.array(f["/K_func/XPH/RE_K_UPDO"])
-imk_updo_xph = np.array(f["/K_func/XPH/IM_K_UPDO"])
-rek_upup_xph =  np.array(f["/K_func/XPH/RE_K_UPUP"])
-imk_upup_xph = np.array(f["/K_func/XPH/IM_K_UPUP"])
+#def plotObs( use_pl, y_arr, string ):
+    #pl.plot( Lam_arr, y_arr, 'bx', ms=3, mew=0.2)
+    #use_pl.set_title( string )
+    ##pl.plot( Lam_arr**2 * UINT, y_arr, 'bx', ms=3, mew=0.2)
+    ##pl.yscale('log')
+    #return
 
-if fgrid_p <= shift:
-    sys.exit("Error: Shift too large for vertex grid"); 
+#plotEffM( pl.subplot(2,1,1) )
+#pl.xlabel(r"$\Lambda$")
+#plotObs( pl.subplot(2,1,2), maxCpl_arr, r"Max Cpl")
+#pl.xlabel(r"$\Lambda$")
 
-N_bose_p = (rep_upup_ph.shape[1]-1)/2
-N_fermi_p = (rep_upup_ph.shape[0])/2
-N_bose_k = (rek_upup_ph.shape[0]-1)/2 
+#pl.tight_layout()
 
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
+#pl.savefig("plots/flow_obs.png", dpi=150)
+#pl.figure(dpi=100) # Reset dpi to default
+#pl.clf()
 
-X = np.array([(2*n+1)*pi/beta for n in range(-50,50)])
-
-minp = N_fermi_p-50
-maxp = N_fermi_p+50
-
-def plotUpUpPRePH( use_pl ):
-    use_pl.set_title( r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\uparrow}(\Omega_{PH},\omega_n)$" , fontsize=10)
-    pl.plot( X, rep_upup_ph[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_ph[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_ph[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_ph[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
-    pl.legend(loc=4,prop={'size':6})
-    return
-
-def plotUpDoPRePH( use_pl ):
-    use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\downarrow}(\Omega_{PH},\omega_n)$" , fontsize=10)
-    pl.plot( X, rep_updo_ph[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-",label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_ph[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-",label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_ph[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-",label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_ph[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-",label=r"$\Omega = 16 \ 2\pi/\beta$")
-    pl.legend(loc=1,prop={'size':6})
-    return
-
-def plotUpUpPRePP( use_pl ):
-    use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\uparrow}(\Omega_{PP},\omega_n)$", fontsize=10)
-    pl.plot( X, rep_upup_pp[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-",label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_pp[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_pp[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-",label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_pp[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
-    pl.legend(loc=1,prop={'size':6})
-    return
-
-def plotUpDoPRePP( use_pl ):
-    use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\downarrow}(\Omega_{PP},\omega_n)$", fontsize=10)
-    pl.plot( X, rep_updo_pp[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_pp[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_pp[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_pp[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
-    pl.xticks(np.arange(min(X), max(X)+1, 20))
-    pl.legend(loc=1,prop={'size':6})
-    return
-
-def plotUpUpPReXPH( use_pl ):
-    use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\uparrow}(\Omega_{XPH},\omega_n)$" , fontsize=10)
-    pl.plot( X, rep_upup_xph[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_xph[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_xph[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_upup_xph[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
-    pl.legend(loc=1,prop={'size':6})
-    return
-
-def plotUpDoPReXPH( use_pl ):
-    use_pl.set_title(r"$\operatorname{Re}\mathcal{K}_{2,\uparrow\downarrow}(\Omega_{XPH},\omega_n)$" , fontsize=10)
-    pl.plot( X, rep_updo_xph[minp:maxp,0+N_bose_p], color="red", linewidth=1.0, linestyle="-", label=r"$\Omega = 0 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_xph[minp:maxp,4+N_bose_p], color="blue", linewidth=1.0, linestyle="-", label=r"$\Omega = 4 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_xph[minp:maxp,8+N_bose_p], color="orange", linewidth=1.0, linestyle="-", label=r"$\Omega = 8 \ 2\pi/\beta$")
-    pl.plot( X, rep_updo_xph[minp:maxp,16+N_bose_p], color="green", linewidth=1.0, linestyle="-", label=r"$\Omega = 16 \ 2\pi/\beta$")
-    pl.legend(loc=1,prop={'size':6})
-    return
-
-
-#--- Plot Physical
-plotUpUpPRePH( pl.subplot(2,3,2))
-pl.xticks([-40,-20,0,20,40])
-plotUpDoPRePH( pl.subplot(2,3,5))
-pl.xticks([-40,-20,0,20,40])
-pl.xlabel(r"$\omega_n$",fontsize=10)
-plotUpUpPRePP( pl.subplot(2,3,1))
-pl.xticks([-40,-20,0,20,40])
-plotUpDoPRePP( pl.subplot(2,3,4))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.xticks([-40,-20,0,20,40])
-plotUpUpPReXPH( pl.subplot(2,3,3))
-pl.xticks([-40,-20,0,20,40])
-plotUpDoPReXPH( pl.subplot(2,3,6))
-pl.xticks([-40,-20,0,20,40])
-pl.xlabel(r"$\omega_n$",fontsize=10)
-
-pl.subplots_adjust(top=1.0)
-pl.tight_layout()
-
-#--- Save to file
-pl.savefig("plots/P_func.png", dpi = 150)
-pl.figure(dpi=100) # Reset dpi to default
-pl.clf()
-
-
-#--------------------------------------------------------------KARRASCH PLOTTING--------------------------------------------------------
-
-
-print("Plotting K ...")
-
-#----Read Karrasch
-
-rek_upup_ph =  np.array(f["/K_func/PH/RE_K_UPUP"])
-imk_upup_ph = np.array(f["/K_func/PH/IM_K_UPUP"])
-rek_updo_ph =  np.array(f["/K_func/PH/RE_K_UPDO"])
-imk_updo_ph = np.array(f["/K_func/PH/IM_K_UPDO"])
-bgrid_k = rek_upup_ph.shape[0]
-rek_upup_pp = np.zeros( bgrid_k , dtype='float64' )
-imk_upup_pp = np.zeros( bgrid_k , dtype='float64' )
-rek_updo_pp =  np.array(f["/K_func/PP/RE_K_UPDO"])
-imk_updo_pp = np.array(f["/K_func/PP/IM_K_UPDO"])
-rek_updo_xph =  np.array(f["/K_func/XPH/RE_K_UPDO"])
-imk_updo_xph = np.array(f["/K_func/XPH/IM_K_UPDO"])
-rek_upup_xph =  np.array(f["/K_func/XPH/RE_K_UPUP"])
-imk_upup_xph = np.array(f["/K_func/XPH/IM_K_UPUP"])
-
-
-N_bose_k = (rek_upup_ph.shape[0]-1)/2
-
-print N_bose_k
-
-
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
-
-X = np.array([(2*n)*pi/beta for n in range(-N_bose_k,N_bose_k+1)])
-
-def plotK( use_pl, zarr, string ):
-    pl.plot( X, zarr)
-    pl.xticks([-80,-40,0,40,80])
-    use_pl.set_title( string , fontsize=10)
-    return
-
-def plotUpUpKRePH( use_pl ):
-    title = r"$\operatorname{Re}\mathcal{K}_{1,\uparrow\uparrow}(\Omega_{PH})$"
-    zarr = rek_upup_ph[:]
-    plotK( use_pl, zarr, title )
-    return
-
-def plotUpDoKRePH( use_pl ):
-    title = r"$\operatorname{Re}\mathcal{K}_{1,\uparrow\downarrow}(\Omega_{PH})$"
-    zarr = rek_updo_ph[:]
-    plotK( use_pl, zarr, title )
-    return
-
-def plotUpUpKRePP( use_pl ):
-    title = r"$\operatorname{Re}\mathcal{K}_{1,\uparrow\uparrow}(\Omega_{PP})$"
-    zarr = rek_upup_pp[:]
-    plotK( use_pl, zarr, title )
-    return
-
-def plotUpDoKRePP( use_pl ):
-    title = r"$\operatorname{Re}\mathcal{K}_{1,\uparrow\downarrow}(\Omega_{PP})$"
-    zarr = rek_updo_pp[:]
-    plotK( use_pl, zarr, title )
-    return
-
-def plotUpUpKReXPH( use_pl ):
-    title = r"$\operatorname{Re}\mathcal{K}_{1,\uparrow\uparrow}(\Omega_{XPH})$"
-    zarr = rek_upup_xph[:]
-    plotK( use_pl, zarr, title )
-    return
-
-def plotUpDoKReXPH( use_pl ):
-    title = r"$\operatorname{Re}\mathcal{K}_{1,\uparrow\downarrow}(\Omega_{XPH})$"
-    zarr = rek_updo_xph[:]
-    plotK( use_pl, zarr, title )
-    return
-
-
-#--- Plot Physical
-plotUpUpKRePH( pl.subplot(2,3,2) )
-plotUpDoKRePH( pl.subplot(2,3,5) )
-pl.xlabel(r"$\Omega_n$",fontsize=10)
-plotUpUpKRePP( pl.subplot(2,3,1) )
-plotUpDoKRePP( pl.subplot(2,3,4) )
-pl.xlabel(r"$\Omega_n$",fontsize=10)
-plotUpUpKReXPH( pl.subplot(2,3,3) )
-plotUpDoKReXPH( pl.subplot(2,3,6) )
-pl.xlabel(r"$\Omega_n$",fontsize=10)
-
-pl.subplots_adjust(top=1.0)
-pl.tight_layout()
-
-#--- Save to file
-pl.savefig("plots/K_func.png", dpi = 150)
-pl.figure(dpi=100) # Reset dpi to default
-pl.clf()
 #--------------------------------------VERTEX PLOTTING ------------------------------------------
 
 print("Plotting vertex ...")
 
+#--- Read
+revert = vert_mul * np.array(f["/Vert/RE"])
+imvert = vert_mul * np.array(f["/Vert/IM"])
+fdim = revert.shape[0]
 
-#VERTEX
+if fdim <= shift:
+    sys.exit("Error: Shift to large for vertex grid"); 
 
-re_f_upup_ph = f["VERT/PH/RE_F_UPUP"][:]
-re_f_updo_ph = f["VERT/PH/RE_F_UPDO"][:]
-re_f_upup_xph = f["VERT/XPH/RE_F_UPUP"][:]
-re_f_updo_xph = f["VERT/XPH/RE_F_UPDO"][:]
-re_f_upup_pp = f["VERT/PP/RE_F_UPUP"][:]
-re_f_updo_pp = f["VERT/PP/RE_F_UPDO"][:]
+#---  Helper functions
+def neg( w ):
+    return fdim - w - 1
 
+def check_bounds( w1, w2, w1p ):
+    if ( w1 < 0 or w1 > fdim - 1 or w2 < 0 or w2 > fdim - 1 or w1p < 0 or w1p > fdim - 1 ):
+        return False
+    return True
 
-im_f_upup_ph = f["VERT/PH/IM_F_UPUP"][:]
-im_f_updo_ph = f["VERT/PH/IM_F_UPDO"][:]
-im_f_upup_xph = f["VERT/XPH/IM_F_UPUP"][:]
-im_f_updo_xph = f["VERT/XPH/IM_F_UPDO"][:]
-im_f_upup_pp = f["VERT/PP/IM_F_UPUP"][:]
-im_f_updo_pp = f["VERT/PP/IM_F_UPDO"][:]
+def ReVert( w1, w2, w1p, i, j, k, l ):
+    if ( not check_bounds( w1, w2, w1p ) ):
+            return float('nan')
+    return revert[w1,w2,w1p,0,0,0,0,0,0,0]
 
-# We assume all the channels to have the same B/F grids
+def ImVert( w1, w2, w1p, i, j, k, l ):
+    if ( not check_bounds( w1, w2, w1p ) ):
+            return float('nan')
+    return imvert[w1,w2,w1p,0,0,0,0,0,0,0]
 
-fgrid = f["VERT/PH/fgrid"][:].shape[0] 
-bgrid = f["VERT/PH/bgrid"][:].shape[0]
+def ReVertUpDown( w1, w2, w1p ):
+    if ( not check_bounds( w1, neg(w2), w1p ) ):
+            return float('nan')
+    return revert[w1, w2, w1p, 0, 0, 0,0,0,0,0]
 
-N_bose = (bgrid-1)/2 # to create a bosonic frequency grid from -N_bose to N_bose
-N_fermi= (fgrid)/2   # to create a fermionic frequency grid from -N_fermi to N_fermi
+def ImVertUpDown( w1, w2, w1p ):
+    if ( not check_bounds( w1, neg(w2), w1p ) ):
+            return float('nan')
+    return imvert[w1, w2, w1p, 0, 0, 0,0,0,0,0]
 
-def isInside(i,j,k):
-    return abs(i) <= N_bose and j >= -N_fermi and j < N_fermi and k >= -N_fermi and k < N_fermi
+def ReVertUpUp( w1, w2, w1p ):
+    if ( not check_bounds( w1, w2, w1p ) ):
+            return float('nan')
+    return ReVertUpDown( w1, w2, w1p ) - ReVertUpDown( w2, w1, w1p )
 
-
-#-------------------------------- FUNCTION DEFINITION--------------------------------------
-
-# 
-def K_upup_ph(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_upup_ph[wb+N_bose_k]+1j*imk_upup_ph[wb+N_bose_k]
-    else:
-        return 0.0
-def K_updo_ph(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_updo_ph[wb+N_bose_k]+1j*imk_updo_ph[wb+N_bose_k]
-    else:
-        return 0.0
-def K_updo_pp(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_updo_pp[wb+N_bose_k]+1j*imk_updo_pp[wb+N_bose_k]
-    else:
-        return 0.0
-def K_upup_xph(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_upup_xph[wb+N_bose_k]+1j*imk_upup_xph[wb+N_bose_k]
-    else:
-        return 0.0
-def K_updo_xph(wb):
-    if (abs(wb) <= N_bose_k):
-        return rek_updo_xph[wb+N_bose_k]+1j*imk_updo_xph[wb+N_bose_k]
-    else:
-        return 0.0
-
-def P_upup_ph(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_upup_ph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_upup_ph[wf+N_fermi_p,wb+N_bose_p]
-    else:
-        return 0.0
-def P_updo_ph(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_ph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_ph[wf+N_fermi_p,wb+N_bose_p]
-    else:
-        return 0.0
-def P_updo_pp(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_pp[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_pp[wf+N_fermi_p,wb+N_bose_p]
-    else:
-        return 0.0
-def P_upup_xph(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_upup_xph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_upup_xph[wf+N_fermi_p,wb+N_bose_p]
-    else:
-        return 0.0
-def P_updo_xph(wb,wf):
-    if (abs(wb) <= N_bose_p and wf >= -N_fermi_p and wf < N_fermi_p):
-        return rep_updo_xph[wf+N_fermi_p,wb+N_bose_p]+1j*imp_updo_xph[wf+N_fermi_p,wb+N_bose_p]
-    else:
-        return 0.0
-
-# Update the asymptotic structures for the VERTEX IN ALL CHANNELS
-
-def f_upup_fun_ph(i,j,k):
-    if isInside(i,j,k):
-        return re_f_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_upup_ph(i) + P_upup_ph(i,j)+ P_upup_ph(i,k) + K_upup_xph(PHtoXPH((i,j,k))[0]) + P_upup_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[1])+P_upup_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[2])
-           
-def f_updo_fun_ph(i,j,k):
-    if isInside(i,j,k):
-        return re_f_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return - U + K_updo_ph(i) + P_updo_ph(i,j)+P_updo_ph(i,k) + K_updo_xph(PHtoXPH((i,j,k))[0]) + P_updo_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[1]) + P_updo_xph(PHtoXPH((i,j,k))[0],PHtoXPH((i,j,k))[2])+ K_updo_pp(PHtoPP((i,j,k))[0]) + P_updo_pp(PHtoPP((i,j,k))[0],PHtoPP((i,j,k))[1]) + P_updo_pp(PHtoPP((i,j,k))[0],PHtoPP((i,j,k))[2])
-
-def f_upup_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return re_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return  K_upup_ph(PPtoPH((i,j,k))[0]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_upup_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_upup_xph(PPtoXPH((i,j,k))[0]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_upup_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
-
-def f_updo_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return re_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return - U + K_updo_pp(i) + P_updo_pp(i,j) + P_updo_pp(i,k) + K_updo_ph(PPtoPH((i,j,k))[0]) + P_updo_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[1]) + P_updo_ph(PPtoPH((i,j,k))[0],PPtoPH((i,j,k))[2])+ K_updo_xph(PPtoXPH((i,j,k))[0]) + P_updo_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[1]) + P_updo_xph(PPtoXPH((i,j,k))[0],PPtoXPH((i,j,k))[2])
-
-def f_upup_fun_xph(i,j,k):
-    if isInside(i,j,k):
-        return re_f_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_upup_xph(i) + P_upup_xph(i,j)+P_upup_xph(i,k) + K_upup_ph(XPHtoPH((i,j,k))[0]) + P_upup_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[1])+ P_upup_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[2]) 
-
-def f_updo_fun_xph(i,j,k):
-    if isInside(i,j,k):
-        return re_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return - U + K_updo_xph(i) + P_updo_xph(i,j)+P_updo_xph(i,k) + K_updo_ph(XPHtoPH((i,j,k))[0]) + P_updo_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[1]) + P_updo_ph(XPHtoPH((i,j,k))[0],XPHtoPH((i,j,k))[2])+ K_updo_pp(XPHtoPP((i,j,k))[0]) + P_updo_pp(XPHtoPP((i,j,k))[0],XPHtoPP((i,j,k))[1]) + P_updo_pp(XPHtoPP((i,j,k))[0],XPHtoPP((i,j,k))[2])
-#-------------------------------Plotting Vertex-----------------
+def ImVertUpUp( w1, w2, w1p ):
+    if ( not check_bounds( w1, w2, w1p ) ):
+            return float('nan')
+    return ImVertUpDown( w1, w2, w1p ) - ImVertUpDown( w2, w1, w1p )
 
 
-N_fermi_plot = 2*N_fermi
-
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
-cmap = pl.get_cmap('jet') # Bianconiglio
-X = np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)])
-#pl.figsize=(13, 7)
-
-def plotVert_ED( use_pl, zarr, string):
+def plotVert( use_pl, zarr, string ):
     use_pl.set_aspect(1.0)
-    pl.pcolormesh(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]),np.ma.masked_where( np.isnan(zarr), zarr )) 
-    use_pl.set_title( string , fontsize=10)    
-    pl.colorbar(shrink=0.6)
+    pl.pcolormesh( vertgrid, vertgrid, np.ma.masked_where( np.isnan(zarr), zarr ) )
+    pl.ylim([min(vertgrid),max(vertgrid)])
+    pl.xlim([min(vertgrid),max(vertgrid)])
+    use_pl.set_title( string , fontsize=10)
+    pl.colorbar(shrink=0.6) 
     return
 
-def plotre_f_upup_ph( use_pl ):
-    title=r"$\operatorname{Re}F^{PH}_{\uparrow \uparrow}$"
-    zarr = np.array([[ f_upup_fun_ph(shift,n,m).real  for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotVert_ED( use_pl, zarr, title ) 
+def plotUpUpVertRePP( use_pl ):
+    title = RE + "\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
+    zarr = np.array([[ ReVertUpUp(n,shift+neg(n),m) for n in range(fdim)] for m in range(fdim)])
+    plotVert( use_pl, zarr, title )
     return
 
-def plotre_f_updo_ph( use_pl ):
-    title=r"$\operatorname{Re}F^{PH}_{\uparrow \downarrow}$"
-    zarr = np.array([[ f_updo_fun_ph(shift,n,m).real  for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotVert_ED( use_pl, zarr, title ) 
+def plotUpDownVertRePP( use_pl ):
+    title = RE + "\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
+    zarr = np.array([[ ReVertUpDown(n,shift+neg(n),m) for n in range(fdim)] for m in range(fdim)])
+    plotVert( use_pl, zarr, title )
     return
 
-def plotre_f_upup_pp( use_pl ):
-    title=r"$\operatorname{Re}F^{PP}_{\uparrow \uparrow}$"
-    zarr = np.array([[ f_upup_fun_pp(shift,n,m).real for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotVert_ED( use_pl, zarr, title ) 
+def plotUpUpVertRePH( use_pl ):
+    title = RE + "\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{PH}+\omega_m,\Omega_{PH}+\omega_n)$"
+    zarr = np.array([[ ReVertUpUp(n,m+shift,n+shift) for n in range(fdim)] for m in range(fdim)])
+    plotVert( use_pl, zarr, title )
     return
 
-def plotre_f_updo_pp( use_pl ):
-    title=r"$\operatorname{Re}F^{PP}_{\uparrow \downarrow}$"
-    zarr = np.array([[ f_updo_fun_pp(shift,n,m).real for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotVert_ED( use_pl, zarr, title ) 
+def plotUpDownVertRePH( use_pl ):
+    title = RE + "\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{PH}+\omega_m,\Omega_{PH}+\omega_n)$"
+    zarr = np.array([[ ReVertUpDown(n,m+shift,n+shift) for n in range(fdim)] for m in range(fdim)])
+    plotVert( use_pl, zarr, title )
     return
 
-def plotre_f_upup_xph( use_pl ):
-    title=r"$\operatorname{Re}F^{XPH}_{\uparrow \uparrow}$"
-    zarr = np.array([[ (f_upup_fun_xph(shift,n,m)).real  for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotVert_ED( use_pl, zarr, title ) 
+def plotUpUpVertReXPH( use_pl ):
+    title = RE + "\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{XPH}+\omega_m,\omega_m)$"
+    zarr = np.array([[ ReVertUpUp(n,m+shift,m) for n in range(fdim)] for m in range(fdim)])
+    plotVert( use_pl, zarr, title )
     return
 
-def plotre_f_updo_xph( use_pl ):
-    title=r"$\operatorname{Re}F^{XPH}_{\uparrow \downarrow}$"
-    zarr = np.array([[ (f_updo_fun_xph(shift,n,m)).real  for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotVert_ED( use_pl, zarr, title ) 
+def plotUpDownVertReXPH( use_pl ):
+    title = RE + "\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{XPH}+\omega_m,\omega_m)$"
+    zarr = np.array([[ ReVertUpDown(n,m+shift,m) for n in range(fdim)] for m in range(fdim)])
+    plotVert( use_pl, zarr, title )
     return
 
-pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))) + r"     $\Omega_{\rm PP}= \Omega_{\rm PH}= \Omega_{\rm XPH}=$" + str(shift) + r"$*2\pi/\beta$")
+#--- Plot
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
 
-plotre_f_upup_pp(pl.subplot(2,3,1))
-pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_f_upup_ph(pl.subplot(2,3,2))
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_f_upup_xph(pl.subplot(2,3,3))
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_f_updo_pp(pl.subplot(2,3,4))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_f_updo_ph(pl.subplot(2,3,5))
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-pl.xlabel(r"$\omega_n$",fontsize=10)
-plotre_f_updo_xph(pl.subplot(2,3,6))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-
+plotUpUpVertRePP( pl.subplot(2,3,1) )
+pl.ylabel(r"$\omega_m$")
+plotUpUpVertRePH( pl.subplot(2,3,2) )
+plotUpUpVertReXPH( pl.subplot(2,3,3) )
+plotUpDownVertRePP( pl.subplot(2,3,4) )
+pl.xlabel(r"$\omega_n$")
+pl.ylabel(r"$\omega_m$")
+plotUpDownVertRePH( pl.subplot(2,3,5) )
+pl.xlabel(r"$\omega_n$")
+plotUpDownVertReXPH( pl.subplot(2,3,6) )
+pl.xlabel(r"$\omega_n$")
 pl.tight_layout()
 
 #--- Save to file
@@ -544,474 +298,451 @@ pl.savefig("plots/Vert.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-#-------------------------------Plotting Gamma-----------------
+shift=8
 
-print("Plotting Gamma ...")
+#--- Plot
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
 
-#PHIs
+#--- Plot Physical
+plotUpUpVertRePP( pl.subplot(2,3,1) )
+pl.ylabel(r"$\omega_m$")
+plotUpUpVertRePH( pl.subplot(2,3,2) )
+plotUpUpVertReXPH( pl.subplot(2,3,3) )
 
-re_gamma_upup_ph = f["GAMMA/PH/RE_GAMMA_UPUP"][:]
-re_gamma_updo_ph = f["GAMMA/PH/RE_GAMMA_UPDO"][:]
-re_gamma_upup_xph = f["GAMMA/XPH/RE_GAMMA_UPUP"][:]
-re_gamma_updo_xph = f["GAMMA/XPH/RE_GAMMA_UPDO"][:]
-re_gamma_upup_pp = f["GAMMA/PP/RE_GAMMA_UPUP"][:]
-re_gamma_updo_pp = f["GAMMA/PP/RE_GAMMA_UPDO"][:]
-
-
-im_gamma_upup_ph = f["GAMMA/PH/IM_GAMMA_UPUP"][:]
-im_gamma_updo_ph = f["GAMMA/PH/IM_GAMMA_UPDO"][:]
-im_gamma_upup_xph = f["GAMMA/XPH/IM_GAMMA_UPUP"][:]
-im_gamma_updo_xph = f["GAMMA/XPH/IM_GAMMA_UPDO"][:]
-im_gamma_upup_pp = f["GAMMA/PP/IM_GAMMA_UPUP"][:]
-im_gamma_updo_pp = f["GAMMA/PP/IM_GAMMA_UPDO"][:]
-
-N_fermi_plot = N_fermi
-
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
-cmap = pl.get_cmap('jet') # Bianconiglio
-
-pl.figsize=(13, 7)
-
-def plotGamma_ED( use_pl, zarr, string):
-    use_pl.set_aspect(1.0)
-    pl.pcolormesh(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]),np.ma.masked_where( np.isnan(zarr), zarr ))
-    use_pl.set_title( string , fontsize=10)    
-    pl.colorbar(shrink=0.6)
-    return
-
-def plotre_gamma_upup_ph( use_pl ):
-    title=r"$\operatorname{Re}\Gamma^{PH}_{\uparrow \uparrow}$"
-    zarr = re_gamma_upup_ph[shift+N_bose,:,:].real
-    plotGamma_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_gamma_updo_ph( use_pl ):
-    title=r"$\operatorname{Re}\Gamma^{PH}_{\uparrow \downarrow}$"
-    zarr = re_gamma_updo_ph[shift+N_bose,:,:].real
-    plotGamma_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_gamma_upup_pp( use_pl ):
-    title=r"$\operatorname{Re}\Gamma^{PP}_{\uparrow \uparrow}$"
-    zarr = re_gamma_upup_pp[shift+N_bose,:,:].real
-    plotGamma_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_gamma_updo_pp( use_pl ):
-    title=r"$\operatorname{Re}\Gamma^{PP}_{\uparrow \downarrow}$"
-    zarr = re_gamma_updo_pp[shift+N_bose,:,:].real
-    plotGamma_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_gamma_upup_xph( use_pl ):
-    title=r"$\operatorname{Re}\Gamma^{XPH}_{\uparrow \uparrow}$"
-    zarr = re_gamma_upup_xph[shift+N_bose,:,:].real
-    plotGamma_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_gamma_updo_xph( use_pl ):
-    title=r"$\operatorname{Re}\Gamma^{XPH}_{\uparrow \downarrow}$"
-    zarr = re_gamma_updo_xph[shift+N_bose,:,:].real
-    plotGamma_ED( use_pl, zarr, title ) 
-    return
-
-
-pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))) + r"     $\Omega_{\rm PP}= \Omega_{\rm PH}= \Omega_{\rm XPH}=$" + str(shift) + r"$*2\pi/\beta$")
-
-plotre_gamma_upup_pp(pl.subplot(2,3,1))
-pl.ylabel(r"$\omega_m$", fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_gamma_upup_ph(pl.subplot(2,3,2))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_gamma_upup_xph(pl.subplot(2,3,3))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_gamma_updo_pp(pl.subplot(2,3,4))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.ylabel(r"$\omega_m$", fontsize=10)
-plotre_gamma_updo_ph(pl.subplot(2,3,5))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-pl.xlabel(r"$\omega_n$",fontsize=10)
-plotre_gamma_updo_xph(pl.subplot(2,3,6))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-pl.xlabel(r"$\omega_n$",fontsize=10)
+plotUpDownVertRePP( pl.subplot(2,3,4) )
+pl.xlabel(r"$\omega_n$")
+pl.ylabel(r"$\omega_m$")
+plotUpDownVertRePH( pl.subplot(2,3,5) )
+pl.xlabel(r"$\omega_n$")
+plotUpDownVertReXPH( pl.subplot(2,3,6) )
+pl.xlabel(r"$\omega_n$")
 
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/Gamma.png", dpi = 150)
+pl.savefig("plots/Vert_shift.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-#--------------------------------------------PHI PLOTTING------------------------------------------
-print("Plotting Phi ...")
+shift=0
 
-#PHIs
-
-re_phi_upup_ph = f["PHI/PH/RE_PHI_UPUP"][:]
-re_phi_updo_ph = f["PHI/PH/RE_PHI_UPDO"][:]
-re_phi_upup_xph = f["PHI/XPH/RE_PHI_UPUP"][:]
-re_phi_updo_xph = f["PHI/XPH/RE_PHI_UPDO"][:]
-re_phi_upup_pp = f["PHI/PP/RE_PHI_UPUP"][:]
-re_phi_updo_pp = f["PHI/PP/RE_PHI_UPDO"][:]
-
-
-im_phi_upup_ph = f["PHI/PH/IM_PHI_UPUP"][:]
-im_phi_updo_ph = f["PHI/PH/IM_PHI_UPDO"][:]
-im_phi_upup_xph = f["PHI/XPH/IM_PHI_UPUP"][:]
-im_phi_updo_xph = f["PHI/XPH/IM_PHI_UPDO"][:]
-im_phi_upup_pp = f["PHI/PP/IM_PHI_UPUP"][:]
-im_phi_updo_pp = f["PHI/PP/IM_PHI_UPDO"][:]
-
-# We assume the phi fucntions to have the same b and f grids
-#PHIS FUNCTIONS
-
-
-def phi_upup_fun_ph(i,j,k):
-    if isInside(i,j,k):
-        return re_phi_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_phi_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_upup_ph(i) + P_upup_ph(i,j) +P_upup_ph(i,k) 
-    
-def phi_updo_fun_ph(i,j,k):
-    if isInside(i,j,k):
-        return re_phi_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_phi_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_updo_ph(i) + P_updo_ph(i,j)+P_updo_ph(i,k)
-    
-def phi_upup_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return re_phi_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_phi_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return 0.0 
-    
-def phi_updo_fun_pp(i,j,k):
-    if isInside(i,j,k):
-        return re_phi_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_phi_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_updo_pp(i) + P_updo_pp(i,j) + P_updo_pp(i,k)
-    
-def phi_upup_fun_xph(i,j,k):
-    if isInside(i,j,k):
-        return re_phi_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_phi_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_upup_xph(i) + P_upup_xph(i,j)  + P_upup_xph(i,k)
-    
-def phi_updo_fun_xph(i,j,k):
-    if isInside(i,j,k):
-        return re_phi_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_phi_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]
-    else:
-        return K_updo_xph(i) + P_updo_xph(i,j)+ P_updo_xph(i,k)
-    
-#-------------------------------Plotting Phi-----------------
-
-N_fermi_plot = 2*N_fermi
-
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
-cmap = pl.get_cmap('jet') # Bianconiglio
-
-#pl.figsize=(13, 7)
-X = np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)])
-
-def plotPhi_ED( use_pl, zarr, string):
-    use_pl.set_aspect(1.0)
-    pl.pcolormesh(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]),np.ma.masked_where( np.isnan(zarr), zarr ))
-    use_pl.set_title( string , fontsize=10)    
-    pl.colorbar(shrink=0.6)
-    return
-
-def plotre_phi_upup_ph( use_pl ):
-    title=r"$\operatorname{Re}\phi^{PH}_{\uparrow \uparrow}$"
-    zarr = np.array([[ phi_upup_fun_ph(shift,n,m).real  for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotPhi_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_phi_updo_ph( use_pl ):
-    title=r"$\operatorname{Re}\phi^{PH}_{\uparrow \downarrow}$"
-    zarr = np.array([[ phi_updo_fun_ph(shift,n,m).real  for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotPhi_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_phi_upup_pp( use_pl ):
-    title=r"$\operatorname{Re}\phi^{PP}_{\uparrow \uparrow}$"
-    zarr = np.array([[ phi_upup_fun_pp(shift,n,m).real for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotPhi_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_phi_updo_pp( use_pl ):
-    title=r"$\operatorname{Re}\phi^{PP}_{\uparrow \downarrow}$"
-    zarr = np.array([[ phi_updo_fun_pp(shift,n,m).real for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotPhi_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_phi_upup_xph( use_pl ):
-    title=r"$\operatorname{Re}\phi^{XPH}_{\uparrow \uparrow}$"
-    zarr = np.array([[ (phi_upup_fun_xph(shift,n,m)).real  for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotPhi_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_phi_updo_xph( use_pl ):
-    title=r"$\operatorname{Re}\phi^{XPH}_{\uparrow \downarrow}$"
-    zarr = np.array([[ (phi_updo_fun_xph(shift,n,m)).real  for n in range(-N_fermi_plot,N_fermi_plot)] for m in range(-N_fermi_plot,N_fermi_plot)])
-    plotPhi_ED( use_pl, zarr, title ) 
-    return
-
-pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))) + r"     $\Omega_{\rm PP}= \Omega_{\rm PH}= \Omega_{\rm XPH}=$" + str(shift) + r"$*2\pi/\beta$")
-
-plotre_phi_upup_pp(pl.subplot(2,3,1))
-pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_phi_upup_ph(pl.subplot(2,3,2))
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_phi_upup_xph(pl.subplot(2,3,3))
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_phi_updo_pp(pl.subplot(2,3,4))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_phi_updo_ph(pl.subplot(2,3,5))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-plotre_phi_updo_xph(pl.subplot(2,3,6))
-pl.xticks([-40,-20,0,20,40])
-pl.yticks([-40,-20,0,20,40])
-pl.xlabel(r"$\omega_n$",fontsize=10)
-
-pl.tight_layout()
-
-#--- Save to file
-pl.savefig("plots/Phi.png", dpi = 150)
-pl.figure(dpi=100) # Reset dpi to default
-pl.clf()
-
-#-------------------------------------------------LAMBDA--------------------------------------------
+#--------------------------------------LAMBDA PLOTTING ------------------------------------------
 
 print("Plotting Lambda ...")
 
-#LAMBDAS
+#--- Read
+relambda = vert_mul * np.array(f["/Lambda/RE"])
+imlambda = vert_mul * np.array(f["/Lambda/IM"])
+fdim = relambda.shape[0]
+lambdagrid = np.array(f["/Lambda/fgrid"])
 
-re_lambda_upup_ph = f["Lambda/PH/RE_LAMBDA_UPUP"][:]
-re_lambda_updo_ph = f["Lambda/PH/RE_LAMBDA_UPDO"][:]
-re_lambda_upup_xph = f["Lambda/XPH/RE_LAMBDA_UPUP"][:]
-re_lambda_updo_xph = f["Lambda/XPH/RE_LAMBDA_UPDO"][:]
-re_lambda_upup_pp = f["Lambda/PP/RE_LAMBDA_UPUP"][:]
-re_lambda_updo_pp = f["Lambda/PP/RE_LAMBDA_UPDO"][:]
+if fdim <= shift:
+    sys.exit("Error: Shift to large for vertex grid"); 
+
+#---  Helper functions
+def neg( w ):
+    return fdim - w - 1
+
+def check_bounds( w1, w2, w1p ):
+    if ( w1 < 0 or w1 > fdim - 1 or w2 < 0 or w2 > fdim - 1 or w1p < 0 or w1p > fdim - 1 ):
+        return False
+    return True
+
+def ReLambda( w1, w2, w1p, i, j, k, l ):
+    if ( not check_bounds( w1, w2, w1p ) ):
+            return float('nan')
+    return relambda[w1,w2,w1p,0,0,0,0,0,0,0]
+
+def ImLambda( w1, w2, w1p, i, j, k, l ):
+    if ( not check_bounds( w1, w2, w1p ) ):
+            return float('nan')
+    return imlambda[w1,w2,w1p,0,0,0,0,0,0,0]
+
+def ReLambdaUpDown( w1, w2, w1p ):
+    if ( not check_bounds( w1, neg(w2), w1p ) ):
+            return float('nan')
+    return relambda[w1, w2, w1p, 0, 0, 0,0,0,0,0]
+
+def ImLambdaUpDown( w1, w2, w1p ):
+    if ( not check_bounds( w1, neg(w2), w1p ) ):
+            return float('nan')
+    return imlambda[w1, w2, w1p, 0, 0, 0,0,0,0,0]
+
+def ReLambdaUpUp( w1, w2, w1p ):
+    if ( not check_bounds( w1, w2, w1p ) ):
+            return float('nan')
+    return ReLambdaUpDown( w1, w2, w1p ) - ReLambdaUpDown( w2, w1, w1p )
+
+def ImLambdaUpUp( w1, w2, w1p ):
+    if ( not check_bounds( w1, w2, w1p ) ):
+            return float('nan')
+    return ImLambdaUpDown( w1, w2, w1p ) - ImLambdaUpDown( w2, w1, w1p )
 
 
-im_lambda_upup_ph = f["Lambda/PH/IM_LAMBDA_UPUP"][:]
-im_lambda_updo_ph = f["Lambda/PH/IM_LAMBDA_UPDO"][:]
-im_lambda_upup_xph = f["Lambda/XPH/IM_LAMBDA_UPUP"][:]
-im_lambda_updo_xph = f["Lambda/XPH/IM_LAMBDA_UPDO"][:]
-im_lambda_upup_pp = f["Lambda/PP/IM_LAMBDA_UPUP"][:]
-im_lambda_updo_pp = f["Lambda/PP/IM_LAMBDA_UPDO"][:]
-
-
-#-------------------------------Plotting Lambda-----------------
-
-N_fermi_plot = N_fermi
-
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
-X = np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)])
-
-pl.register_cmap(name='agnesepalette', data=create_palette_georg()) #New palette from agneselib to plot lambda in the same way as Georg's paper
-
-def plotLambda_ED( use_pl, zarr, string):
+def plotLambda( use_pl, zarr, string ):
     use_pl.set_aspect(1.0)
-    pl.pcolormesh(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), np.ma.masked_where( np.isnan(zarr), zarr ), cmap = 'agnesepalette')
-    use_pl.set_title( string , fontsize=10)    
-    pl.colorbar(shrink=0.6)
+    pl.pcolormesh( lambdagrid, lambdagrid, np.ma.masked_where( np.isnan(zarr), zarr ) )
+    pl.ylim([min(lambdagrid),max(lambdagrid)])
+    pl.xlim([min(lambdagrid),max(lambdagrid)])
+    use_pl.set_title( string , fontsize=10)
+    pl.colorbar(shrink=0.6) 
     return
 
-def plotre_lambda_upup_ph( use_pl ):
-    title=r"$\operatorname{Re}\Lambda^{PH}_{\uparrow \uparrow}$"
-    zarr =  re_lambda_upup_ph[:,:,shift+N_bose]
-    plotLambda_ED( use_pl, zarr, title ) 
+def plotUpUpLambdaRePP( use_pl ):
+    title = r"$\operatorname{Re}\Lambda_{\uparrow\uparrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
+    zarr = np.array([[ ReLambdaUpUp(n,shift+neg(n),m) for n in range(fdim)] for m in range(fdim)])
+    plotLambda( use_pl, zarr, title )
     return
 
-def plotre_lambda_updo_ph( use_pl ):
-    title=r"$\operatorname{Re}\Lambda^{PH}_{\uparrow \downarrow}$"
-    zarr =  re_lambda_updo_ph[:,:,shift+N_bose]
-    plotLambda_ED( use_pl, zarr, title ) 
+def plotUpDownLambdaRePP( use_pl ):
+    title = r"$\operatorname{Re}\Lambda_{\uparrow\downarrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
+    zarr = np.array([[ ReLambdaUpDown(n,shift+neg(n),m) for n in range(fdim)] for m in range(fdim)])
+    plotLambda( use_pl, zarr, title )
     return
 
-def plotre_lambda_upup_pp( use_pl ):
-    title=r"$\operatorname{Re}\Lambda^{PP}_{\uparrow \uparrow}$"
-    zarr =  re_lambda_upup_pp[:,:,shift+N_bose]
-    plotLambda_ED( use_pl, zarr, title ) 
+def plotUpUpLambdaRePH( use_pl ):
+    title = r"$\operatorname{Re}\Lambda_{\uparrow\uparrow}(\omega_n,\Omega_{PH}+\omega_m,\Omega_{PH}+\omega_n)$"
+    zarr = np.array([[ ReLambdaUpUp(n,m+shift,n+shift) for n in range(fdim)] for m in range(fdim)])
+    plotLambda( use_pl, zarr, title )
     return
 
-def plotre_lambda_updo_pp( use_pl ):
-    title=r"$\operatorname{Re}\Lambda^{PP}_{\uparrow \downarrow}$"
-    zarr =  re_lambda_updo_pp[:,:,shift+N_bose]
-    plotLambda_ED( use_pl, zarr, title ) 
+def plotUpDownLambdaRePH( use_pl ):
+    title = r"$\operatorname{Re}\Lambda_{\uparrow\downarrow}(\omega_n,\Omega_{PH}+\omega_m,\Omega_{PH}+\omega_n)$"
+    zarr = np.array([[ ReLambdaUpDown(n,m+shift,n+shift) for n in range(fdim)] for m in range(fdim)])
+    plotLambda( use_pl, zarr, title )
     return
 
-def plotre_lambda_upup_xph( use_pl ):
-    title=r"$\operatorname{Re}\Lambda^{XPH}_{\uparrow \uparrow}$"
-    zarr =  re_lambda_upup_xph[:,:,shift+N_bose]
-    plotLambda_ED( use_pl, zarr, title ) 
+def plotUpUpLambdaRePHX( use_pl ):
+    title = r"$\operatorname{Re}\Lambda_{\uparrow\uparrow}(\omega_n,\Omega_{PHX}+\omega_m,\omega_m)$"
+    zarr = np.array([[ ReLambdaUpUp(n,m+shift,m) for n in range(fdim)] for m in range(fdim)])
+    plotLambda( use_pl, zarr, title )
     return
 
-def plotre_lambda_updo_xph( use_pl ):
-    title=r"$\operatorname{Re}\Lambda^{XPH}_{\uparrow \downarrow}$"
-    zarr =  re_lambda_updo_xph[:,:,shift+N_bose] 
-    plotLambda_ED( use_pl, zarr, title ) 
+def plotUpDownLambdaRePHX( use_pl ):
+    title = r"$\operatorname{Re}\Lambda_{\uparrow\downarrow}(\omega_n,\Omega_{PHX}+\omega_m,\omega_m)$"
+    zarr = np.array([[ ReLambdaUpDown(n,m+shift,m) for n in range(fdim)] for m in range(fdim)])
+    plotLambda( use_pl, zarr, title )
     return
 
-pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))) + r"     $\Omega_{\rm PP}= \Omega_{\rm PH}= \Omega_{\rm XPH}=$" + str(shift) + r"$*2\pi/\beta$")
 
-plotre_lambda_upup_pp(pl.subplot(2,3,1))
-pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_lambda_upup_ph(pl.subplot(2,3,2))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_lambda_upup_xph(pl.subplot(2,3,3))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_lambda_updo_pp(pl.subplot(2,3,4))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_lambda_updo_ph(pl.subplot(2,3,5))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_lambda_updo_xph(pl.subplot(2,3,6))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-pl.xlabel(r"$\omega_n$",fontsize=10)
+#--- plot
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\Lambda(\omega_1,\omega_2,\omega_1')$")
 
+plotUpUpLambdaRePP( pl.subplot(2,3,1) )
+pl.ylabel(r"$\omega_m$")
+plotUpUpLambdaRePH( pl.subplot(2,3,2) )
+plotUpUpLambdaRePHX( pl.subplot(2,3,3) )
+plotUpDownLambdaRePP( pl.subplot(2,3,4) )
+pl.xlabel(r"$\omega_n$")
+pl.ylabel(r"$\omega_m$")
+plotUpDownLambdaRePH( pl.subplot(2,3,5) )
+pl.xlabel(r"$\omega_n$")
+plotUpDownLambdaRePHX( pl.subplot(2,3,6) )
+pl.xlabel(r"$\omega_n$")
 pl.tight_layout()
+
+shift=8
 
 #--- Save to file
 pl.savefig("plots/Lambda.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
+#--- plot
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\Lambda(\omega_1,\omega_2,\omega_1')$")
 
-#-------------------------------------------------REST FUNCTION--------------------------------------------
+plotUpUpLambdaRePP( pl.subplot(2,3,1) )
+pl.ylabel(r"$\omega_m$")
+plotUpUpLambdaRePH( pl.subplot(2,3,2) )
+plotUpUpLambdaRePHX( pl.subplot(2,3,3) )
+plotUpDownLambdaRePP( pl.subplot(2,3,4) )
+pl.xlabel(r"$\omega_n$")
+pl.ylabel(r"$\omega_m$")
+plotUpDownLambdaRePH( pl.subplot(2,3,5) )
+pl.xlabel(r"$\omega_n$")
+plotUpDownLambdaRePHX( pl.subplot(2,3,6) )
+pl.xlabel(r"$\omega_n$")
+pl.tight_layout()
 
-print("Plotting R_func ...")
+#--- Save to file
+pl.savefig("plots/Lambda_shift.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
 
-#RS
+shift=0
 
-re_R_upup_ph = f["R_func/PH/RE_R_UPUP"][:]
-re_R_updo_ph = f["R_func/PH/RE_R_UPDO"][:]
-re_R_upup_xph = f["R_func/XPH/RE_R_UPUP"][:]
-re_R_updo_xph = f["R_func/XPH/RE_R_UPDO"][:]
-re_R_upup_pp = f["R_func/PP/RE_R_UPUP"][:]
-re_R_updo_pp = f["R_func/PP/RE_R_UPDO"][:]
+#--------------------------------------PHI PLOTTING ------------------------------------------
 
+print("Plotting phi ...")
 
-im_R_upup_ph = f["R_func/PH/IM_R_UPUP"][:]
-im_R_updo_ph = f["R_func/PH/IM_R_UPDO"][:]
-im_R_upup_xph = f["R_func/XPH/IM_R_UPUP"][:]
-im_R_updo_xph = f["R_func/XPH/IM_R_UPDO"][:]
-im_R_upup_pp = f["R_func/PP/IM_R_UPUP"][:]
-im_R_updo_pp = f["R_func/PP/IM_R_UPDO"][:]
+#--- Read
+rephi_pp = vert_mul * np.array(f["/phi_func/RE_PP"])
+imphi_pp = vert_mul * np.array(f["/phi_func/IM_PP"])
+rephi_ph = vert_mul * np.array(f["/phi_func/RE_PH"])
+imphi_ph = vert_mul * np.array(f["/phi_func/IM_PH"])
+rephi_xph = vert_mul * np.array(f["/phi_func/RE_XPH"])
+imphi_xph = vert_mul * np.array(f["/phi_func/IM_XPH"])
 
+bdim = rephi_pp.shape[0]
+fdim = rephi_pp.shape[1]
 
-#-------------------------------Plotting R_func-----------------
+phigrid = np.array(f["/phi_func/fgrid"])
 
-N_fermi_plot = N_fermi
-
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
-cmap = pl.get_cmap('jet') # Bianconiglio
-
-#pl.figsize=(13, 7)
-
-def plotR_func_ED( use_pl, zarr, string):
+#---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+def plotphi( use_pl, arr, string ):
     use_pl.set_aspect(1.0)
-    pl.pcolormesh(np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]), np.array([(2*i+1)*pi/beta for i in range(-N_fermi_plot,N_fermi_plot)]),np.ma.masked_where( np.isnan(zarr), zarr ))
-    use_pl.set_title( string , fontsize=10)    
-    pl.colorbar(shrink=0.6)
+    zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
+    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.ylim([min(phigrid),max(phigrid)])
+    pl.xlim([min(phigrid),max(phigrid)])
+    use_pl.set_title( string , fontsize=10 )
+    pl.colorbar(shrink=0.6) 
     return
 
-def plotre_R_upup_ph( use_pl ):
-    title=r"$\operatorname{Re}\mathcal{R}^{PH}_{\uparrow \uparrow}$"
-    zarr =  re_R_upup_ph[:,:,shift+N_bose] 
-    plotR_func_ED( use_pl, zarr, title ) 
-    return
+#--- Plot 
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
-def plotre_R_updo_ph( use_pl ):
-    title=r"$\operatorname{Re}\mathcal{R}^{PH}_{\uparrow \downarrow}$"
-    zarr =  re_R_updo_ph[:,:,shift+N_bose]
-    plotR_func_ED( use_pl, zarr, title ) 
-    return
+plotphi( pl.subplot(2,3,1), rephi_pp - rephi_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\phi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,2), rephi_ph - rephi_xph, RE + r"\phi^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,3), rephi_xph - rephi_ph, RE + r"\phi^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
 
-def plotre_R_upup_pp( use_pl ):
-    title=r"$\operatorname{Re}\mathcal{R}^{PP}_{\uparrow \uparrow}$"
-    zarr =  re_R_upup_pp[:,:,shift+N_bose]
-    plotR_func_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_R_updo_pp( use_pl ):
-    title=r"$\operatorname{Re}\mathcal{R}^{PP}_{\uparrow \downarrow}}}$"
-    zarr =  re_R_updo_pp[:,:,shift+N_bose]    
-    plotR_func_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_R_upup_xph( use_pl ):
-    title=r"$\operatorname{Re}\mathcal{R}^{XPH}_{2\uparrow \uparrow}$"
-    zarr =  re_R_upup_xph[:,:,shift+N_bose]
-    plotR_func_ED( use_pl, zarr, title ) 
-    return
-
-def plotre_R_updo_xph( use_pl ):
-    title=r"$\operatorname{Re}\mathcal{R}^{XPH}_{2\uparrow \downarrow}$"
-    zarr =  re_R_updo_xph[:,:,shift+N_bose]
-    plotR_func_ED( use_pl, zarr, title ) 
-    return
-
-pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))) + r"     $\Omega_{\rm PP}= \Omega_{\rm PH}= \Omega_{\rm XPH}=$" + str(shift) + r"$*2\pi/\beta$")
-
-plotre_R_upup_pp(pl.subplot(2,3,1))
-pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_R_upup_ph(pl.subplot(2,3,2))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_R_upup_xph(pl.subplot(2,3,3))
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_R_updo_pp(pl.subplot(2,3,4))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.ylabel(r"$\omega_m$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_R_updo_ph(pl.subplot(2,3,5))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
-plotre_R_updo_xph(pl.subplot(2,3,6))
-pl.xlabel(r"$\omega_n$",fontsize=10)
-pl.xticks([-20,-10,0,10,20])
-pl.yticks([-20,-10,0,10,20])
+plotphi( pl.subplot(2,3,4), rephi_pp, RE + r"\phi^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,5), rephi_ph, RE + r"\phi^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,6), rephi_xph, RE + r"\phi^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
 
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/R_func.png", dpi = 150)
+pl.savefig("plots/phi.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
+shift=8
 
+#--- Plot
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
+
+plotphi( pl.subplot(2,3,1), rephi_pp - rephi_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\phi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,2), rephi_ph - rephi_xph, RE + r"\phi^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,3), rephi_xph - rephi_ph, RE + r"\phi^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotphi( pl.subplot(2,3,4), rephi_pp, RE + r"\phi^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,5), rephi_ph, RE + r"\phi^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,6), rephi_xph, RE + r"\phi^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/phi_shift.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=0
+
+#--------------------------------------Chi PLOTTING ------------------------------------------
+
+print("Plotting chi functions ...")
+
+
+#--- Read
+bosgrid = np.array(f["/chi_func/bgrid"])
+rechi_pp = vert_mul * np.array(f["/chi_func/RE_PP"])
+imchi_pp = vert_mul * np.array(f["/chi_func/IM_PP"])
+rechi_ph = vert_mul * np.array(f["/chi_func/RE_PH"])
+imchi_ph = vert_mul * np.array(f["/chi_func/IM_PH"])
+rechi_xph = vert_mul * np.array(f["/chi_func/RE_XPH"])
+imchi_xph = vert_mul * np.array(f["/chi_func/IM_XPH"])
+fdim_bos = bosgrid.shape[0]
+
+x_range_fact = 0.1
+
+#--- Helper functions
+def plotchi( use_pl, arr, title ):
+    pl.plot(bosgrid, arr[:,0,0,0,0,0], 'b-', ms=3, mew=0.2)
+    pl.xlim([x_range_fact*min(bosgrid),x_range_fact*max(bosgrid)])
+    use_pl.set_title(title)
+    return
+
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) + "  BEPs ")
+
+plotchi( pl.subplot(2,3,1), rechi_pp - rechi_pp, RE + r"\chi^{PP}_{\uparrow\uparrow}$" )
+plotchi( pl.subplot(2,3,2), rechi_ph - rechi_xph, RE + r"\chi^{PH}_{\uparrow\uparrow}$" )
+plotchi( pl.subplot(2,3,3), rechi_xph - rechi_ph, RE + r"\chi^{XPH}_{\uparrow\uparrow}$" )
+
+plotchi( pl.subplot(2,3,4), rechi_pp, RE + r"\chi^{PP}_{\uparrow\downarrow}$" )
+pl.xlabel(r"$\Omega$")
+plotchi( pl.subplot(2,3,5), rechi_ph, RE + r"\chi^{PH}_{\uparrow\downarrow}$" )
+pl.xlabel(r"$\Omega$")
+plotchi( pl.subplot(2,3,6), rechi_xph, RE + r"\chi^{XPH}_{\uparrow\downarrow}$" )
+pl.xlabel(r"$\Omega$")
+
+pl.tight_layout()
+
+pl.savefig("plots/chi.png", dpi=150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+#--------------------------------------P PLOTTING ------------------------------------------
+
+print("Plotting P ...")
+
+#--- Read
+reP_pp = vert_mul * np.array(f["/P_func/RE_PP"])
+imP_pp = vert_mul * np.array(f["/P_func/IM_PP"])
+reP_ph = vert_mul * np.array(f["/P_func/RE_PH"])
+imP_ph = vert_mul * np.array(f["/P_func/IM_PH"])
+reP_xph = vert_mul * np.array(f["/P_func/RE_XPH"])
+imP_xph = vert_mul * np.array(f["/P_func/IM_XPH"])
+
+bdim = reP_pp.shape[0]
+fdim = reP_pp.shape[1]
+
+Pgrid = np.array(f["/P_func/fgrid"])
+
+x_range_fact = 1.0
+
+#--- Helper functions
+def plotP_Omega( W, arr, color ):
+    pl.plot(Pgrid + (W % 2) * math.pi/BETA, arr[W + (bdim-1)/2,:,0,0,0,0,0,0], color, ms=3, mew=0.2, label=r"$\Omega=" + str(W*2) + r"\pi/\beta$")
+
+def plotP( use_pl, arr, title, legend ):
+    plotP_Omega( 0, arr, 'r-' ) 
+    plotP_Omega( 1, arr, 'g-' ) 
+    plotP_Omega( 2, arr, 'b-' ) 
+    plotP_Omega( 8, arr, 'c-' ) 
+    plotP_Omega( 16, arr, 'm-' ) 
+    #plotP_Omega( 32, arr, 'y-' ) 
+    pl.xlim([x_range_fact*min(Pgrid),x_range_fact*max(Pgrid)])
+    if ( legend ):
+        pl.legend(prop={'size':7})
+
+    use_pl.set_title(title)
+    return
+
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) + "  BEPs ")
+
+plotP( pl.subplot(2,3,1), reP_pp - reP_pp, RE + r"P^{PP}_{\uparrow\uparrow}$", True )
+plotP( pl.subplot(2,3,2), reP_ph - reP_xph, RE + r"P^{PH}_{\uparrow\uparrow}$", False )
+plotP( pl.subplot(2,3,3), reP_xph - reP_ph, RE + r"P^{XPH}_{\uparrow\uparrow}$", False )
+
+plotP( pl.subplot(2,3,4), reP_pp, RE + r"P^{PP}_{\uparrow\downarrow}$", False )
+pl.xlabel(r"$\omega$")
+plotP( pl.subplot(2,3,5), reP_ph, RE + r"P^{PH}_{\uparrow\downarrow}$", False )
+pl.xlabel(r"$\omega$")
+plotP( pl.subplot(2,3,6), reP_xph, RE + r"P^{XPH}_{\uparrow\downarrow}$", False )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+pl.savefig("plots/P.png", dpi=150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+#--------------------------------------R PLOTTING ------------------------------------------
+
+print("Plotting R ...")
+
+#--- Read
+reR_pp = vert_mul * np.array(f["/R_func/RE_PP"])
+imR_pp = vert_mul * np.array(f["/R_func/IM_PP"])
+reR_ph = vert_mul * np.array(f["/R_func/RE_PH"])
+imR_ph = vert_mul * np.array(f["/R_func/IM_PH"])
+reR_xph = vert_mul * np.array(f["/R_func/RE_XPH"])
+imR_xph = vert_mul * np.array(f["/R_func/IM_XPH"])
+
+bdim = reR_pp.shape[0]
+fdim = reR_pp.shape[1]
+
+Rgrid = np.array(f["/R_func/fgrid"])
+
+#---  Helper functions 
+def plotR( use_pl, arr, string ):
+    use_pl.set_aspect(1.0)
+    zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
+    pl.pcolormesh( Rgrid, Rgrid, zarr )
+    pl.ylim([min(Rgrid),max(Rgrid)])
+    pl.xlim([min(Rgrid),max(Rgrid)])
+    use_pl.set_title( string , fontsize=10 )
+    pl.colorbar(shrink=0.6) 
+    return
+
+
+#--- Plot 
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $R(\Omega,\omega,\omega')$")
+
+plotR( pl.subplot(2,3,1), reR_pp - reR_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"R^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotR( pl.subplot(2,3,2), reR_ph - reR_xph, RE + r"R^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotR( pl.subplot(2,3,3), reR_xph - reR_ph, RE + r"R^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotR( pl.subplot(2,3,4), reR_pp, RE + r"R^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotR( pl.subplot(2,3,5), reR_ph, RE + r"R^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotR( pl.subplot(2,3,6), reR_xph, RE + r"R^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/R.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=8
+
+#--- Plot
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $R(\Omega,\omega,\omega')$")
+
+
+plotR( pl.subplot(2,3,1), reR_pp - reR_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"R^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotR( pl.subplot(2,3,2), reR_ph - reR_xph, RE + r"R^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotR( pl.subplot(2,3,3), reR_xph - reR_ph, RE + r"R^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotR( pl.subplot(2,3,4), reR_pp, RE + r"R^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotR( pl.subplot(2,3,5), reR_ph, RE + r"R^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotR( pl.subplot(2,3,6), reR_xph, RE + r"R^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/R_shift.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+#---- Open files
+#os.system('feh plots/phi.png')
+#os.system('feh plots/Giw.png')
+#os.system('feh plots/karr_func.png')
+#os.system('feh plots/flow_obs.png')
+#os.system('feh plots/chi.png')
+#os.system('feh plots/trileg.png')
+#os.system('feh plots/Sig.png')
