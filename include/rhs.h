@@ -8,7 +8,6 @@
 
 
 #pragma once
-
 #include <state.h>
 #include <grid.h>
 #include <symmetry_group.h>
@@ -48,3 +47,5 @@ class rhs_t 		///< Functor to specify the rhs calculation for both the self-ener
       static gf<double, 2> weight_vec_2d; 
 
 };
+
+

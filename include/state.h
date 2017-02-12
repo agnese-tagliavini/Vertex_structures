@@ -93,9 +93,9 @@ class state_t: public ReaK::arithmetic_tuple< gf_1p_t, gf_phi_t, gf_phi_t, gf_ph
 
       dcomplex genchi_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
       dcomplex genchi_0_ph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
-
-      dcomplex genchi_s_plus_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
-      dcomplex genchi_t_minus_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
+      
+      dcomplex genchis_plus_30_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;
+      dcomplex genchit_minus_30_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
       dcomplex genchi_d( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
       dcomplex genchi_m( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
 
@@ -129,8 +129,18 @@ class state_t: public ReaK::arithmetic_tuple< gf_1p_t, gf_phi_t, gf_phi_t, gf_ph
 
       dcomplex chi_pp_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for PP-channel
       dcomplex chi_pp_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for PP-channel
+      dcomplex chi_pp_d( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for PP-channel
+      dcomplex chi_pp_m( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for PP-channel
+      
       dcomplex chi_ph_m( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for PH-channel
       dcomplex chi_ph_d( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for XPH-channel
+      dcomplex chi_ph_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for PH-channel
+      dcomplex chi_ph_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for XPH-channel
+      
+      dcomplex chi_xph_m( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for PH-channel
+      dcomplex chi_xph_d( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for XPH-channel
+      dcomplex chi_xph_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for PH-channel
+      dcomplex chi_xph_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return chi function for XPH-channel
       
       dcomplex P_pp( int W, int w, int K, int k, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return P function for PP-channel
       dcomplex P_ph( int W, int w, int K, int k, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return P function for PH-channel
@@ -174,6 +184,26 @@ class state_t: public ReaK::arithmetic_tuple< gf_1p_t, gf_phi_t, gf_phi_t, gf_ph
 	 return vertx_ph( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
       }
 
+      inline dcomplex vertx_xph( const idx_phi_t& idx ) const
+      {
+	 return vertx_xph( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
+      }
+      
+      inline dcomplex genchi_pp( const idx_phi_t& idx ) const
+      {
+	 return genchi_pp( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
+      }
+
+      inline dcomplex genchi_ph( const idx_phi_t& idx ) const
+      {
+	 return genchi_ph( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
+      }
+
+      inline dcomplex genchi_xph( const idx_phi_t& idx ) const
+      {
+	 return genchi_xph( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
+      }
+      
       inline dcomplex lambda( const idx_2p_t& idx ) const
       {
 	 return lambda( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
@@ -226,19 +256,19 @@ class state_t: public ReaK::arithmetic_tuple< gf_1p_t, gf_phi_t, gf_phi_t, gf_ph
 
 }; 
 
-namespace boost {
-   namespace numeric {
-      namespace odeint {
-	 template<>
-	    struct vector_space_norm_inf< state_t >
-	    {
-	       typedef double result_type;
-	       double operator()( const state_t &state_vec ) const
-	       {
-		  using namespace std; 
-		  return norm( state_vec ); 
-	       }
-	    };
-      }
-   }
-}
+//namespace boost {
+//   namespace numeric {
+//      namespace odeint {
+//	 template<>
+//	    struct vector_space_norm_inf< state_t >
+//	    {
+//	       typedef double result_type;
+//	       double operator()( const state_t &state_vec ) const
+//	       {
+//		  using namespace std; 
+//		  return norm( state_vec ); 
+//	       }
+//	    };
+//      }
+//   }
+//}

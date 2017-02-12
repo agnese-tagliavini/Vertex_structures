@@ -76,7 +76,7 @@ int main ( int argc, char * argv[])
    state_vec.gf_chi_xph().init( chi_init ); 
 
    cout << " Starting scale-dependent PARQUET solver... "  << endl << endl;
-   //bool success = true; 
+ //bool success = true; 
 
    vector<double> Lam_list = { 1.0 }; 
    bool success; 
@@ -131,7 +131,7 @@ int main ( int argc, char * argv[])
 
    }
 
-   // ------ Write output file
+ // ------ Write output file
 
    H5std_string FILE_NAME("dat/dat");
    vector<pair<string, double>> fname_params = {{ "U", UINT }, { "Beta", BETA }, { "PFCB", POS_BFREQ_COUNT_CHI }}; //{ "PFC", POS_FFREQ_COUNT_P }}; //, { "Eps", EPS }};
@@ -167,6 +167,12 @@ int main ( int argc, char * argv[])
 
    FILE_NAME.append("_SU2"); 
 
+#ifdef METHOD2
+   FILE_NAME.append("_METH2"); 
+#elif METHOD1
+   FILE_NAME.append("_METH1");
+#endif
+  
    if( !success ) FILE_NAME.append("_DIVERGENT"); 
 
    FILE_NAME.append(".h5"); 

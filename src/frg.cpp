@@ -57,7 +57,7 @@ void read_exact()
    cout << "Got vert ph data" << endl;
 
    Group vert_group_xph = vert_group.openGroup("XPH");
-   read( vert_exact_ph, vert_group_ph,"_F_UPDO");
+   read( vert_exact_xph, vert_group_xph,"_F_UPDO");
    cout << "Got vert xph data" << endl;
 
    Group genchi_group =  input_file.openGroup("/GENCHI"); 
@@ -184,6 +184,22 @@ MatQN G0inv( double w, double kx, double ky )
 dcomplex asympt_GG_ph( int W, double Lam )
 {
    return -asympt_GG_pp( W, Lam ); 
+}
+
+dcomplex FUNC_PH( int W_int, int POS_INV )
+{
+   double W = W_int; 
+
+   if( W_int == 0 )
+      return BETA*BETA/(PI*PI)*2*(1.0/(2.0+4.0*POS_INV)); 
+
+   return -BETA*BETA/(PI*PI)*(1.0/(4*W))*log((1.0+2.0*POS_INV-2.0*div2_floor(W))*(1.0+2.0*POS_INV-2.0*div2_ceil(W))/((1.0+2.0*POS_INV+2.0*div2_ceil(W))*(1.0+2.0*POS_INV+2.0*div2_floor(W))));
+      
+}
+
+dcomplex FUNC_PP( int W_int,int POS_INV )
+{
+     return -FUNC_PH( W_int, POS_INV ); 
 }
 
 // ---- Initial values 

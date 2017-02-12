@@ -1,0 +1,12 @@
+
+anderson_pp_shift.cxx11.pomerol:26948 terminated with signal 6 at PC=2aaaad9a65f7 SP=7fffffff9078.  Backtrace:
+/usr/lib64/libc.so.6(gsignal+0x37)[0x2aaaad9a65f7]
+/usr/lib64/libc.so.6(abort+0x148)[0x2aaaad9a7ce8]
+/opt/sw/x86_64/glibc-2.17/ivybridge-ep/gcc/5.3.0//lib64/libstdc++.so.6(_ZN9__gnu_cxx27__verbose_terminate_handlerEv+0x15d)[0x2aaaacf4895d]
+/opt/sw/x86_64/glibc-2.17/ivybridge-ep/gcc/5.3.0//lib64/libstdc++.so.6(+0x8c956)[0x2aaaacf46956]
+/opt/sw/x86_64/glibc-2.17/ivybridge-ep/gcc/5.3.0//lib64/libstdc++.so.6(+0x8c9a1)[0x2aaaacf469a1]
+/opt/sw/x86_64/glibc-2.17/ivybridge-ep/gcc/5.3.0//lib64/libstdc++.so.6(+0x8cbb9)[0x2aaaacf46bb9]
+/home/lv70707/atagliav/.usr/pomerol/bin/anderson_pp_shift.cxx11.pomerol(_ZN7Pomerol11Hamiltonian7computeERKN5boost3mpi12communicatorE+0x85d)[0x4727ed]
+/home/lv70707/atagliav/.usr/pomerol/bin/anderson_pp_shift.cxx11.pomerol(main+0x9d9)[0x43af79]
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)[0x2aaaad992b15]
+/home/lv70707/atagliav/.usr/pomerol/bin/anderson_pp_shift.cxx11.pomerol[0x4401ad]

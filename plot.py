@@ -298,7 +298,7 @@ pl.savefig("plots/Vert.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=8
+shift=10
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
@@ -441,7 +441,7 @@ plotUpDownLambdaRePHX( pl.subplot(2,3,6) )
 pl.xlabel(r"$\omega_n$")
 pl.tight_layout()
 
-shift=8
+shift=3
 
 #--- Save to file
 pl.savefig("plots/Lambda.png", dpi = 150)
@@ -466,6 +466,174 @@ pl.tight_layout()
 
 #--- Save to file
 pl.savefig("plots/Lambda_shift.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=0
+
+#--------------------------------------GENCHI PLOTTING ------------------------------------------
+
+print("Plotting genchi ...")
+
+#--- Read
+regenchi_pp = vert_mul * np.array(f["/genchi_func/RE_PP"])
+imgenchi_pp = vert_mul * np.array(f["/genchi_func/IM_PP"])
+regenchi_ph = vert_mul * np.array(f["/genchi_func/RE_PH"])
+imgenchi_ph = vert_mul * np.array(f["/genchi_func/IM_PH"])
+regenchi_xph = vert_mul * np.array(f["/genchi_func/RE_XPH"])
+imgenchi_xph = vert_mul * np.array(f["/genchi_func/IM_XPH"])
+
+bdim = regenchi_pp.shape[0]
+fdim = regenchi_pp.shape[1]
+
+genchigrid = np.array(f["/genchi_func/fgrid"])
+
+#---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+def plotgenchi( use_pl, arr, string ):
+    use_pl.set_aspect(1.0)
+    zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
+    pl.pcolormesh( genchigrid, genchigrid, zarr )
+    pl.ylim([min(genchigrid),max(genchigrid)])
+    pl.xlim([min(genchigrid),max(genchigrid)])
+    use_pl.set_title( string , fontsize=10 )
+    pl.colorbar(shrink=0.6) 
+    return
+
+#--- Plot 
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
+
+plotgenchi( pl.subplot(2,3,1), regenchi_pp - regenchi_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\chi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotgenchi( pl.subplot(2,3,2), regenchi_ph - regenchi_xph, RE + r"\chi^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotgenchi( pl.subplot(2,3,3), regenchi_xph - regenchi_ph, RE + r"\chi^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotgenchi( pl.subplot(2,3,4), regenchi_pp, RE + r"\chi^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotgenchi( pl.subplot(2,3,5), regenchi_ph, RE + r"\chi^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotgenchi( pl.subplot(2,3,6), regenchi_xph, RE + r"\chi^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/genchi.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=3
+
+#--- Plot
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
+
+plotgenchi( pl.subplot(2,3,1), regenchi_pp - regenchi_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotgenchi( pl.subplot(2,3,2), regenchi_ph - regenchi_xph, RE + r"\chi^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotgenchi( pl.subplot(2,3,3), regenchi_xph - regenchi_ph, RE + r"\chi^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotgenchi( pl.subplot(2,3,4), regenchi_pp, RE + r"\chi^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotgenchi( pl.subplot(2,3,5), regenchi_ph, RE + r"\chi^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotgenchi( pl.subplot(2,3,6), regenchi_xph, RE + r"\chi^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/genchi_shift.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=0
+
+#--------------------------------------VERT PLOTTING ------------------------------------------
+
+print("Plotting vert ...")
+
+#--- Read
+revert_pp = vert_mul * np.array(f["/vert_func/RE_PP"])
+imvert_pp = vert_mul * np.array(f["/vert_func/IM_PP"])
+revert_ph = vert_mul * np.array(f["/vert_func/RE_PH"])
+imvert_ph = vert_mul * np.array(f["/vert_func/IM_PH"])
+revert_xph = vert_mul * np.array(f["/vert_func/RE_XPH"])
+imvert_xph = vert_mul * np.array(f["/vert_func/IM_XPH"])
+
+bdim = revert_pp.shape[0]
+fdim = revert_pp.shape[1]
+
+vertgrid = np.array(f["/vert_func/fgrid"])
+
+#---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+def plotvert( use_pl, arr, string ):
+    use_pl.set_aspect(1.0)
+    zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
+    pl.pcolormesh( vertgrid, vertgrid, zarr )
+    pl.ylim([min(vertgrid),max(vertgrid)])
+    pl.xlim([min(vertgrid),max(vertgrid)])
+    use_pl.set_title( string , fontsize=10 )
+    pl.colorbar(shrink=0.6) 
+    return
+
+#--- Plot 
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
+
+plotvert( pl.subplot(2,3,1), revert_pp - revert_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotvert( pl.subplot(2,3,2), revert_ph - revert_xph, RE + r"F^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotvert( pl.subplot(2,3,3), revert_xph - revert_ph, RE + r"F^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotvert( pl.subplot(2,3,4), revert_pp, RE + r"F^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotvert( pl.subplot(2,3,5), revert_ph, RE + r"F^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotvert( pl.subplot(2,3,6), revert_xph, RE + r"F^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/vert.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=3
+
+#--- Plot
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
+
+plotvert( pl.subplot(2,3,1), revert_pp - revert_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotvert( pl.subplot(2,3,2), revert_ph - revert_xph, RE + r"F^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotvert( pl.subplot(2,3,3), revert_xph - revert_ph, RE + r"F^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotvert( pl.subplot(2,3,4), revert_pp, RE + r"F^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotvert( pl.subplot(2,3,5), revert_ph, RE + r"F^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotvert( pl.subplot(2,3,6), revert_xph, RE + r"F^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/vert_shift.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -525,7 +693,7 @@ pl.savefig("plots/phi.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=8
+shift=3
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
@@ -570,7 +738,7 @@ rechi_xph = vert_mul * np.array(f["/chi_func/RE_XPH"])
 imchi_xph = vert_mul * np.array(f["/chi_func/IM_XPH"])
 fdim_bos = bosgrid.shape[0]
 
-x_range_fact = 0.1
+x_range_fact = 0.3
 
 #--- Helper functions
 def plotchi( use_pl, arr, title ):
@@ -709,7 +877,7 @@ pl.savefig("plots/R.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=8
+shift=3
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $R(\Omega,\omega,\omega')$")

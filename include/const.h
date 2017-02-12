@@ -33,7 +33,7 @@ const int BFREQ_COUNT_PHI = 2 * POS_BFREQ_COUNT_PHI + 1;	///< Amount of bosonic 
 
 // ----- P dimensions
 
-const int POS_FFREQ_COUNT_P = 2*COUNT;				///< Amount of positive fermionic frequencies in P grid
+const int POS_FFREQ_COUNT_P = 3*COUNT;				///< Amount of positive fermionic frequencies in P grid
 const int FFREQ_COUNT_P = 2 * POS_FFREQ_COUNT_P;		///< Amount of fermionic frequencies in P grid
                                                                                                                           
 const int POS_BFREQ_COUNT_P = 3 * POS_FFREQ_COUNT_P / 2;	///< Amount of positive bosonic frequencies in P grid 
@@ -41,7 +41,7 @@ const int BFREQ_COUNT_P = 2 * POS_BFREQ_COUNT_P + 1;		///< Amount of bosonic fre
 
 // ----- internal integration range and green function grid
 
-const int POS_INT_RANGE = 6 * COUNT;				///< Positive range for internal integrations
+const int POS_INT_RANGE = 4 * COUNT;				///< Positive range for internal integrations
 const int TAIL_LENGTH = POS_INT_RANGE / 5; 			///< Length of tail used for fitting matsubara sum
 const int FIT_ORDER = 4; 					///< Fit tail function has exponents one lower than this constant
 
@@ -57,7 +57,7 @@ const int POS_1P_RANGE = POS_BFREQ_COUNT_CHI + POS_INT_RANGE; 	///< Positive ran
 
 // ----- Output ranges
 
-const int POS_PLOT_RANGE_PHI = 1.2 * POS_FFREQ_COUNT_PHI; 	///< Amount of positive frequencies in phi output grid
+const int POS_PLOT_RANGE_PHI = 1.2* POS_FFREQ_COUNT_PHI; 	///< Amount of positive frequencies in phi output grid
 const int POS_PLOT_RANGE_VERT = POS_PLOT_RANGE_PHI; 		///< Amount of positive frequencies in vertex output grid
 
 

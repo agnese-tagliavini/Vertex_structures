@@ -13,6 +13,8 @@
 #include <complex>
 #include <cmath>
 #include<boost/numeric/ublas/matrix_expression.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 using namespace boost::numeric::ublas;
 
@@ -20,6 +22,23 @@ using namespace boost::numeric::ublas;
 
 template<class E1, class T2> typename matrix_binary_scalar2_traits<E1, T2, scalar_multiplies<typename E1::value_type, T2> >::result_type operator * (const matrix_expression<E1> &e1,const T2 &e2);
 
+// Matrix-matrix multiplication
+
+//template<class T1, class E1, class T2, class E2>
+//struct matrix_matrix_binary_traits {
+//   typedef unknown_orientation_tag dispatch_category;
+//   typedef typename promote_traits<T1, T2>::promote_type promote_type;
+//   typedef matrix_matrix_binary<typename E1::const_closure_type, typename E2::const_closure_type, matrix_matrix_prod<T1, T2, promote_type> > expression_type;
+//   typedef expression_type result_type;
+//};
+
+template<class E1, class E2> typename matrix_matrix_binary_traits<typename E1::value_type, E1, typename E2::value_type, E2>::result_type prod (const matrix_expression<E1> &e1, const matrix_expression<E2> &e2, unknown_orientation_tag);
+
+// Dispatcher
+
+template<class E1, class E2> typename matrix_matrix_binary_traits<typename type_traits<typename E1::value_type>::precision_type, E1, typename type_traits<typename E2::value_type>::precision_type, E2>::result_type prec_prod (const matrix_expression<E1> &e1, const matrix_expression<E2> &e2, unknown_orientation_tag);
+
+//void multiplyMatrices(dcomplex firstMatrix[][], dcomplex secondMatrix[][], dcomplex mult[][], int rowFirst, int columnFirst, int rowSecond, int columnSecond);
 // ---- Useful functions
 
 inline int div2_ceil( int W )

@@ -46,6 +46,8 @@ dcomplex chi_init( const idx_chi_t& idx );				///< Return initial vertex value f
 dcomplex asympt_GG_pp( int W, double Lam = LAM_FIN );	///< Give estimate for the integral 1/2/PI * G(W/2-w-1,Lam) * G(W/2+w,Lam) for the outside region N \ [ -POS_INT_RANGE, POS_INT_RANGE )
 dcomplex asympt_GG_ph( int W, double Lam = LAM_FIN );	///< Give estimate for the integral 1/2/PI * G(w-W/2,Lam) * G(w+W/2,Lam) for the outside region N \ [ -POS_INT_RANGE, POS_INT_RANGE )
 
+dcomplex FUNC_PP( int W, int POS_INV );
+dcomplex FUNC_PH( int W, int POS_INV );
 
 inline double w_val( int w_idx )					///< Return value of fermionic matsubara frequency for a given index
 {

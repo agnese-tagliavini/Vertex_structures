@@ -55,8 +55,8 @@ dcomplex state_t::vertx( int w1_in, int w2_in, int w1_out, int k1_in, int k2_in,
 
 #ifdef READIN
    
-   return vertx_ph( w1_out - w1_in, w1_in + div2_floor( w1_out - w1_in ),w2_in - div2_ceil( w1_out - w1_in ),dif_k(k1_out, k1_in), k1_in,dif_k(k2_in, dif_k(k1_out, k1_in) ),s1_in, s2_in, s1_out, s2_out); // Here the purely fermionic notation is recovered from the ph channel (the other channels would be good as well!)-> It's nor really used if the SE is not calculated using the Schwringer-Dyson equation!!!
-
+   return vertx_ph( w1_out - w1_in, w1_in + div2_floor( w1_out - w1_in ),w2_in - div2_ceil( w1_out - w1_in ),dif_k(k1_out, k1_in), k1_in, add_k( k1_in, dif_k( k2_in, k1_out ) ), s1_in, s2_in, s1_out, s2_out); // Here the purely fermionic notation is recovered from the ph channel (the other channels would be good as well!)-> It's nor really used if the SE is not calculated using the Schwringer-Dyson equation!!!
+ 
 #endif
 
    int W_pp  = w1_in + w2_in + 1;
@@ -69,7 +69,7 @@ dcomplex state_t::vertx( int w1_in, int w2_in, int w1_out, int k1_in, int k2_in,
 
    int k2_out = add_k( k1_in, dif_k( k2_in, k1_out ) ); // calculate k2_out 
 
-   return phi_pp_outside( W_pp, w1_in - div2_ceil( W_pp ), w1_out - div2_ceil( W_pp ), K_pp, k1_in, k1_out, s1_in, s2_in, s1_out, s2_out ) + 
+   return phi_pp_outside( W_pp, w1_in - div2_ceil( W_pp ), -w1_out-1+ div2_floor( W_pp ), K_pp, k1_in, k1_out, s1_in, s2_in, s1_out, s2_out ) + 
       phi_ph_outside( W_ph, w1_in + div2_floor( W_ph ), w2_in - div2_ceil( W_ph ), K_ph, k1_in, k2_out, s1_in, s2_in, s1_out, s2_out ) +
       phi_xph_outside( W_xph, w1_in + div2_floor( W_xph ), w2_in - div2_ceil( W_xph ), K_xph, k1_in, k1_out, s1_in, s2_in, s1_out, s2_out ) +
       vert_bare( s1_in, s2_in, s1_out, s2_out );
@@ -83,7 +83,7 @@ dcomplex state_t::vertx_pp( int W, int w_in, int w_out, int K, int k_in, int k_o
    if (  W  >= -POS_BOS_VERT_COUNT_EXACT && W  <= POS_BOS_VERT_COUNT_EXACT &&
 	 w_in  >= -POS_FERM_VERT_COUNT_EXACT && w_in  <= POS_FERM_VERT_COUNT_EXACT - 1 &&
 	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
-      return vert_exact_pp[W][w_in][-w_out-1][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; //INPUT DATA FROM POMEROL-> WARNING: DIFFERENT NOTATION!!
+      return vert_exact_pp[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; //INPUT DATA FROM POMEROL-> WARNING: DIFFERENT NOTATION!!
 #endif
 
 #ifdef FORCED_ZEROS
@@ -91,15 +91,15 @@ dcomplex state_t::vertx_pp( int W, int w_in, int w_out, int K, int k_in, int k_o
       return dcomplex( 0.0, 0.0 );
 #endif
 
-   int W_ph  = w_out - w_in;
-   int W_xph  = - ( W + 100000 ) % 2 - w_out - w_in - 1;
+   int W_xph  = w_out - w_in;
+   int W_ph  = - ( W + 100000 ) % 2 - w_out - w_in - 1;
 
-   int K_ph = dif_k( k_out, k_in ); 
-   int K_xph = dif_k( K, add_k( k_in, k_out ) ); 
+   int K_xph = dif_k( k_out, k_in ); 
+   int K_ph = dif_k( K, add_k( k_in, k_out ) ); 
 
    return phi_pp( W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out ) + 
-      phi_ph( W_ph, w_in + div2_ceil( W ) + div2_floor( W_ph ), div2_floor( W ) - w_out + div2_floor( W_ph ) - 1, K_ph, k_in, dif_k( K, k_out ), s1_in, s2_in, s1_out, s2_out ) +
-      phi_xph( W_xph, w_in + div2_ceil( W ) + div2_floor( W_xph ), w_out + div2_ceil( W ) + div2_floor( W_xph ), K_xph, k_in, k_out, s1_in, s2_in, s1_out, s2_out ) +
+      phi_xph( W_xph, w_in + div2_ceil( W ) + div2_floor( W_xph ), div2_floor( W ) - w_out + div2_floor( W_xph ) - 1, K_xph, k_in, dif_k( K, k_out ), s1_in, s2_in, s1_out, s2_out ) +
+      phi_ph( W_ph, w_in + div2_ceil( W ) + div2_floor( W_ph ), w_out + div2_ceil( W ) + div2_floor( W_ph ), K_ph, k_in, k_out, s1_in, s2_in, s1_out, s2_out ) +
       vert_bare( s1_in, s2_in, s1_out, s2_out );
 }
 
@@ -125,7 +125,7 @@ dcomplex state_t::vertx_ph( int W, int w_in, int w_out, int K, int k_in, int k_o
    int K_pp = add_k( K, add_k( k_out, k_in ) ); 
    int K_xph = dif_k( k_out, k_in ); 
 
-   return phi_pp( W_pp, w_in - div2_floor( W ) - div2_ceil( W_pp ), w_in + div2_ceil( W ) - div2_ceil( W_pp ), K_pp, k_in, add_k( K, k_in ), s1_in, s2_in, s1_out, s2_out ) + 
+   return phi_pp( W_pp, w_in - div2_floor( W ) - div2_ceil( W_pp ), w_out - div2_floor( W ) - div2_ceil( W_pp ), K_pp, k_in, k_out, s1_in, s2_in, s1_out, s2_out ) + 
       phi_ph( W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out ) +
       phi_xph( W_xph, w_in - div2_floor( W ) + div2_floor( W_xph ), w_out + div2_ceil( W ) - div2_ceil( W_xph ), K_xph, k_in, add_k( K, k_in ), s1_in, s2_in, s1_out, s2_out ) +
       vert_bare( s1_in, s2_in, s1_out, s2_out );
@@ -153,7 +153,7 @@ dcomplex state_t::vertx_xph( int W, int w_in, int w_out, int K, int k_in, int k_
    int K_pp = add_k( K, add_k( k_out, k_in ) ); 
    int K_ph = dif_k( k_out, k_in ); 
 
-   return phi_pp( W_pp, w_in - div2_floor( W ) - div2_ceil( W_pp ), w_out - div2_floor( W ) - div2_ceil( W_pp ), K_pp, k_in, k_out, s1_in, s2_in, s1_out, s2_out ) + 
+   return phi_pp( W_pp, w_in - div2_floor( W ) - div2_ceil( W_pp ), -w_out -1 + div2_floor( W ) + div2_floor( W_pp ), K_pp, k_in, add_k( K,k_in ), s1_in, s2_in, s1_out, s2_out ) + 
       phi_ph( W_ph, w_in - div2_floor( W ) + div2_floor( W_ph ), w_out + div2_ceil( W ) - div2_ceil( W_ph ), K_ph, k_in, add_k( K, k_in ), s1_in, s2_in, s1_out, s2_out ) +
       phi_xph( W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out ) +
       vert_bare( s1_in, s2_in, s1_out, s2_out );
@@ -181,14 +181,16 @@ dcomplex state_t::genchi_pp( int W, int w_in, int w_out, int K, int k_in, int k_
     //Return exact solution if available
    if (  W  >= -POS_BOS_VERT_COUNT_EXACT && W  <= POS_BOS_VERT_COUNT_EXACT &&
 	 w_in  >= -POS_FERM_VERT_COUNT_EXACT && w_in  <= POS_FERM_VERT_COUNT_EXACT - 1 &&
-	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
-      return genchi_exact_pp[W][w_in][-w_out-1][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; //INPUT DATA FROM POMEROL-> WARNING: DIFFERENT NOTATION!!
+	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 ){
+      return genchi_exact_pp[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; //INPUT DATA FROM POMEROL-> WARNING: DIFFERENT NOTATION!!
+     }
    //ASYMPTOTIC FOR GENCHIPP
-   if((w_in == w_out) && (k_in == k_out))
-      return -G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s1_in,s1_out)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_in))(s2_in,s2_out) + 
-	 G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s1_in,s1_in)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_in))(s2_in,s2_in)*vertx_pp(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s1_out,s1_out)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_out))(s2_out,s2_out);
-   
-   return G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s1_in,s1_in)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_in))(s2_in,s2_in)*vertx_pp(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s1_out,s1_out)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_in))(s2_out,s2_out);
+//   if((w_in == w_out) && (k_in == k_out) && (s1_in == s1_out) && (s2_in == s2_out)){
+//   
+//     return -G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s1_in,s1_in)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_in))(s2_in,s2_in) + G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s1_in,s1_in)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_in))(s2_in,s2_in)*vertx_pp(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_floor(W)-w_out-1),mom_grid[dif_k(K,k_out)].first,mom_grid[dif_k(K,k_out)].second,Lam,SigMat(div2_floor(W)-w_out-1,dif_k(K,k_out)))(s1_out,s1_out)*G(w_val(w_out+div2_ceil(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out+div2_ceil(W),k_out))(s2_out,s2_out);
+// 
+//   }
+   return G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s2_in,s2_in)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_in))(s1_in,s1_in)*vertx_pp(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_floor(W)-w_out-1),mom_grid[dif_k(K,k_out)].first,mom_grid[dif_k(K,k_out)].second,Lam,SigMat(div2_floor(W)-w_out-1,dif_k(K,k_out)))(s1_out,s1_out)*G(w_val(w_out+div2_ceil(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out+div2_ceil(W),k_out))(s2_out,s2_out);
 
 #endif
 
@@ -206,9 +208,6 @@ dcomplex state_t::genchi_ph( int W, int w_in, int w_out, int K, int k_in, int k_
 	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
       return genchi_exact_ph[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; 
 #endif
-   if((W == 0 ) && (K == 0))
-      return -G(w_val(w_out),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out,k_out))(s1_in,s1_out)*G(w_val(w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in,k_in))(s2_in,s2_out) +
-	 G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_in)*G(w_val(w_out+div2_ceil(W)),mom_grid[add_k(K,k_out)].first,mom_grid[add_k(K,k_out)].second,Lam,SigMat(w_out+div2_ceil(W),add_k(K,k_out)))(s2_in,s2_in)*vertx_ph(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_ceil(W)+w_in),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(div2_ceil(W)+w_in,add_k(K,k_in)))(s1_out,s1_out)*G(w_val(w_out-div2_floor(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out-div2_floor(W),k_out))(s2_out,s2_out);
 
    return G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_in)*G(w_val(w_out+div2_ceil(W)),mom_grid[add_k(K,k_out)].first,mom_grid[add_k(K,k_out)].second,Lam,SigMat(w_out+div2_ceil(W),add_k(K,k_out)))(s2_in,s2_in)*vertx_ph(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_ceil(W)+w_in),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(div2_ceil(W)+w_in,add_k(K,k_in)))(s1_out,s1_out)*G(w_val(w_out-div2_floor(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out-div2_floor(W),k_out))(s2_out,s2_out);
 }
@@ -227,40 +226,40 @@ dcomplex state_t::genchi_xph( int W, int w_in, int w_out, int K, int k_in, int k
 	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
       return genchi_exact_xph[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; 
 #endif
-   if((w_in == w_out) && (k_in == k_out))
+   if((w_in == w_out) && (k_in == k_out) && (s1_in == s1_out) && (s2_in == s2_out)){
    
-      return -G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_out)*G(w_val(w_in+div2_ceil(W)),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(w_in+div2_ceil(W),add_k(K,k_in)))(s2_in,s2_out) +
-	 G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_in)*G(w_val(w_out+div2_ceil(W)),mom_grid[add_k(K,k_out)].first,mom_grid[add_k(K,k_out)].second,Lam,SigMat(w_out+div2_ceil(W),add_k(K,k_out)))(s2_in,s2_in)*vertx_xph(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_ceil(W)+w_in),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(div2_ceil(W)+w_in,add_k(K,k_in)))(s2_out,s2_out)*G(w_val(w_out-div2_floor(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out-div2_floor(W),k_out))(s1_out,s1_out);
-      
+      return -G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_out)*G(w_val(w_in+div2_ceil(W)),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(w_in+div2_ceil(W),add_k(K,k_in)))(s2_in,s2_out) + G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_in)*G(w_val(w_out+div2_ceil(W)),mom_grid[add_k(K,k_out)].first,mom_grid[add_k(K,k_out)].second,Lam,SigMat(w_out+div2_ceil(W),add_k(K,k_out)))(s2_in,s2_in)*vertx_xph(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_ceil(W)+w_in),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(div2_ceil(W)+w_in,add_k(K,k_in)))(s2_out,s2_out)*G(w_val(w_out-div2_floor(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out-div2_floor(W),k_out))(s1_out,s1_out);
+   }
       return G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_in)*G(w_val(w_out+div2_ceil(W)),mom_grid[add_k(K,k_out)].first,mom_grid[add_k(K,k_out)].second,Lam,SigMat(w_out+div2_ceil(W),add_k(K,k_out)))(s2_in,s2_in)*vertx_xph(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_ceil(W)+w_in),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(div2_ceil(W)+w_in,add_k(K,k_in)))(s2_out,s2_out)*G(w_val(w_out-div2_floor(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out-div2_floor(W),k_out))(s1_out,s1_out);
 }
 
 
 dcomplex state_t::genchi_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {
-   if((w_in == w_out) && (s1_in == s1_out) && (s2_in == s2_out))
-      return -BETA*G(w_val(w_in + div2_ceil(W)),mom_grid[k_in].first, mom_grid[k_in].second, Lam, SigMat(w_in + div2_ceil(W),k_in))(s1_in,s1_out)*G(w_val(div2_floor(W) - w_out - 1),mom_grid[dif_k(K,k_out)].first, mom_grid[dif_k(K,k_out)].second, Lam, SigMat(div2_floor(W) - w_out - 1, dif_k(K,k_out)))(s2_in,s2_out);
-
+   if((w_in == w_out) && (k_in == k_out) && (s1_in == s1_out) && (s2_in == s2_out)){
+      return BETA*G(w_val(w_in + div2_ceil(W)),mom_grid[k_in].first, mom_grid[k_in].second, Lam, SigMat(w_in + div2_ceil(W),k_in))(s1_in,s1_out)*G(w_val(div2_floor(W) - w_out - 1),mom_grid[dif_k(K,k_out)].first, mom_grid[dif_k(K,k_out)].second, Lam, SigMat(div2_floor(W) - w_out - 1, dif_k(K,k_out)))(s2_in,s2_out);
+   }
   return dcomplex(0.0,0.0); 
 }
 
 dcomplex state_t::genchi_0_ph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {
-   if((w_in == w_out) && (s1_in == s1_out) && (s2_in == s2_out))
+   if((w_in == w_out) && (k_in == k_out) && (s1_in == s1_out) && (s2_in == s2_out)){
       return BETA*G(w_val(w_in + div2_ceil(W)),mom_grid[add_k(K,k_in)].first, mom_grid[add_k(K,k_in)].second, Lam, SigMat(w_in + div2_ceil(W),add_k(K,k_in)))(s1_in,s1_out)*G(w_val(w_out - div2_floor(W)),mom_grid[k_out].first, mom_grid[k_out].second, Lam, SigMat(w_out - div2_floor(W), k_out))(s2_in,s2_out);
-
+   }
   return dcomplex(0.0,0.0); 
 }
 
 
-dcomplex state_t::genchi_s_plus_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
+dcomplex state_t::genchis_plus_30_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {
-   return genchi_pp(W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out)-genchi_pp(W, w_in, -w_out-1, K, k_in, dif_k(K,k_out), s1_in, s2_in, s1_out, s2_out) + genchi_0_pp(W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out) ; 
+   return genchi_pp(W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out)-genchi_pp(W, w_in, -w_out-1-( W + 100000 ) % 2, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out) + 3.0 * genchi_0_pp(W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out) ; 
 }
 
-dcomplex state_t::genchi_t_minus_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
+
+dcomplex state_t::genchit_minus_30_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {
-   return genchi_pp(W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out)+genchi_pp(W, w_in, -w_out-1, K, k_in, dif_k(K,k_out), s1_in, s2_in, s1_out, s2_out) - genchi_0_pp(W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out) ; 
+   return genchi_pp(W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out)+genchi_pp(W, w_in, -w_out-1-( W + 100000 ) % 2, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out) - 3.0 * genchi_0_pp(W, w_in, w_out, K, k_in, k_out, s1_in, s2_in, s1_out, s2_out) ; 
 }
 
 dcomplex state_t::genchi_d( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
@@ -363,7 +362,7 @@ dcomplex state_t::lambda( int w1_in, int w2_in, int w1_out, int k1_in, int k2_in
    int k2_out = add_k( k1_in, dif_k( k2_in, k1_out ) ); // calculate k2_out 
 
    return vertx( w1_in, w2_in, w1_out, k1_in, k2_in, k1_out, s1_in, s2_in, s1_out, s2_out ) - 
-      phi_pp( W_pp, w1_in - div2_ceil( W_pp ), w1_out - div2_ceil( W_pp ), K_pp, k1_in, k1_out, s1_in, s2_in, s1_out, s2_out ) -
+      phi_pp( W_pp, w1_in - div2_ceil( W_pp ), -w1_out-1 + div2_floor( W_pp ), K_pp, k1_in, k1_out, s1_in, s2_in, s1_out, s2_out ) -
       phi_ph( W_ph, w1_in + div2_floor( W_ph ), w2_in - div2_ceil( W_ph ), K_ph, k1_in, k2_out, s1_in, s2_in, s1_out, s2_out ) -
       phi_xph( W_xph, w1_in + div2_floor( W_xph ), w2_in - div2_ceil( W_xph ), K_xph, k1_in, k1_out, s1_in, s2_in, s1_out, s2_out ); 
 }
@@ -407,7 +406,7 @@ dcomplex state_t::phi_pp_outside( int W, int w_in, int w_out, int K, int k_in, i
 {
    return chi_pp( W, K, s1_in, s2_in, s1_out, s2_out ) + 
       P_pp( W, w_in, K, k_in, s1_in, s2_in, s1_out, s2_out ) + 
-      P_pp( W, w_out, K, k_out, s1_out, s2_out, s1_in, s2_in );  // time reversal symmetry used
+      P_pp( W, -w_out-1-( W + 10000 ) % 2, K, k_out, s1_out, s2_out, s1_in, s2_in );  // time reversal symmetry used
 }
 
 dcomplex state_t::phi_ph_outside( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
@@ -426,8 +425,8 @@ dcomplex state_t::phi_xph_outside( int W, int w_in, int w_out, int K, int k_in, 
 
 dcomplex state_t::chi_pp( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
-   //if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI  ) 
-      //return 0.0; 
+//   if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI  ) 
+//      return 0.0; 
 
    if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI ) 
       return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W * gf_chi_pp()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
@@ -438,7 +437,7 @@ dcomplex state_t::chi_pp( int W, int K, int s1_in, int s2_in, int s1_out, int s2
 dcomplex state_t::chi_ph( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {
    //if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI  ) 
-      //return 0.0; 
+     // return 0.0; 
 
    if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI ) 
       return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W / W / W * gf_chi_ph()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
@@ -449,7 +448,7 @@ dcomplex state_t::chi_ph( int W, int K, int s1_in, int s2_in, int s1_out, int s2
 dcomplex state_t::chi_xph( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
    //if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI  ) 
-      //return 0.0; 
+   //   return 0.0; 
 
    if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI ) 
       return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W * gf_chi_xph()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
@@ -457,24 +456,64 @@ dcomplex state_t::chi_xph( int W, int K, int s1_in, int s2_in, int s1_out, int s
    return gf_chi_xph()[W][K][s1_in][s2_in][s1_out][s2_out]; 
 }
 
-dcomplex state_t::chi_pp_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+dcomplex state_t::chi_pp_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
    return 2.*chi_pp(W,K,s1_in,s2_in,s1_out,s2_out); 
 }
 
-dcomplex state_t::chi_pp_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+dcomplex state_t::chi_pp_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
    return dcomplex(0.0,0.0); 
 }
 
-dcomplex state_t::chi_ph_m( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+dcomplex state_t::chi_pp_d( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
-   return 2.*chi_ph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
+   return chi_pp(W,K,s1_in,s2_in,s1_out,s2_out); 
+}
+
+dcomplex state_t::chi_pp_m( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+{   
+   return -chi_pp(W,K,s1_in,s2_in,s1_out,s2_out); 
 }
 
 dcomplex state_t::chi_ph_d( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
+   return 2.*chi_ph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
+}
+
+dcomplex state_t::chi_ph_m( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+{   
    return -chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
+}
+
+dcomplex state_t::chi_ph_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+{   
+   return chi_ph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
+}
+
+dcomplex state_t::chi_ph_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+{   
+   return chi_ph(W,K,s1_in,s2_in,s1_out,s2_out)+chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
+}
+
+dcomplex state_t::chi_xph_d( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+{   
+   return 2.*chi_xph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_ph(W,K,s1_in,s2_in,s1_out,s2_out); 
+}
+
+dcomplex state_t::chi_xph_m( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+{   
+   return -chi_ph(W,K,s1_in,s2_in,s1_out,s2_out); 
+}
+
+dcomplex state_t::chi_xph_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+{   
+   return chi_xph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_ph(W,K,s1_in,s2_in,s1_out,s2_out); 
+}
+
+dcomplex state_t::chi_xph_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
+{   
+   return chi_xph(W,K,s1_in,s2_in,s1_out,s2_out)+chi_ph(W,K,s1_in,s2_in,s1_out,s2_out); 
 }
 dcomplex state_t::P_pp( int W, int w, int K, int k, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {
@@ -488,8 +527,10 @@ dcomplex state_t::P_pp( int W, int w, int K, int k, int s1_in, int s2_in, int s1
    if( w < -POS_FFREQ_COUNT_P ) // Check validity out of PH symmetry! ( imaginary part )
       return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_pp()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
 
+
    if( w > POS_FFREQ_COUNT_P - 1 )
       return ( - 0.25 * W * W + ( POS_FFREQ_COUNT_P - 1 ) * ( POS_FFREQ_COUNT_P - 1 ) ) / ( - 0.25 * W * W + w * w ) * gf_P_pp()[W][POS_FFREQ_COUNT_P-1][K][k][s1_in][s2_in][s1_out][s2_out]; 
+
 
    return gf_P_pp()[W][w][K][k][s1_in][s2_in][s1_out][s2_out]; 
 }
@@ -504,7 +545,7 @@ dcomplex state_t::P_ph( int W, int w, int K, int k, int s1_in, int s2_in, int s1
       return 0.0; 
       
    if( w < -POS_FFREQ_COUNT_P ) // Check validity out of PH symmetry! ( imaginary part )
-      return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_ph()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
+     return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_ph()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
 
    if( w > POS_FFREQ_COUNT_P - 1 )
       return ( - 0.25 * W * W + ( POS_FFREQ_COUNT_P - 1 ) * ( POS_FFREQ_COUNT_P - 1 ) ) / ( - 0.25 * W * W + w * w ) * gf_P_ph()[W][POS_FFREQ_COUNT_P-1][K][k][s1_in][s2_in][s1_out][s2_out]; 
@@ -530,12 +571,12 @@ dcomplex state_t::P_xph( int W, int w, int K, int k, int s1_in, int s2_in, int s
    return gf_P_xph()[W][w][K][k][s1_in][s2_in][s1_out][s2_out]; 
 }
 
-dcomplex state_t::P_pp_t( int W, int w, int K, int k, int s1_in, int s2_in, int s1_out, int s2_out ) const
+dcomplex state_t::P_pp_s( int W, int w, int K, int k, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {
    return 2.*P_pp(W,w,K,k,s1_in,s2_in,s1_out,s2_out); 
 }
 
-dcomplex state_t::P_pp_s( int W, int w, int K, int k, int s1_in, int s2_in, int s1_out, int s2_out ) const
+dcomplex state_t::P_pp_t( int W, int w, int K, int k, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {
    return 0.0; 
 }
