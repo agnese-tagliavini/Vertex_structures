@@ -9,6 +9,7 @@ import os
 import sys
 import subprocess
 import math
+from agneselibrary.mymath import *
 
 #--------------------------------------SETTINGS ------------------------------------------
 #if -1, change overall vertex sign (switch definition)
@@ -243,13 +244,13 @@ def plotVert( use_pl, zarr, string ):
 
 def plotUpUpVertRePP( use_pl ):
     title = RE + "\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
-    zarr = np.array([[ ReVertUpUp(n,shift+neg(n),m) for n in range(fdim)] for m in range(fdim)])
+    zarr = np.array([[ ReVertUpUp(n,shift+neg(n),shift+neg(m)) for n in range(fdim)] for m in range(fdim)])
     plotVert( use_pl, zarr, title )
     return
 
 def plotUpDownVertRePP( use_pl ):
     title = RE + "\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
-    zarr = np.array([[ ReVertUpDown(n,shift+neg(n),m) for n in range(fdim)] for m in range(fdim)])
+    zarr = np.array([[ ReVertUpDown(n,shift+neg(n),shift+neg(m)) for n in range(fdim)] for m in range(fdim)])
     plotVert( use_pl, zarr, title )
     return
 
@@ -298,7 +299,7 @@ pl.savefig("plots/Vert.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=10
+shift=3
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
@@ -390,13 +391,13 @@ def plotLambda( use_pl, zarr, string ):
 
 def plotUpUpLambdaRePP( use_pl ):
     title = r"$\operatorname{Re}\Lambda_{\uparrow\uparrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
-    zarr = np.array([[ ReLambdaUpUp(n,shift+neg(n),m) for n in range(fdim)] for m in range(fdim)])
+    zarr = np.array([[ ReLambdaUpUp(n,shift+neg(n),shift+neg(m)) for n in range(fdim)] for m in range(fdim)])
     plotLambda( use_pl, zarr, title )
     return
 
 def plotUpDownLambdaRePP( use_pl ):
     title = r"$\operatorname{Re}\Lambda_{\uparrow\downarrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
-    zarr = np.array([[ ReLambdaUpDown(n,shift+neg(n),m) for n in range(fdim)] for m in range(fdim)])
+    zarr = np.array([[ ReLambdaUpDown(n,shift+neg(n),shift+neg(m)) for n in range(fdim)] for m in range(fdim)])
     plotLambda( use_pl, zarr, title )
     return
 

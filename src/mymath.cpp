@@ -17,31 +17,6 @@
 
 using std::cout; using std::endl; 
 
-//void multiplyMatrices(dcomplex firstMatrix[][], dcomplex secondMatrix[][], dcomplex mult[][], int rowFirst, int columnFirst, int rowSecond, int columnSecond)
-//{
-//  	int i, j, k;
-//	// Initializing elements of matrix mult to 0.
-//	for(i = 0; i < rowFirst; ++i)
-//	{
-//	   for(j = 0; j < columnSecond; ++j)
-//	   {
-//	      mult[i][j] = 0;
-//	   }
-//	}
-//	
-//	// Multiplying matrix firstMatrix and secondMatrix and storing in array mult.
-//	for(i = 0; i < rowFirst; ++i)
-//	{
-//	   for(j = 0; j < columnSecond; ++j)
-//	   {
-//	      for(k=0; k<columnFirst; ++k)
-//	      {
-//		 mult[i][j] += firstMatrix[i][k] * secondMatrix[k][j];
-//	      }
-//	   }
-//	}
-//}
-
 // CONST //
 
 size_t wspace_size = 10000;
@@ -70,6 +45,7 @@ double kdel( double a, double b )
 }
 
 // -------------- Self Consistency ----------------
+
 double dist( const dcomplex a[], const dcomplex b[], int len ) // maximumsnorm
 {
     double err = 0.0;

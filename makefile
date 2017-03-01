@@ -38,8 +38,8 @@ CFLAGS += -D INT_FLOW #			Interaction Flow
 #CFLAGS += -D RES_FLOW #		Reservoir cutoff scheme
 
 #------Choose which method for the inversion of the Bethe-Salpeter Equations
-#CFLAGS += -D METHOD2 #Agnese's method
-CFLAGS += -D METHOD1 #Stefan's method
+CFLAGS += -D METHOD2 #Agnese's method
+#CFLAGS += -D METHOD1 #Stefan's method
 #CFLAGS += -D METHOD3 # Brute force inversion
 
 # -- Higher order corrections

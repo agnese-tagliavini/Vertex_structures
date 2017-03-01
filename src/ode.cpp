@@ -46,8 +46,6 @@ int main ( int argc, char * argv[])
    cout << " Initializing ODE solver... " << endl << endl;
 
    rhs_t rhs;
-   
-   //vector< pair< string, vector<double> >  >   flow_obs_lst;		///< Vector to contain the values of observables tracked during the flow
 
 #ifdef READIN
    // ------ Reading exact data as specified in fRG.cpp
@@ -157,8 +155,6 @@ int main ( int argc, char * argv[])
    FILE_NAME.append("_HUB"); 
 #endif
 
-   //FILE_NAME.append( "_" + FLOW_SCHEME_ABBREV ); 
-
    FILE_NAME.append("_PARQ"); 
 
 #ifndef READIN
@@ -169,6 +165,7 @@ int main ( int argc, char * argv[])
 
 #ifdef METHOD2
    FILE_NAME.append("_METH2"); 
+
 #elif METHOD1
    FILE_NAME.append("_METH1");
 #endif

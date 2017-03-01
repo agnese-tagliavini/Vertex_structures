@@ -52,7 +52,6 @@ const int BFREQ_COUNT_CHI = 2 * POS_BFREQ_COUNT_CHI + 1;	///< Amount of bosonic 
 
 // ----- Green function and single scale propagator dimension
 
-//const int POS_1P_RANGE = POS_FFREQ_COUNT_SIG;
 const int POS_1P_RANGE = POS_BFREQ_COUNT_CHI + POS_INT_RANGE; 	///< Positive range for Green functions and Single scale propagator
 
 // ----- Output ranges

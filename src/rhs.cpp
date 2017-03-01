@@ -23,37 +23,21 @@ using boost::bind;
 
 symmetry_grp_t<4> rhs_t::symm_grp_sig( gf_1p_t(), { cconj_sig } ); 
 
-symmetry_grp_t<10> rhs_t::symm_grp_phi_pp( gf_phi_t(), { } );
-//symmetry_grp_t<10> rhs_t::symm_grp_phi_pp( gf_phi_t(), { hmirror_phi_pp,cconj_phi_pp,timerev_phi_pp } ); 
+//symmetry_grp_t<10> rhs_t::symm_grp_phi_pp( gf_phi_t(), { } );
+symmetry_grp_t<10> rhs_t::symm_grp_phi_pp( gf_phi_t(), { hmirror_phi_pp,cconj_phi_pp,timerev_phi_pp } ); 
 symmetry_grp_t<10> rhs_t::symm_grp_phi_ph( gf_phi_t(), { hmirror_phi_ph,cconj_phi_ph,timerev_phi_ph } ); 
 symmetry_grp_t<10> rhs_t::symm_grp_phi_xph( gf_phi_t(), { hmirror_phi_xph,cconj_phi_xph,timerev_phi_xph } ); 
 
-symmetry_grp_t<8> rhs_t::symm_grp_P_pp( gf_P_t(), { } );
-//symmetry_grp_t<8> rhs_t::symm_grp_P_pp( gf_P_t(), { hmirror_P_pp,cconj_timerev_P_pp } ); 
+//symmetry_grp_t<8> rhs_t::symm_grp_P_pp( gf_P_t(), { } );
+symmetry_grp_t<8> rhs_t::symm_grp_P_pp( gf_P_t(), { hmirror_P_pp,cconj_timerev_P_pp } ); 
 symmetry_grp_t<8> rhs_t::symm_grp_P_xph( gf_P_t(), { cconj_P_xph,timerev_P_xph } ); 
 symmetry_grp_t<8> rhs_t::symm_grp_P_ph( gf_P_t(), { hmirror_timerev_P_ph,vmirror_P_ph } ); 
 
-symmetry_grp_t<6> rhs_t::symm_grp_chi_pp( gf_chi_t(), { } );
-//symmetry_grp_t<6> rhs_t::symm_grp_chi_pp( gf_chi_t(), { cconj_chi_pp } ); 
+//symmetry_grp_t<6> rhs_t::symm_grp_chi_pp( gf_chi_t(), { } );
+symmetry_grp_t<6> rhs_t::symm_grp_chi_pp( gf_chi_t(), { cconj_chi_pp } ); 
 symmetry_grp_t<6> rhs_t::symm_grp_chi_ph( gf_chi_t(), { hmirror_chi_ph,cconj_chi_ph } ); 
 symmetry_grp_t<6> rhs_t::symm_grp_chi_xph( gf_chi_t(), { hmirror_chi_xph,cconj_chi_xph,timerev_chi_xph } ); 
-//
 
-// NO SYMMETRIES
-
-//symmetry_grp_t<4> rhs_t::symm_grp_sig( gf_1p_t(), { } ); 
-//
-//symmetry_grp_t<10> rhs_t::symm_grp_phi_pp( gf_phi_t(), { } ); 
-//symmetry_grp_t<10> rhs_t::symm_grp_phi_ph( gf_phi_t(), { } ); 
-//symmetry_grp_t<10> rhs_t::symm_grp_phi_xph( gf_phi_t(), { } ); 
-//
-//symmetry_grp_t<8> rhs_t::symm_grp_P_pp( gf_P_t(), { } ); 
-//symmetry_grp_t<8> rhs_t::symm_grp_P_xph( gf_P_t(), { } ); 
-//symmetry_grp_t<8> rhs_t::symm_grp_P_ph( gf_P_t(), { } ); 
-//
-//symmetry_grp_t<6> rhs_t::symm_grp_chi_pp( gf_chi_t(), { } ); 
-//symmetry_grp_t<6> rhs_t::symm_grp_chi_ph( gf_chi_t(), { } ); 
-//symmetry_grp_t<6> rhs_t::symm_grp_chi_xph( gf_chi_t(), { } ); 
 
 gf<double, 1> rhs_t::weight_vec( generate_weights( POS_INT_RANGE-TAIL_LENGTH, TAIL_LENGTH, FIT_ORDER ) ); 
 gf<double, 2> rhs_t::weight_vec_2d( generate_2d_weights( POS_INT_RANGE-TAIL_LENGTH, TAIL_LENGTH, FIT_ORDER ) ); 
@@ -143,8 +127,6 @@ dcomplex rhs_t::eval_diag_pp( const idx_2p_t& idx, const state_t& state_vec, con
    int s1_out = idx( I2P::s1_out );
    int s2_out = idx( I2P::s2_out );
 
-//   if( abs(w_in) < abs(w_out) )
-//   {   
       for( int s3 = 0; s3 < QN_COUNT; ++s3 )
 	 for( int s3p = 0; s3p < QN_COUNT; ++s3p )
 	    for( int s4 = 0; s4 < QN_COUNT; ++s4 )
@@ -155,7 +137,7 @@ dcomplex rhs_t::eval_diag_pp( const idx_2p_t& idx, const state_t& state_vec, con
 		     int K_minus_k = dif_k( K, k ); 
 
 		     // Particle particle channel
-		     for( int w = -POS_INT_RANGE - abs(W/2) ; w < POS_INT_RANGE + abs(W/2) ; ++w )
+		     for( int w = -POS_INT_RANGE - abs(W/2)-(W+1000000)%2 ; w < POS_INT_RANGE + abs(W/2) ; ++w )
 		     {
 			val += 
 			   0.5*state_vec.vertx_pp( W, w_in, w, K, k_in, k, s1_in, s2_in, s3p, s4p ) *  
@@ -177,37 +159,6 @@ dcomplex rhs_t::eval_diag_pp( const idx_2p_t& idx, const state_t& state_vec, con
 			state_vec.gam_pp( W, w, w_out, K, k, k_out, s3, s4, s1_out, s2_out )); 
 
 		  }
-//   }
-//   else
-//   {
-//      for( int s3 = 0; s3 < QN_COUNT; ++s3 )
-//	 for( int s3p = 0; s3p < QN_COUNT; ++s3p )
-//	    for( int s4 = 0; s4 < QN_COUNT; ++s4 )
-//	       for( int s4p = 0; s4p < QN_COUNT; ++s4p )
-//		  for( int k = 0; k < PATCH_COUNT; ++k )
-//		  {
-//
-//		     int K_minus_k = dif_k( K, k ); 
-//
-//		     // Particle particle channel
-//		     for( int w = -POS_INT_RANGE - abs(W/2) ; w < POS_INT_RANGE + abs(W/2) ; ++w )
-//		     {
-//			val += 
-//			   state_vec.gam_pp( W, w_in, w, K, k_in, k, s1_in, s2_in, s3p, s4p ) *  
-//			   Gvec[ w + div2_ceil( W ) ][k]( s4,s4p ) * Gvec[ div2_floor( W ) - w - 1 ][K_minus_k]( s3, s3p ) *
-//			   //weight_vec[w] * READJUST for varying summation range
-//			   state_vec.vertx_pp( W, w, w_out, K, k, k_out, s3, s4, s1_out, s2_out ); 
-//		     }
-//
-//		     // explicit large frequency contribution -- alternative to weight_vec
-//		     int w = POS_INT_RANGE + abs(W/2); 
-//		     val +=  
-//			BETA * ( s3 == s3p ) * ( s4 == s4p ) * asympt_GG_pp( W, Lam ) * 
-//			state_vec.gam_pp( W, w_in, w, K, k_in, k, s1_in, s2_in, s3p, s4p ) *  
-//			state_vec.vertx_pp( W, w, w_out, K, k, k_out, s3, s4, s1_out, s2_out ); 
-//
-//		  }
-//   }
 
    val *= 1.0/ BETA / PATCH_COUNT; 
    return val; 
@@ -236,8 +187,6 @@ dcomplex rhs_t::eval_diag_ph( const idx_2p_t& idx, const state_t& state_vec, con
    int s1_out = idx( I2P::s1_out );
    int s2_out = idx( I2P::s2_out );
 
-//   if( abs(w_in) < abs(w_out) )
-//   {
       for( int s3 = 0; s3 < QN_COUNT; ++s3 )
 	 for( int s3p = 0; s3p < QN_COUNT; ++s3p )
 	    for( int s4 = 0; s4 < QN_COUNT; ++s4 )
@@ -248,7 +197,7 @@ dcomplex rhs_t::eval_diag_ph( const idx_2p_t& idx, const state_t& state_vec, con
 		     int K_plus_k = add_k( K, k ); 
 
 		     // Particle hole channel
-		     for( int w = -POS_INT_RANGE - abs(W/2) ; w < POS_INT_RANGE + abs(W/2) ; ++w )
+		     for( int w = -POS_INT_RANGE - abs(W/2) - (W+1000000)%2 ; w < POS_INT_RANGE + abs(W/2) ; ++w )
 		     {
 			val += 
 			   - Gvec[ w-div2_floor( W ) ][k]( s4,s4p ) * Gvec[ div2_ceil( W ) + w ][K_plus_k]( s3, s3p ) *
@@ -275,47 +224,6 @@ dcomplex rhs_t::eval_diag_ph( const idx_2p_t& idx, const state_t& state_vec, con
 			); 
 
 		  }
-//   }
-//   else
-//   {
-//      for( int s3 = 0; s3 < QN_COUNT; ++s3 )
-//	 for( int s3p = 0; s3p < QN_COUNT; ++s3p )
-//	    for( int s4 = 0; s4 < QN_COUNT; ++s4 )
-//	       for( int s4p = 0; s4p < QN_COUNT; ++s4p )
-//		  for( int k = 0; k < PATCH_COUNT; ++k )
-//		  {
-//
-//		     int K_plus_k = add_k( K, k ); 
-//
-//		     // Particle hole channel
-//		     for( int w = -POS_INT_RANGE - abs(W/2) ; w < POS_INT_RANGE + abs(W/2) ; ++w )
-//		     {
-//			val += 
-//			   - Gvec[ w-div2_floor( W ) ][k]( s4,s4p ) * Gvec[ div2_ceil( W ) + w ][K_plus_k]( s3, s3p ) *
-//			   //weight_vec[w] * READJUST for varying summation range
-//			   (
-//			    state_vec.gam_ph_upup( W, w_in, w, K, k_in, k, s1_in, s3, s1_out, s4p ) *  
-//			    state_vec.vertx_ph( W, w, w_out, K, k, k_out, s4, s2_in, s3p, s2_out )
-//			    +
-//			    state_vec.gam_ph( W, w_in, w, K, k_in, k, s1_in, s3, s1_out, s4p ) *  
-//			    state_vec.vertx_ph_upup( W, w, w_out, K, k, k_out, s4, s2_in, s3p, s2_out )
-//			   ); 
-//		     }
-//
-//		     // explicit large frequency contribution -- alternative to weight_vec
-//		     int w = POS_INT_RANGE + abs(W/2); 
-//		     val +=  
-//			-BETA * ( s3 == s3p ) * ( s4 == s4p ) * asympt_GG_ph( W, Lam ) * 
-//			(
-//			 state_vec.gam_ph_upup( W, w_in, w, K, k_in, k, s1_in, s3, s1_out, s4p ) *  
-//			 state_vec.vertx_ph( W, w, w_out, K, k, k_out, s4, s2_in, s3p, s2_out )
-//			 +
-//			 state_vec.gam_ph( W, w_in, w, K, k_in, k, s1_in, s3, s1_out, s4p ) *  
-//			 state_vec.vertx_ph_upup( W, w, w_out, K, k, k_out, s4, s2_in, s3p, s2_out )
-//			); 
-//
-//		  }
-//   }
 
    val *= 1.0/ BETA / PATCH_COUNT; 
    return val; 
@@ -356,7 +264,7 @@ dcomplex rhs_t::eval_diag_xph( const idx_2p_t& idx, const state_t& state_vec, co
 		     int K_plus_k = add_k( K, k ); 
 
 		     // Particle hole exchange channel, this way of connecting has no loop and no swap
-		     for( int w = -POS_INT_RANGE - abs(W/2) ; w < POS_INT_RANGE + abs(W/2) ; ++w )
+		     for( int w = -POS_INT_RANGE - abs(W/2) - (W+100000)%2 ; w < POS_INT_RANGE + abs(W/2) ; ++w )
 		     {
 			val += 
 			   state_vec.vertx_xph( W, w_in, w, K, k_in, k, s1_in, s3, s4p, s2_out ) *  
@@ -373,50 +281,18 @@ dcomplex rhs_t::eval_diag_xph( const idx_2p_t& idx, const state_t& state_vec, co
 			state_vec.gam_xph( W, w, w_out, K, k, k_out, s4, s2_in, s1_out, s3p );
 
 		  }    
- //  }
- //  else
- //  {
- //     for( int s3 = 0; s3 < QN_COUNT; ++s3 )
- //        for( int s3p = 0; s3p < QN_COUNT; ++s3p )
- //           for( int s4 = 0; s4 < QN_COUNT; ++s4 )
- //              for( int s4p = 0; s4p < QN_COUNT; ++s4p )
- //       	  for( int k = 0; k < PATCH_COUNT; ++k )
- //       	  {
-
- //       	     int K_plus_k = add_k( K, k ); 
-
- //       	     // Particle hole exchange channel, this way of connecting has no loop and no swap
- //       	     for( int w = -POS_INT_RANGE - abs(W/2) ; w < POS_INT_RANGE + abs(W/2) ; ++w )
- //       	     {
- //       		val += 
- //       		   state_vec.gam_xph( W, w_in, w, K, k_in, k, s1_in, s3, s4p, s2_out ) *  
- //       		   //weight_vec[w] * READJUST for varying summation range
- //       		   Gvec[ w-div2_floor( W ) ][k]( s4,s4p ) * Gvec[ div2_ceil( W ) + w ][K_plus_k]( s3, s3p ) *
- //       		   state_vec.vertx_xph( W, w, w_out, K, k, k_out, s4, s2_in, s1_out, s3p );
- //       	     }
-
- //       	     // explicit large frequency contribution -- alternative to weight_vec
- //       	     int w = POS_INT_RANGE + abs(W/2); 
- //       	     val +=  
- //       		BETA * ( s3 == s3p ) * ( s4 == s4p ) * asympt_GG_ph( W, Lam ) * 
- //       		state_vec.gam_xph( W, w_in, w, K, k_in, k, s1_in, s3, s4p, s2_out ) *  
- //       		state_vec.vertx_xph( W, w, w_out, K, k, k_out, s4, s2_in, s1_out, s3p );
-
- //       	  }
- //  }
 
    val *= 1.0/ BETA / PATCH_COUNT; 
    return val; 
 }
 
 
-//using gf_mat_t = gf<dcomplex, 8>; 
-//
-//gf_mat_t ones_matrices_times_scalar(double num){
-//   gf_mat_t ones_matrix(boost::extents[ffreq(POS_INT_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INT_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT]);
-//   ones_matrix.init({return dcomplex(0.0,0.0);});
-//   return ones_matrix;
-//}
+/*********************************************************************************************************************************************************
+ *
+ * 				BETHE-SALPETER EQUATIONS INVERTED WITH CORRECTION TO THE FINITE MATRIX INVERSION:
+ * 				1) AGNESE'S CORRECTIONS 2) STEFAN'S CORRECTIONS 3) BIG MATRIX WITH ASYMPTOTICS USES(TODO:CHECK NOTATION-> NON TESTED)
+ *
+ ***********************************************************************************************************************************************************/ 				
 
 #ifdef METHOD2 // AGNESE'S METHOD FOR THE INVERSION OF THE BETHE-SALPETER EQUATIONS -> VERTEX ASYMPTOTICS USED 
 void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const gf_1p_mat_t& Gvec, double Lam )
@@ -484,8 +360,6 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	 gam_s *= -BETA*BETA;
          gam_t *= -BETA*BETA;
 
-         cout << "GAMMA S AND GAMMA T!!!"<< endl;	 
-	 //copy this part to gf_phi_pp
 	 for( int w_in = -POS_FFREQ_COUNT_PHI; w_in < POS_FFREQ_COUNT_PHI; ++w_in )
 	    for( int w_out = -POS_FFREQ_COUNT_PHI; w_out < POS_FFREQ_COUNT_PHI; ++w_out )
 	       for( int k_in = 0; k_in < PATCH_COUNT; ++k_in )
@@ -498,7 +372,6 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 				    state_vec.vertx_pp( W, w_in, w_out, K, k_in, k_out, s1, s2, s1p, s2p ) - 
 				    0.5*(gam_s[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]+gam_t[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]); //GAMMA UPDO PP = (GAMMA_S + GAMMA_T)/2 
 			      }
-         cout << "PHI S T FIXED W K!!!"<< endl;	
       }
    }
 }
@@ -521,11 +394,12 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
       
       for( int K = 0; K < PATCH_COUNT; ++K )
       {
-	 // Initialize gam_t with genchi_t_minus_0_pp
+	 // Initialize gam_m gam_d and gam_0
 	 gam_m.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_m( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) )-2.0*state_vec.genchi_0_ph( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } ); 
 	 gam_0.init([W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_0_ph( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } );
 	 gam_d.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_d( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) )-2.0*state_vec.genchi_0_ph( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } );
-	 // Build 'Identity + weight_vec * G * G * F' matrixx
+	 
+	 // Corrections to the density channel
 	 corr_gamma_d.init( [W,K,POS_INV_RANGE,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
 	       { 
 	       dcomplex val( 0.0, 0.0 );
@@ -555,6 +429,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	       return val; 
 	       } ); 
 
+	 //Corrections to the magnetic channel
 	 corr_gamma_m.init( [W,K,POS_INV_RANGE,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
 	       { 
 	       dcomplex val( 0.0, 0.0 );
@@ -600,8 +475,6 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	 gam_m *= -BETA*BETA;
 	 
          
-	 cout << "GAMMA M AND GAMMA D!!!"<< endl;	 
-	 //copy this part to gf_phi_pp
 	 for( int w_in = -POS_FFREQ_COUNT_PHI; w_in < POS_FFREQ_COUNT_PHI; ++w_in )
 	    for( int w_out = -POS_FFREQ_COUNT_PHI; w_out < POS_FFREQ_COUNT_PHI; ++w_out )
 	       for( int k_in = 0; k_in < PATCH_COUNT; ++k_in )
@@ -616,7 +489,6 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 				 gf_phi_xph[W][w_in][w_out][K][k_in][k_out][s1][s2][s1p][s2p] = 
 				    state_vec.vertx_xph( W, w_in, w_out, K, k_in, k_out, s1, s2, s1p, s2p ) + gam_m[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]; //GAMMA UPDO XPH = - GAMMA_M 
 			      }
-      cout << "PHI M D FOR FIXED K AND W!!!"<< endl;
       }
    }
 
@@ -649,7 +521,7 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
       
       for( int K = 0; K < PATCH_COUNT; ++K )
       {
-	 // Initialize gam_pp with full vertex
+	 // Initialize gam_t, gam_s in all the matrix blocks
 	 gam_t_00_pp.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchit_minus_30_pp( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } ); 
 
 	 gam_s_00_pp.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchis_plus_30_pp( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } ); 
@@ -662,7 +534,6 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	 gam_corr_pp.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return dcomplex(0.0,0.0); } );
 	 gam_0_11_pp.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_0_pp( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } );
 
-	 // Build 'Identity + weight_vec * G * G * F' matrixx
 	 gam_11_pp.init( [W,K,POS_INV_RANGE,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
 	       { 
 
@@ -726,34 +597,34 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 
          cout << "init done"<< endl; 
 
-	 MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ) *= MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
+	 MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
 	 gam_11_pp *= gam_0_11_pp;
 
 	 cout << "inverted correction" << endl;
-         //gam_11_pp *= gam_10_pp;
-         prod(gam_11_pp,gam_11_pp); 
-         //MapXcd(gam_corr_pp.data(), MAT_11_DIM, MAT_10_DIM ) = prod( MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ), MapXcd(  gam_10_pp.data(), MAT_11_DIM, MAT_10_DIM ) );
-	 //MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ) *= MapXcd(  gam_10_pp.data(), MAT_11_DIM, MAT_10_DIM );
+	 MapXcd(  gam_corr_pp.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_10_pp.data(), MAT_11_DIM, MAT_DIM );
 
 	 cout << "Multiplied by matrix 01" << endl;
 
-         MapXcd(  gam_t_00_pp.data(), MAT_DIM, MAT_DIM ) *= MapXcd(  gam_t_00_pp.data(), MAT_DIM, MAT_DIM ).inverse();
-	 MapXcd(  gam_s_00_pp.data(), MAT_DIM, MAT_DIM ) *= MapXcd(  gam_s_00_pp.data(), MAT_DIM, MAT_DIM ).inverse();
-         MapXcd(  gam_0_00_pp.data(), MAT_DIM, MAT_DIM ) *= MapXcd(  gam_0_00_pp.data(), MAT_DIM, MAT_DIM ).inverse();
+         MapXcd(  gam_t_00_pp.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_t_00_pp.data(), MAT_DIM, MAT_DIM ).inverse();
+	 MapXcd(  gam_s_00_pp.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_s_00_pp.data(), MAT_DIM, MAT_DIM ).inverse();
+         MapXcd(  gam_0_00_pp.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_0_00_pp.data(), MAT_DIM, MAT_DIM ).inverse();
 	 
 	 MapXcd(  gam_t_00_pp.data(), MAT_DIM, MAT_DIM ) *= dcomplex(4.0,0.0);
 	 MapXcd(  gam_s_00_pp.data(), MAT_DIM, MAT_DIM ) *= dcomplex(4.0,0.0);
 	 MapXcd(  gam_0_00_pp.data(), MAT_DIM, MAT_DIM ) *= dcomplex(2.0,0.0);
 
-
+         
 	 gam_t_00_pp += gam_0_00_pp;
 	 gam_s_00_pp -= gam_0_00_pp;
 
-	 MapXcd(  gam_s_00_pp.data(), MAT_DIM, MAT_DIM ) += 1./BETA/BETA/2.0* prod(MapXcd(  gam_10_pp.data(), MAT_10_DIM, MAT_11_DIM ),MapXcd(  gam_corr_pp.data(), MAT_11_DIM, MAT_10_DIM ));
+	 cout << "Non corrected gamma pp" << endl; 
+	 
+	 MapXcd( gam_s_00_pp.data(), MAT_DIM, MAT_DIM ) += 1./BETA/BETA/BETA/BETA/2.0*MapXcd(  gam_01_pp.data(), MAT_DIM, MAT_11_DIM ) * MapXcd(  gam_corr_pp.data(), MAT_11_DIM, MAT_DIM );
          
+	 cout << "Corrected gamma pp" << endl; 
 
-	 gam_t_00_pp -= BETA*BETA; 
-	 gam_s_00_pp -= BETA*BETA;
+	 gam_t_00_pp *= -BETA*BETA; 
+	 gam_s_00_pp *= -BETA*BETA;
 
 	 //copy this part to gf_phi_pp
 	 for( int w_in = -POS_FFREQ_COUNT_PHI; w_in < POS_FFREQ_COUNT_PHI; ++w_in )
@@ -780,7 +651,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
    for( int W = -POS_BFREQ_COUNT_PHI; W < POS_BFREQ_COUNT_PHI + 1; ++W )
    {
       int  POS_INV_RANGE = POS_FERM_VERT_COUNT_EXACT;
-      int  POS_ASY_RANGE = 8*POS_FERM_VERT_COUNT_EXACT;	 
+      int  POS_ASY_RANGE = 4*POS_FERM_VERT_COUNT_EXACT;	 
       const int MAT_DIM = 2* POS_INV_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
       const int MAT_11_DIM = 2* POS_ASY_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
       const int MAT_10_DIM = POS_INV_RANGE * POS_ASY_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
@@ -793,6 +664,8 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
       gf_mat_t gam_d_10_ph( boost::extents[ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] );
       gf_mat_t gam_m_01_ph( boost::extents[ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] );
       gf_mat_t gam_m_10_ph( boost::extents[ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] );
+      gf_mat_t gam_corr_m_10_ph( boost::extents[ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] );
+      gf_mat_t gam_corr_d_10_ph( boost::extents[ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] ); 
       
       gf_mat_t gam_d_11_ph( boost::extents[ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] );
       gf_mat_t gam_m_11_ph( boost::extents[ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_ASY_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] );
@@ -803,7 +676,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	 // Initialize gam_pp with full vertex
 	 gam_d_00_ph.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_d( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) )-2.0*state_vec.genchi_0_ph( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } ); 
 
-	 gam_m_00_ph.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_m( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) )+2.0*state_vec.genchi_0_ph( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } ); 
+	 gam_m_00_ph.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_m( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) )-2.0*state_vec.genchi_0_ph( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } ); 
 	 
 	 gam_0_00_ph.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_0_ph( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } ); 
 	 
@@ -935,31 +808,31 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	       } ); 
 
          
-	 MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) *= MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
+	 MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
 	
-	 MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) *= MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
+	 MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
 	 
 	 gam_d_11_ph *= gam_0_11_ph;
 	 gam_m_11_ph *= gam_0_11_ph;
          
-	 MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) *= MapXcd(  gam_d_10_ph.data(), MAT_11_DIM, MAT_10_DIM );
+	 MapXcd(  gam_corr_d_10_ph.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_d_10_ph.data(), MAT_11_DIM, MAT_DIM );
 
-	 MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) *= MapXcd(  gam_m_10_ph.data(), MAT_11_DIM, MAT_10_DIM );
+	 MapXcd(  gam_corr_m_10_ph.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_m_10_ph.data(), MAT_11_DIM, MAT_DIM );
          
-	 MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ) *= MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ).inverse();
-	 MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ) *= MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ).inverse();
-         MapXcd(  gam_0_00_ph.data(), MAT_DIM, MAT_DIM ) *= MapXcd(  gam_0_00_ph.data(), MAT_DIM, MAT_DIM ).inverse();
+	 MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ).inverse();
+	 MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ).inverse();
+         MapXcd(  gam_0_00_ph.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_0_00_ph.data(), MAT_DIM, MAT_DIM ).inverse();
 	 
 
 	 gam_d_00_ph += gam_0_00_ph;
 	 gam_m_00_ph += gam_0_00_ph;
 
-	 MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA* MapXcd(  gam_d_10_ph.data(), MAT_10_DIM, MAT_11_DIM )*MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_10_DIM );
+	 MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA/BETA/BETA* MapXcd(  gam_d_10_ph.data(), MAT_DIM, MAT_11_DIM )*MapXcd(  gam_corr_d_10_ph.data(), MAT_11_DIM, MAT_DIM );
          
-	 MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA* MapXcd(  gam_m_10_ph.data(), MAT_10_DIM, MAT_11_DIM )*MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_10_DIM );
+	 MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA/BETA/BETA* MapXcd(  gam_m_10_ph.data(), MAT_DIM, MAT_11_DIM )*MapXcd(  gam_corr_m_10_ph.data(), MAT_11_DIM, MAT_DIM );
 
-	 gam_d_00_ph -= BETA*BETA; 
-	 gam_m_00_ph -= BETA*BETA;
+	 gam_d_00_ph *= -BETA*BETA; 
+	 gam_m_00_ph *= -BETA*BETA;
 
 	 //copy this part to gf_phi_pp
 	 for( int w_in = -POS_FFREQ_COUNT_PHI; w_in < POS_FFREQ_COUNT_PHI; ++w_in )
@@ -972,7 +845,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 			      for( int s2p = 0; s2p < QN_COUNT; ++s2p ){
 				 gf_phi_ph[W][w_in][w_out][K][k_in][k_out][s1][s2][s1p][s2p] = 
 				    state_vec.vertx_ph( W, w_in, w_out, K, k_in, k_out, s1, s2, s1p, s2p ) - 
-				    0.5*(gam_d_00_ph[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]+gam_m_00_ph[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]);
+				    0.5*(gam_d_00_ph[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]-gam_m_00_ph[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]);
 					  
 				 gf_phi_xph[W][w_in][w_out][K][k_in][k_out][s1][s2][s1p][s2p] = 
 				    state_vec.vertx_xph( W, w_in, w_out, K, k_in, k_out, s1, s2, s1p, s2p ) + gam_m_00_ph[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p];

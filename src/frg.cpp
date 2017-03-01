@@ -144,7 +144,7 @@ dcomplex asympt_GG_pp( int W_int, double Lam )
    if( W_int == 0 )
       return (BETA*Lam*Lam)/(2.0*pow(PI,2.0)*PIR); 
 
-   return (BETA*Lam*Lam*atanh(W/(2.0*PIR)))/(pow(PI,2.0)*W); 
+   return 0.0;
 }
 
 #endif
@@ -193,7 +193,7 @@ dcomplex FUNC_PH( int W_int, int POS_INV )
    if( W_int == 0 )
       return BETA*BETA/(PI*PI)*2*(1.0/(2.0+4.0*POS_INV)); 
 
-   return -BETA*BETA/(PI*PI)*(1.0/(4*W))*log((1.0+2.0*POS_INV-2.0*div2_floor(W))*(1.0+2.0*POS_INV-2.0*div2_ceil(W))/((1.0+2.0*POS_INV+2.0*div2_ceil(W))*(1.0+2.0*POS_INV+2.0*div2_floor(W))));
+   //return -BETA*BETA/(PI*PI)*(1.0/(4*W))*log((1.0+2.0*POS_INV-2.0*div2_floor(W))*(1.0+2.0*POS_INV-2.0*div2_ceil(W))/((1.0+2.0*POS_INV+2.0*div2_ceil(W))*(1.0+2.0*POS_INV+2.0*div2_floor(W))));
       
 }
 
@@ -220,9 +220,6 @@ dcomplex Sig_init( const idx_1p_t& idx ) // initial values for Sigma
    if ((idx(0) >= -POS_SIG_COUNT_EXACT) && (idx(0) <= POS_SIG_COUNT_EXACT - 1) )
       return Sig_exact[idx(0)][idx(1)][idx(2)][idx(3)]; 
 #endif
-   //if ( idx(0) >= 0 )
-      //return -I*10.0; 
-   //return I*10.0; 
 
    return 0.0;
 }

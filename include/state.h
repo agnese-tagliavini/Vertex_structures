@@ -256,19 +256,21 @@ class state_t: public ReaK::arithmetic_tuple< gf_1p_t, gf_phi_t, gf_phi_t, gf_ph
 
 }; 
 
-//namespace boost {
-//   namespace numeric {
-//      namespace odeint {
-//	 template<>
-//	    struct vector_space_norm_inf< state_t >
-//	    {
-//	       typedef double result_type;
-//	       double operator()( const state_t &state_vec ) const
-//	       {
-//		  using namespace std; 
-//		  return norm( state_vec ); 
-//	       }
-//	    };
-//      }
-//   }
-//}
+namespace boost {
+   namespace numeric {
+      namespace odeint {
+	 template<>
+	    struct vector_space_norm_inf< state_t >
+
+	    {
+	       typedef double result_type;
+	       double operator()( const state_t &state_vec ) const
+
+	       {
+		  using namespace std; 
+		  return norm( state_vec ); 
+	       }
+	    };
+      }
+   }
+}
