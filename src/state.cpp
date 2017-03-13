@@ -36,10 +36,12 @@ dcomplex state_t::Sig( int w, int k, int s_in, int s_out ) const
 MatQN state_t::SigMat( int w, int k ) const
 {
    if ( w < -POS_FFREQ_COUNT_SIG )
-      return -1.0 * POS_FFREQ_COUNT_SIG / w * Eigen::Map<const MatQN>( &(gf_Sig()[-POS_FFREQ_COUNT_SIG][k][0][0]) ); 
+      //return -1.0 * POS_FFREQ_COUNT_SIG / w * Eigen::Map<const MatQN>( &(gf_Sig()[-POS_FFREQ_COUNT_SIG][k][0][0]) ); 
+	return MatQN::Zero();
 
    if ( w > POS_FFREQ_COUNT_SIG - 1 )
-      return 1.0 * ( POS_FFREQ_COUNT_SIG - 1 ) / w * Eigen::Map<const MatQN>( &(gf_Sig()[POS_FFREQ_COUNT_SIG-1][k][0][0]) ); 
+//      return 1.0 * ( POS_FFREQ_COUNT_SIG - 1 ) / w * Eigen::Map<const MatQN>( &(gf_Sig()[POS_FFREQ_COUNT_SIG-1][k][0][0]) ); 
+	return MatQN::Zero();
 
    if ( w < -POS_FFREQ_COUNT_SIG || w > POS_FFREQ_COUNT_SIG - 1 ) 
       return MatQN::Zero(); 
@@ -427,7 +429,7 @@ dcomplex state_t::phi_pp_outside( int W, int w_in, int w_out, int K, int k_in, i
 {
    return chi_pp( W, K, s1_in, s2_in, s1_out, s2_out ) + 
       P_pp( W, w_in, K, k_in, s1_in, s2_in, s1_out, s2_out ) + 
-      P_pp( W, -w_out-1-( W + 10000 ) % 2, K, k_out, s1_out, s2_out, s1_in, s2_in );  // time reversal symmetry used
+      P_pp( W, w_out, K, k_out, s1_out, s2_out, s1_in, s2_in );  // time reversal symmetry used
 }
 //PH
 dcomplex state_t::phi_ph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const
@@ -479,8 +481,8 @@ dcomplex state_t::chi_pp( int W, int K, int s1_in, int s2_in, int s1_out, int s2
       return 0.0; 
 
    if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI ) 
-      return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W * gf_chi_pp()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
-
+      //return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W * gf_chi_pp()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
+	return 0.0;
    return gf_chi_pp()[W][K][s1_in][s2_in][s1_out][s2_out]; 
 }
 
@@ -491,8 +493,8 @@ dcomplex state_t::chi_ph( int W, int K, int s1_in, int s2_in, int s1_out, int s2
      return 0.0; 
 
    if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI ) 
-      return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W / W / W * gf_chi_ph()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
-
+      //return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W / W / W * gf_chi_ph()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
+        return 0.0;
    return gf_chi_ph()[W][K][s1_in][s2_in][s1_out][s2_out]; 
 }
 
@@ -503,8 +505,9 @@ dcomplex state_t::chi_xph( int W, int K, int s1_in, int s2_in, int s1_out, int s
       return 0.0; 
 
    if ( W < -POS_BFREQ_COUNT_CHI || W > POS_BFREQ_COUNT_CHI ) 
-      return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W * gf_chi_xph()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
-
+      //return 1.0 * POS_BFREQ_COUNT_CHI * POS_BFREQ_COUNT_CHI / W / W * gf_chi_xph()[sgn(W)*POS_BFREQ_COUNT_CHI][K][s1_in][s2_in][s1_out][s2_out]; 
+	return 0.0;
+   
    return gf_chi_xph()[W][K][s1_in][s2_in][s1_out][s2_out]; 
 }
 
@@ -600,12 +603,12 @@ dcomplex state_t::P_pp( int W, int w, int K, int k, int s1_in, int s2_in, int s1
       return 0.0; 
       
    if( w < -POS_FFREQ_COUNT_P ) // Check validity out of PH symmetry! ( imaginary part )
-      return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_pp()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
-
+      //return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_pp()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
+	return 0.0;
 
    if( w > POS_FFREQ_COUNT_P - 1 )
-      return ( - 0.25 * W * W + ( POS_FFREQ_COUNT_P - 1 ) * ( POS_FFREQ_COUNT_P - 1 ) ) / ( - 0.25 * W * W + w * w ) * gf_P_pp()[W][POS_FFREQ_COUNT_P-1][K][k][s1_in][s2_in][s1_out][s2_out]; 
-
+      //return ( - 0.25 * W * W + ( POS_FFREQ_COUNT_P - 1 ) * ( POS_FFREQ_COUNT_P - 1 ) ) / ( - 0.25 * W * W + w * w ) * gf_P_pp()[W][POS_FFREQ_COUNT_P-1][K][k][s1_in][s2_in][s1_out][s2_out]; 
+	return 0.0;
 
    return gf_P_pp()[W][w][K][k][s1_in][s2_in][s1_out][s2_out]; 
 }
@@ -621,10 +624,11 @@ dcomplex state_t::P_ph( int W, int w, int K, int k, int s1_in, int s2_in, int s1
       return 0.0; 
       
    if( w < -POS_FFREQ_COUNT_P ) // Check validity out of PH symmetry! ( imaginary part )
-     return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_ph()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
-
+     //return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_ph()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
+	return 0.0;
    if( w > POS_FFREQ_COUNT_P - 1 )
-      return ( - 0.25 * W * W + ( POS_FFREQ_COUNT_P - 1 ) * ( POS_FFREQ_COUNT_P - 1 ) ) / ( - 0.25 * W * W + w * w ) * gf_P_ph()[W][POS_FFREQ_COUNT_P-1][K][k][s1_in][s2_in][s1_out][s2_out]; 
+      //return ( - 0.25 * W * W + ( POS_FFREQ_COUNT_P - 1 ) * ( POS_FFREQ_COUNT_P - 1 ) ) / ( - 0.25 * W * W + w * w ) * gf_P_ph()[W][POS_FFREQ_COUNT_P-1][K][k][s1_in][s2_in][s1_out][s2_out]; 
+	return 0.0;
 
    return gf_P_ph()[W][w][K][k][s1_in][s2_in][s1_out][s2_out]; 
 }
@@ -640,10 +644,11 @@ dcomplex state_t::P_xph( int W, int w, int K, int k, int s1_in, int s2_in, int s
       return 0.0; 
       
    if( w < -POS_FFREQ_COUNT_P ) // Check validity out of PH symmetry! ( imaginary part )
-      return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_xph()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
-
+      //return ( - 0.25 * W * W + POS_FFREQ_COUNT_P * POS_FFREQ_COUNT_P ) / ( - 0.25 * W * W + w * w ) * gf_P_xph()[W][-POS_FFREQ_COUNT_P][K][k][s1_in][s2_in][s1_out][s2_out]; 
+	return 0.0;
    if( w > POS_FFREQ_COUNT_P - 1 )
-      return ( - 0.25 * W * W + ( POS_FFREQ_COUNT_P - 1 ) * ( POS_FFREQ_COUNT_P - 1 ) ) / ( - 0.25 * W * W + w * w ) * gf_P_xph()[W][POS_FFREQ_COUNT_P-1][K][k][s1_in][s2_in][s1_out][s2_out]; 
+      //return ( - 0.25 * W * W + ( POS_FFREQ_COUNT_P - 1 ) * ( POS_FFREQ_COUNT_P - 1 ) ) / ( - 0.25 * W * W + w * w ) * gf_P_xph()[W][POS_FFREQ_COUNT_P-1][K][k][s1_in][s2_in][s1_out][s2_out]; 
+	return 0.0;
 
    return gf_P_xph()[W][w][K][k][s1_in][s2_in][s1_out][s2_out]; 
 }

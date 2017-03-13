@@ -22,7 +22,7 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-fname = "/home/agnese/Coding/Vertex_structures/dat/U1.0_beta26.0_FFREQ_20_BFREQ_20_noQN_idx.h5"
+fname = "/home/agnese/Coding/Vertex_structures/dat/U1.0_beta26.0_FFREQ_40_BFREQ_60_noQN_idx.h5"
 
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
