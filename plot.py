@@ -14,7 +14,7 @@ from agneselibrary.mymath import *
 #--------------------------------------SETTINGS ------------------------------------------
 #if -1, change overall vertex sign (switch definition)
 vert_mul = 1
-
+pi = math.pi
 
 #--------------------------------------MANAGING FILES ------------------------------------------
 
@@ -24,7 +24,7 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-fname = "dat/" + most_recently_edited
+fname = "dat/dat_U1_Beta20_PFCB120_PARQ_SU2_METH2.h5"
 
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
@@ -225,12 +225,12 @@ def ImVertUpDown( w1, w2, w1p ):
 def ReVertUpUp( w1, w2, w1p ):
     if ( not check_bounds( w1, w2, w1p ) ):
             return float('nan')
-    return ReVertUpDown( w1, w2, w1p ) - ReVertUpDown( w2, w1, w1p )
+    return ReVertUpDown( w1, w2, w1p ) - ReVertUpDown( w1, w2, w1+w2-w1p-1 )
 
 def ImVertUpUp( w1, w2, w1p ):
     if ( not check_bounds( w1, w2, w1p ) ):
             return float('nan')
-    return ImVertUpDown( w1, w2, w1p ) - ImVertUpDown( w2, w1, w1p )
+    return ImVertUpDown( w1, w2, w1p ) - ImVertUpDown( w1, w2, w1+w2-w1p-1 )
 
 
 def plotVert( use_pl, zarr, string ):
@@ -299,7 +299,7 @@ pl.savefig("plots/Vert.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=4
+shift=6
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
@@ -343,6 +343,11 @@ if fdim <= shift:
 #---  Helper functions
 def neg( w ):
     return fdim - w - 1
+
+def check_bounds_mix( W, w, wp ):
+    if ( W < 0 or W > bdim or w < 0 or w > fdim - 1 or wp < 0 or wp > fdim - 1 ):
+        return False
+    return True
 
 def check_bounds( w1, w2, w1p ):
     if ( w1 < 0 or w1 > fdim - 1 or w2 < 0 or w2 > fdim - 1 or w1p < 0 or w1p > fdim - 1 ):
@@ -442,7 +447,7 @@ plotUpDownLambdaRePHX( pl.subplot(2,3,6) )
 pl.xlabel(r"$\omega_n$")
 pl.tight_layout()
 
-shift=4
+shift=6
 
 #--- Save to file
 pl.savefig("plots/Lambda.png", dpi = 150)
@@ -526,7 +531,7 @@ pl.savefig("plots/genchi.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=4
+shift=6
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
@@ -610,7 +615,7 @@ pl.savefig("plots/vert.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=4
+shift=6
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
@@ -654,8 +659,15 @@ imphi_xph = vert_mul * np.array(f["/phi_func/IM_XPH"])
 
 bdim = rephi_pp.shape[0]
 fdim = rephi_pp.shape[1]
-
+fdimo2 = fdim/2
 phigrid = np.array(f["/phi_func/fgrid"])
+phigrid_plot = np.array([(2*n+1)*pi/BETA for n in range(-fdimo2+1,fdimo2-1)])
+#rephi_pp_upup = np.array([[[[[[[[[[ rephi_pp[W,m,n,K,k,kp,s1,s2,s3,s3] - rephi_pp[W,m,-n-1+fdim-mymod_abs(W),K,k,kp,s1,s2,s3,s4] for s4 in range(0,1)] for s3 in range(0,1)]for s2 in range(0,1)]for s1 in range(0,1)] for kp in range(0,1)] for k in range(0,1)] for K in range(0,1)] for n in range(fdim)] for m in range(fdim)] for W in range(bdim+1)])
+
+def rephi_pp_updo( W, w, wp, K, k, kp , s1, s2, s3, s4 ):
+    if ( not check_bounds_mix( W, w, wp ) ):
+            return 0.0
+    return rephi_pp[W,w,wp,K,k,kp,s1,s2,s3,s4]
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
 def plotphi( use_pl, arr, string ):
@@ -668,10 +680,19 @@ def plotphi( use_pl, arr, string ):
     pl.colorbar(shrink=0.6) 
     return
 
+def plotphiupup( use_pl, string ):
+    use_pl.set_aspect(1.0)
+    zarr = np.array([[ rephi_pp_updo(shift + (bdim-1)/2,n+fdim/2,m+fdim/2,0,0,0,0,0,0,0)-rephi_pp_updo(shift + (bdim-1)/2,n+fdim/2,-m-1-mymod_abs(shift + (bdim-1)/2)+fdim/2,0,0,0,0,0,0,0) for n in range(-fdimo2,fdimo2)] for m in range(-fdimo2,fdimo2)])
+    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.ylim([min(phigrid),max(phigrid)])
+    pl.xlim([min(phigrid),max(phigrid)])
+    use_pl.set_title( string , fontsize=10 )
+    pl.colorbar(shrink=0.6) 
+    return
 #--- Plot 
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
-plotphi( pl.subplot(2,3,1), rephi_pp - rephi_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\phi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+plotphiupup( pl.subplot(2,3,1), RE + r"\phi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
 pl.xlabel(r"$\omega$")
 plotphi( pl.subplot(2,3,2), rephi_ph - rephi_xph, RE + r"\phi^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
@@ -694,12 +715,12 @@ pl.savefig("plots/phi.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=4
+shift=6
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
-plotphi( pl.subplot(2,3,1), rephi_pp - rephi_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\phi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+plotphiupup( pl.subplot(2,3,1),  RE + r"\phi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
 pl.xlabel(r"$\omega$")
 plotphi( pl.subplot(2,3,2), rephi_ph - rephi_xph, RE + r"\phi^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
@@ -878,7 +899,7 @@ pl.savefig("plots/R.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=4
+shift=6
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $R(\Omega,\omega,\omega')$")

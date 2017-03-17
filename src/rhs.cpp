@@ -453,7 +453,7 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	       {
 	       val += Gvec[div2_floor( W )-w_in-1 ][dif_k(K,k_in)]( s2_in,s4 )*Gvec[ div2_ceil( W )+w_in ][k_in]( s1_in,s3 )*
 		  (vert_bare(s3,s4,s1_out,s2_out)+state_vec.P_pp_s(W,w_in,K,k_in,s3,s4,s1_out,s2_out)+state_vec.chi_pp_s(W,K,s3,s4,s1_out,s2_out))*
-		  UINT*0.5*FUNC_PP(W,POS_INV_RANGE); //Check sign of UINT
+		  -UINT*0.5*FUNC_PP(W,POS_INV_RANGE); //Check sign of UINT
 	       }
 	       
 	       val *= 1.0 / BETA / BETA; 

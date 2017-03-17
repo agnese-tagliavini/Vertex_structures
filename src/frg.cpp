@@ -35,13 +35,13 @@ gf_phi_t genchi_exact_ph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
 gf_phi_t genchi_exact_xph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
 
 
-const int POS_SIG_COUNT_EXACT = 156; 
+const int POS_SIG_COUNT_EXACT = 160; 
 gf_1p_t Sig_exact(POS_SIG_COUNT_EXACT); 
 
 void read_exact()
 {
    using namespace H5;
-   H5File input_file( "dat/U1.0_beta26.0_FFREQ_40_BFREQ_60.h5", H5F_ACC_RDONLY );
+   H5File input_file( "dat/U1.0_beta20.0_FFREQ_40_BFREQ_60.h5", H5F_ACC_RDONLY );
    cout << "Got file" << endl;
 
    Group vert_group =  input_file.openGroup("/VERT");

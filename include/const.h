@@ -20,7 +20,7 @@ const int COUNT = 40;
 
 // ----- SE dimensions
 
-const int POS_FFREQ_COUNT_SIG = 156;				///< Amount of positive frequencies in self-energy grid
+const int POS_FFREQ_COUNT_SIG = 160;				///< Amount of positive frequencies in self-energy grid
 const int FFREQ_COUNT_SIG = 2 * POS_FFREQ_COUNT_SIG;		///< Amount of frequencies in self-energy grid
 
 // ----- phi dimensions
@@ -33,7 +33,7 @@ const int BFREQ_COUNT_PHI = 2 * POS_BFREQ_COUNT_PHI + 1;	///< Amount of bosonic 
 
 // ----- P dimensions
 
-const int POS_FFREQ_COUNT_P = 5*COUNT;		        ///< Amount of positive fermionic frequencies in P grid
+const int POS_FFREQ_COUNT_P = COUNT;		        ///< Amount of positive fermionic frequencies in P grid
 const int FFREQ_COUNT_P = 2 * POS_FFREQ_COUNT_P;		///< Amount of fermionic frequencies in P grid
                                                                                                                           
 const int POS_BFREQ_COUNT_P = 2*POS_BFREQ_COUNT_PHI;	///< Amount of positive bosonic frequencies in P grid 
@@ -56,7 +56,7 @@ const int POS_1P_RANGE = POS_BFREQ_COUNT_CHI + POS_INT_RANGE; 	///< Positive ran
 
 // ----- Output ranges
 
-const int POS_PLOT_RANGE_PHI = 2* POS_FFREQ_COUNT_PHI; 	///< Amount of positive frequencies in phi output grid
+const int POS_PLOT_RANGE_PHI = 1.5* POS_FFREQ_COUNT_PHI; 	///< Amount of positive frequencies in phi output grid
 const int POS_PLOT_RANGE_VERT = POS_PLOT_RANGE_PHI; 		///< Amount of positive frequencies in vertex output grid
 
 

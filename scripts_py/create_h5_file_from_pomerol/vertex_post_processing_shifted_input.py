@@ -46,7 +46,7 @@ from _functools import partial
 
 U=1.0
 MU= 0.0 # half-filling
-beta=26.0
+beta=20.0
 
 FFREQ = 40 #fermionic frequencies in the mixed notation
 BFREQ = 60 #bosonic frequency transfer in the mixed notation
@@ -72,7 +72,7 @@ f = h5py.File('/home/agnese/Coding/Vertex_structures/dat/U'+ str(U)+'_beta'+ str
 
 #---------------------------------------------------------------------------------
 #GF
-g_iw  = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/U_1.0_beta_26.0_FFREQ_40/BFREQ_60_SHIFT/gw_imfreq_00.dat')
+g_iw  = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/U_1.0_beta_20.0_FFREQ_40/BFREQ_60_SHIFT/gw_imfreq_00.dat')
 N_fermi_gf = g_iw.shape[0]-40
 print ("Number of fermionic frequencies for the GF:")
 print N_fermi_gf
@@ -110,7 +110,7 @@ f.create_dataset('Sig/fgrid', data=fgrid_arr, dtype='float64', compression="gzip
 #---------------------------------------------------------------------------------------------------------
 #--------------------------------------- 2PGF PP------------------------------------------------------------
 
-twopgf_updo = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/U_1.0_beta_26.0_FFREQ_40/BFREQ_60_SHIFT/PP/2pgf_updo_pp_shift.dat')
+twopgf_updo = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/U_1.0_beta_20.0_FFREQ_40/BFREQ_60_SHIFT/PP/2pgf_updo_pp_shift.dat')
 print twopgf_updo.shape
 ffreq_pp = int(0.5*(np.transpose(twopgf_updo)[1,:].max()*beta/pi-1))+1
 print ffreq_pp
@@ -118,17 +118,18 @@ bfreq_pp = int(0.5*np.transpose(twopgf_updo)[0,:].max()*beta/pi)+1
 print bfreq_pp
 
 
-def re_2pgf_upup_pp(wb,wf,wf1):
-	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 3]-twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (-wf1-1+ffreq_pp), 3]
-
 def re_2pgf_updo_pp(wb,wf,wf1):
 	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 3]
 
-def im_2pgf_upup_pp(wb,wf,wf1):
+def re_2pgf_upup_pp(wb,wf,wf1):
+	return 	re_2pgf_updo_pp(wb,wf,wf1)-re_2pgf_updo_pp(wb,wf,-wf1-1)
 
-	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (wf1+ffreq_pp), 4]-twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp) + (-wf1-1+ffreq_pp), 4]
 def im_2pgf_updo_pp(wb,wf,wf1):
 	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 4]
+
+def im_2pgf_upup_pp(wb,wf,wf1):
+
+	return 	im_2pgf_updo_pp(wb,wf,wf1)-im_2pgf_updo_pp(wb,wf,-wf1-1)
 
 # ----------define arrays to store in hdf5 file
 
@@ -159,13 +160,13 @@ f.create_dataset('2PGF/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compressio
 
 def chi_upup_pp(wb,wf,wf1):
     if (wf == -wf1-1-mymod_abs(wb)):
-        return re_2pgf_upup_pp(wb,wf,wf1)+1j*im_2pgf_upup_pp(wb,wf,wf1)+beta*(G(wf+myceil_div2(wb))*G(myfloor_div2(wb)-wf-1))
+        return re_2pgf_upup_pp(wb,wf,wf1)+1j*im_2pgf_upup_pp(wb,wf,wf1)-beta*(G(wf+myceil_div2(wb))*G(myfloor_div2(wb)-wf-1))
     else:
         return re_2pgf_upup_pp(wb,wf,wf1)+1j*im_2pgf_upup_pp(wb,wf,wf1)
 
 def chi_updo_pp(wb,wf,wf1):
     if (wf == -wf1-1-mymod_abs(wb)):
-        return re_2pgf_updo_pp(wb,wf,wf1)+1j*im_2pgf_updo_pp(wb,wf,wf1)+beta*(G(wf+myceil_div2(wb))*G(myfloor_div2(wb)-wf-1))
+        return re_2pgf_updo_pp(wb,wf,wf1)+1j*im_2pgf_updo_pp(wb,wf,wf1)-beta*(G(wf+myceil_div2(wb))*G(myfloor_div2(wb)-wf-1))
     else:
         return re_2pgf_updo_pp(wb,wf,wf1)+1j*im_2pgf_updo_pp(wb,wf,wf1)
 
@@ -208,7 +209,7 @@ def chi_0_pp(wb,wf,wf1):
         return 0.0
 
 def f_upup_pp(wb,wf,wf1):
-    return beta*beta*(1.0/(chi_l_pp(wb,wf,wf)))*(chi_upup_pp(wb,wf,wf1)-chi_0_pp(wb,wf,wf1))*(1.0/(chi_l_pp(wb,wf1,wf1)))
+    return beta*beta*(1.0/(chi_l_pp(wb,wf,wf)))*(chi_upup_pp(wb,wf,wf1)+chi_0_pp(wb,wf,wf1))*(1.0/(chi_l_pp(wb,wf1,wf1)))
 
 def f_updo_pp(wb,wf,wf1):
     return beta*beta*(1.0/(chi_l_pp(wb,wf,wf)))*(chi_updo_pp(wb,wf,wf1))*(1.0/(chi_l_pp(wb,wf1,wf1)))
@@ -240,8 +241,8 @@ f.create_dataset('VERT/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compressio
 
 #--------------------------------------- 2PGF PH------------------------------------------------------------
 
-twopgf_updo_ph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/U_1.0_beta_26.0_FFREQ_40/BFREQ_60_SHIFT/PH/2pgf_updo_ph_shift.dat')
-twopgf_updo_xph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/U_1.0_beta_26.0_FFREQ_40/BFREQ_60_SHIFT/XPH/2pgf_updo_xph_shift.dat')
+twopgf_updo_ph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/U_1.0_beta_20.0_FFREQ_40/BFREQ_60_SHIFT/PH/2pgf_updo_ph_shift.dat')
+twopgf_updo_xph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/U_1.0_beta_20.0_FFREQ_40/BFREQ_60_SHIFT/XPH/2pgf_updo_xph_shift.dat')
 ffreq_ph = int(0.5*(np.transpose(twopgf_updo_ph_l)[1,:].max()*beta/pi-1))+1
 print ffreq_ph
 bfreq_ph = int(0.5*np.transpose(twopgf_updo_ph_l)[0,:].max()*beta/pi)+1
@@ -287,13 +288,13 @@ f.create_dataset('2PGF/PH/bgrid', data=bgrid_arr_ph, dtype='float64', compressio
 
 def chi_upup_ph(wb,wf,wf1):
     if (wb== 0):
-        return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1)+beta*(G(wf)*G(wf1))
+        return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1)-beta*(G(wf)*G(wf1))
     else:
         return re_2pgf_upup_ph(wb,wf,wf1)+1j*im_2pgf_upup_ph(wb,wf,wf1)
 
 def chi_updo_ph(wb,wf,wf1):
     if (wb== 0):
-        return re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)+beta*(G(wf)*G(wf1))
+        return re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)-beta*(G(wf)*G(wf1))
     else:
         return re_2pgf_updo_ph(wb,wf,wf1)+1j*im_2pgf_updo_ph(wb,wf,wf1)
 
@@ -335,7 +336,7 @@ def chi_0_ph(wb,wf,wf1):
 
 
 def f_upup_ph(wb,wf,wf1):
-    return beta*beta*(1.0/chi_lup_ph(wb,wf,wf))*(chi_upup_ph(wb,wf,wf1)-chi_0_ph(wb,wf,wf1))*(1.0/chi_lup_ph(wb,wf1,wf1))
+    return beta*beta*(1.0/chi_lup_ph(wb,wf,wf))*(chi_upup_ph(wb,wf,wf1)+chi_0_ph(wb,wf,wf1))*(1.0/chi_lup_ph(wb,wf1,wf1))
 
 def f_updo_ph(wb,wf,wf1):
     return beta*beta*(1.0/chi_lup_ph(wb,wf,wf))*(chi_updo_ph(wb,wf,wf1))*(1.0/chi_lup_ph(wb,wf1,wf1))
@@ -412,7 +413,7 @@ f.create_dataset('2PGF/XPH/bgrid', data=bgrid_arr_xph, dtype='float64', compress
 
 def chi_upup_xph(wb,wf,wf1):
     if (wb == 0):
-        return re_2pgf_upup_xph(wb,wf,wf1)+1j*im_2pgf_upup_xph(wb,wf,wf1)-beta*G(wf)*G(wf1)
+        return re_2pgf_upup_xph(wb,wf,wf1)+1j*im_2pgf_upup_xph(wb,wf,wf1)+beta*G(wf)*G(wf1)
     else:
         return re_2pgf_upup_xph(wb,wf,wf1)+1j*im_2pgf_upup_xph(wb,wf,wf1)
 
@@ -449,10 +450,10 @@ def chi_0_xph(wb,wf,wf1):
         return 0.0
 
 def f_upup_xph(wb,wf,wf1):
-    return beta*beta*(1.0/chi_l_xph(wb,wf,wf1))*(chi_upup_xph(wb,wf,wf1)+chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
+    return beta*beta*(1.0/chi_l_xph(wb,wf,wf1))*(chi_upup_xph(wb,wf,wf1)-chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
 
 def f_updo_xph(wb,wf,wf1):
-    return beta*beta*(1.0/chi_l_xph(wb,wf,wf1))*(chi_updo_xph(wb,wf,wf1)+chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
+    return beta*beta*(1.0/chi_l_xph(wb,wf,wf1))*(chi_updo_xph(wb,wf,wf1)-chi_0_xph(wb,wf,wf1))*(1.0/chi_l_xph(wb,wf1,wf))
 
 
 # ----------define arrays to store in hdf5 file

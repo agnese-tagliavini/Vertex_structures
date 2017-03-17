@@ -22,7 +22,7 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-fname = "/home/agnese/Coding/Vertex_structures/dat/U1.0_beta26.0_FFREQ_40_BFREQ_60_noQN_idx.h5"
+fname = "/home/agnese/Coding/Vertex_structures/dat/U1.0_beta20.0_FFREQ_40_BFREQ_60_noQN_idx.h5"
 
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
@@ -56,10 +56,10 @@ os.system('mv plots/R.png plots/prev_R.png 2> log/plot.log')
 print "Check UINT and BETA in plot.py!"
 
 U =  1.0          # follows order in script_conversion_hdf5_demetrio.py
-beta = 26.0
+beta = 20.0
 pi = math.pi
 
-shift=0
+shift=32
 
 #-----------------------------------GREEN'S FUNCTION--------------------------
 

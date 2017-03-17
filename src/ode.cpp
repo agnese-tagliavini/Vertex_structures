@@ -85,47 +85,47 @@ int main ( int argc, char * argv[])
 
       state_t state_vec_old;
       double diff; 
-      double damping = 0.01; 
+      double damping = 0.00; 
       int count = 0; 
 
       do
       {
          count++; 
-	 cout << " Iteration " << count << endl; 
-	 state_vec_old = state_vec; 
+         cout << " Iteration " << count << endl; 
+         state_vec_old = state_vec; 
 
-	 // --- Update state_vec
-	 rhs( state_vec_old, state_vec, Lam ); 
-	 cout << " ... Damping with factor " << damping << endl;
-	 state_vec = state_vec_old * damping + state_vec * ( 1.0 - damping ); 
-	 cout << " ... Calculating difference ... ";
-	 diff = norm( state_vec - state_vec_old ); 
-	 cout << diff << endl << endl; 
+         // --- Update state_vec
+         rhs( state_vec_old, state_vec, Lam ); 
+         cout << " ... Damping with factor " << damping << endl;
+         state_vec = state_vec_old * damping + state_vec * ( 1.0 - damping ); 
+         cout << " ... Calculating difference ... ";
+         diff = norm( state_vec - state_vec_old ); 
+         cout << diff << endl << endl; 
 
-	 // Output intermediate files
-	 if( count == 1 || count % 20 == 0 )
-	    write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
+         // Output intermediate files
+         if( count == 1 || count % 20 == 0 )
+            write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
 
-      } while( diff > 1e-16 && diff < MAX_COUPLING ); 
+      } while( diff > 1e-15 && diff < MAX_COUPLING ); 
 
       if( diff >= MAX_COUPLING )
       {
-	 cout << " DIVERGENT! " << endl << endl; 
-	 success = false; 
+         cout << " DIVERGENT! " << endl << endl; 
+         success = false; 
       }
       else
       {
-	 cout << " converged after " << count << " iterations " << endl << endl; 
-	 success = true; 
+         cout << " converged after " << count << " iterations " << endl << endl; 
+         success = true; 
       }
 
-      cout << " Calculating phi functions by inverse ... " << endl;
+      //cout << " Calculating phi functions by inverse ... " << endl;
 
-      gf_1p_mat_t Gvec( POS_1P_RANGE ); 
-      Gvec.init( bind( &state_t::GMat, boost::cref(state_vec), _1, Lam ) ); // Initialize big Green function vector 
+      //gf_1p_mat_t Gvec( POS_1P_RANGE ); 
+      //Gvec.init( bind( &state_t::GMat, boost::cref(state_vec), _1, Lam ) ); // Initialize big Green function vector 
 
-      rhs_t::phi_pp_inverse( state_vec, state_vec.gf_phi_pp(), Gvec, LAM_FIN ); 
-      rhs_t::phi_ph_xph_inverse( state_vec, state_vec.gf_phi_ph(), state_vec.gf_phi_xph(), Gvec, LAM_FIN ); 
+      //rhs_t::phi_pp_inverse( state_vec, state_vec.gf_phi_pp(), Gvec, LAM_FIN ); 
+      //rhs_t::phi_ph_xph_inverse( state_vec, state_vec.gf_phi_ph(), state_vec.gf_phi_xph(), Gvec, LAM_FIN ); 
 
    }
 
@@ -164,6 +164,7 @@ int main ( int argc, char * argv[])
    FILE_NAME.append("_SU2"); 
 
 #ifdef METHOD2
+   cout << "write meth2" << endl;
    FILE_NAME.append("_METH2"); 
 
 #elif METHOD1
