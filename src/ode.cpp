@@ -74,10 +74,9 @@ int main ( int argc, char * argv[])
    state_vec.gf_chi_xph().init( chi_init ); 
 
    cout << " Starting scale-dependent PARQUET solver... "  << endl << endl;
- //bool success = true; 
+   bool success = true; 
 
    vector<double> Lam_list = { 1.0 }; 
-   bool success; 
 
    for( double Lam: Lam_list )
    {
@@ -106,7 +105,7 @@ int main ( int argc, char * argv[])
          if( count == 1 || count % 20 == 0 )
             write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
 
-      } while( diff > 1e-15 && diff < MAX_COUPLING ); 
+      } while( diff > 1e-8 && diff < MAX_COUPLING ); 
 
       if( diff >= MAX_COUPLING )
       {
@@ -119,13 +118,13 @@ int main ( int argc, char * argv[])
          success = true; 
       }
 
-      //cout << " Calculating phi functions by inverse ... " << endl;
+      cout << " Calculating phi functions by inverse ... " << endl;
 
-      //gf_1p_mat_t Gvec( POS_1P_RANGE ); 
-      //Gvec.init( bind( &state_t::GMat, boost::cref(state_vec), _1, Lam ) ); // Initialize big Green function vector 
+      gf_1p_mat_t Gvec( POS_1P_RANGE ); 
+      Gvec.init( bind( &state_t::GMat, boost::cref(state_vec), _1, Lam ) ); // Initialize big Green function vector 
 
-      //rhs_t::phi_pp_inverse( state_vec, state_vec.gf_phi_pp(), Gvec, LAM_FIN ); 
-      //rhs_t::phi_ph_xph_inverse( state_vec, state_vec.gf_phi_ph(), state_vec.gf_phi_xph(), Gvec, LAM_FIN ); 
+      rhs_t::phi_pp_inverse( state_vec, state_vec.gf_phi_pp(), Gvec, LAM_FIN ); 
+      rhs_t::phi_ph_xph_inverse( state_vec, state_vec.gf_phi_ph(), state_vec.gf_phi_xph(), Gvec, LAM_FIN ); 
 
    }
 

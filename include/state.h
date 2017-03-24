@@ -94,8 +94,8 @@ class state_t: public ReaK::arithmetic_tuple< gf_1p_t, gf_phi_t, gf_phi_t, gf_ph
       dcomplex genchi_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
       dcomplex genchi_0_ph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
       
-      dcomplex genchis_plus_30_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;
-      dcomplex genchit_minus_30_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
+      dcomplex genchis_plus_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;
+      dcomplex genchit_minus_0_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
       dcomplex genchi_d( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
       dcomplex genchi_m( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return vertex-tensor element
 
@@ -109,11 +109,11 @@ class state_t: public ReaK::arithmetic_tuple< gf_1p_t, gf_phi_t, gf_phi_t, gf_ph
 
       dcomplex lambda( int w1_in, int w2_in, int w1_out, int k1_in, int k2_in, int k1_out, int s1_in, int s2_in, int s1_out, int s2_out ) const; /// < Return lambda-tensor element
 
-      dcomplex gam_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return gamma-tensor element
-      dcomplex gam_ph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return gamma-tensor element
-      dcomplex gam_xph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return gamma-tensor element
+      dcomplex gamma_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return gamma-tensor element
+      dcomplex gamma_ph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return gamma-tensor element
+      dcomplex gamma_xph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return gamma-tensor element
 
-      dcomplex gam_ph_upup( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return gamma-tensor element
+      dcomplex gamma_ph_upup( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return gamma-tensor element
 
       dcomplex phi_pp( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return Phi function for PP-channel
       dcomplex phi_ph( int W, int w_in, int w_out, int K, int k_in, int k_out, int s1_in, int s2_in, int s1_out, int s2_out ) const;	///< Return Phi function for PH-channel
@@ -204,6 +204,20 @@ class state_t: public ReaK::arithmetic_tuple< gf_1p_t, gf_phi_t, gf_phi_t, gf_ph
 	 return genchi_xph( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
       }
       
+      inline dcomplex gamma_pp( const idx_phi_t& idx ) const
+      {
+	 return gamma_pp( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
+      }
+
+      inline dcomplex gamma_ph( const idx_phi_t& idx ) const
+      {
+	 return gamma_ph( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
+      }
+
+      inline dcomplex gamma_xph( const idx_phi_t& idx ) const
+      {
+	 return gamma_xph( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 
+      }
       inline dcomplex lambda( const idx_2p_t& idx ) const
       {
 	 return lambda( idx(0), idx(1), idx(2), idx(3), idx(4), idx(5), idx(6), idx(7), idx(8), idx(9) ); 

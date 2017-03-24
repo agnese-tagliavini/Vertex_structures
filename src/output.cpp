@@ -174,6 +174,25 @@ void write_genchi_func( H5File& file, const state_t& state_vec )
    write( Bos_Grid( POS_BFREQ_COUNT_PHI, 2.0*PI / BETA ), group );
    write( F_Grid( POS_PLOT_RANGE_PHI, 2.0*PI / BETA ), group );
 }
+void write_gam_func( H5File& file, const state_t& state_vec )
+{
+   Group group( file.createGroup("/gamma_func") );
+
+   gf_phi_t gam_pp_plot( POS_PLOT_RANGE_PHI ); 
+   gf_phi_t gam_ph_plot( POS_PLOT_RANGE_PHI ); 
+   gf_phi_t gam_xph_plot( POS_PLOT_RANGE_PHI ); 
+
+   gam_pp_plot.init( bind( &state_t::gamma_pp, boost::ref(state_vec), _1 ) ); 
+   gam_ph_plot.init( bind( &state_t::gamma_ph, boost::ref(state_vec), _1 ) ); 
+   gam_xph_plot.init( bind( &state_t::gamma_xph, boost::ref(state_vec), _1 ) ); 
+
+   write( gam_pp_plot, group, "_PP" ); 
+   write( gam_ph_plot, group, "_PH" ); 
+   write( gam_xph_plot, group, "_XPH" ); 
+
+   write( Bos_Grid( POS_BFREQ_COUNT_PHI, 2.0*PI / BETA ), group );
+   write( F_Grid( POS_PLOT_RANGE_PHI, 2.0*PI / BETA ), group );
+}
 void write_lambda_tensor( H5File& file, const state_t& state_vec )
 {
    Group group( file.createGroup("/Lambda") );
@@ -305,7 +324,8 @@ void write_all( std::string file_name, const state_t& state_vec )
       write_vert_tensor( file, state_vec ); 
       write_genchi_func( file, state_vec ); 
       write_vert_func( file, state_vec );
-      write_lambda_tensor( file, state_vec ); 
+      write_lambda_tensor( file, state_vec );
+      write_gam_func( file, state_vec ); 
       write_phi_func( file, state_vec ); 
       write_chi_func( file, state_vec ); 
       write_P_func( file, state_vec ); 

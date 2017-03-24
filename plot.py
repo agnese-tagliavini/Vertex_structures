@@ -745,6 +745,104 @@ pl.clf()
 
 shift=0
 
+#-------------------------------------GAMMA PLOTTING ------------------------------------------
+
+print("Plotting phi ...")
+
+#--- Read
+regamma_pp = vert_mul * np.array(f["/gamma_func/RE_PP"])
+imgamma_pp = vert_mul * np.array(f["/gamma_func/IM_PP"])
+regamma_ph = vert_mul * np.array(f["/gamma_func/RE_PH"])
+imgamma_ph = vert_mul * np.array(f["/gamma_func/IM_PH"])
+regamma_xph = vert_mul * np.array(f["/gamma_func/RE_XPH"])
+imgamma_xph = vert_mul * np.array(f["/gamma_func/IM_XPH"])
+
+bdim = regamma_pp.shape[0]
+fdim = regamma_pp.shape[1]
+fdimo2 = fdim/2
+phigrid = np.array(f["/gamma_func/fgrid"])
+phigrid_plot = np.array([(2*n+1)*pi/BETA for n in range(-fdimo2+1,fdimo2-1)])
+#rephi_pp_upup = np.array([[[[[[[[[[ rephi_pp[W,m,n,K,k,kp,s1,s2,s3,s3] - rephi_pp[W,m,-n-1+fdim-mymod_abs(W),K,k,kp,s1,s2,s3,s4] for s4 in range(0,1)] for s3 in range(0,1)]for s2 in range(0,1)]for s1 in range(0,1)] for kp in range(0,1)] for k in range(0,1)] for K in range(0,1)] for n in range(fdim)] for m in range(fdim)] for W in range(bdim+1)])
+
+def regamma_pp_updo( W, w, wp, K, k, kp , s1, s2, s3, s4 ):
+    if ( not check_bounds_mix( W, w, wp ) ):
+            return 0.0
+    return regamma_pp[W,w,wp,K,k,kp,s1,s2,s3,s4]
+
+#---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+def plotgamma( use_pl, arr, string ):
+    use_pl.set_aspect(1.0)
+    zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
+    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.ylim([min(phigrid),max(phigrid)])
+    pl.xlim([min(phigrid),max(phigrid)])
+    use_pl.set_title( string , fontsize=10 )
+    pl.colorbar(shrink=0.6) 
+    return
+
+def plotgammaupup( use_pl, string ):
+    use_pl.set_aspect(1.0)
+    zarr = np.array([[ regamma_pp_updo(shift + (bdim-1)/2,n+fdim/2,m+fdim/2,0,0,0,0,0,0,0)-regamma_pp_updo(shift + (bdim-1)/2,n+fdim/2,-m-1-mymod_abs(shift + (bdim-1)/2)+fdim/2,0,0,0,0,0,0,0) for n in range(-fdimo2,fdimo2)] for m in range(-fdimo2,fdimo2)])
+    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.ylim([min(phigrid),max(phigrid)])
+    pl.xlim([min(phigrid),max(phigrid)])
+    use_pl.set_title( string , fontsize=10 )
+    pl.colorbar(shrink=0.6) 
+    return
+#--- Plot 
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
+
+plotgammaupup( pl.subplot(2,3,1), RE + r"\Gamma^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotgamma( pl.subplot(2,3,2), regamma_ph - regamma_xph, RE + r"\Gamma^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotgamma( pl.subplot(2,3,3), regamma_xph - regamma_ph, RE + r"\Gamma^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotgamma( pl.subplot(2,3,4), regamma_pp, RE + r"\Gamma^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,5), regamma_ph, RE + r"\Gamma^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,6), regamma_xph, RE + r"\Gamma^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/gamma.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=6
+
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
+
+plotgammaupup( pl.subplot(2,3,1), RE + r"\Gamma^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotgamma( pl.subplot(2,3,2), regamma_ph - regamma_xph, RE + r"\Gamma^{PH}_{\uparrow\uparrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotgamma( pl.subplot(2,3,3), regamma_xph - regamma_ph, RE + r"\Gamma^{XPH}_{\uparrow\uparrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+plotgamma( pl.subplot(2,3,4), regamma_pp, RE + r"\Gamma^{PP}_{\uparrow\downarrow}(\Omega_{PP},\omega,\omega')$" )
+pl.ylabel(r"$\omega'$")
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,5), regamma_ph, RE + r"\Gamma^{PH}_{\uparrow\downarrow}(\Omega_{PH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+plotphi( pl.subplot(2,3,6), regamma_xph, RE + r"\Gamma^{XPH}_{\uparrow\downarrow}(\Omega_{XPH},\omega,\omega')$" )
+pl.xlabel(r"$\omega$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/gamma_shift.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=0
 #--------------------------------------Chi PLOTTING ------------------------------------------
 
 print("Plotting chi functions ...")

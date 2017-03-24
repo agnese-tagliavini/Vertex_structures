@@ -188,12 +188,13 @@ dcomplex asympt_GG_ph( int W, double Lam )
 
 dcomplex FUNC_PH( int W_int, int POS_INV )
 {
-   double W = W_int; 
+   int W = W_int; 
 
    if( W_int == 0 )
-      return BETA*BETA/(PI*PI)*2*(1.0/(2.0+4.0*POS_INV)); 
+      return -BETA*BETA/(PI*PI)*2.*(1.0/(2.0+4.0*POS_INV)); 
 
-   //return -BETA*BETA/(PI*PI)*(1.0/(4*W))*log((1.0+2.0*POS_INV-2.0*div2_floor(W))*(1.0+2.0*POS_INV-2.0*div2_ceil(W))/((1.0+2.0*POS_INV+2.0*div2_ceil(W))*(1.0+2.0*POS_INV+2.0*div2_floor(W))));
+   //return 0.0;
+   return BETA*BETA/(PI*PI)*(1.0/(4*W))*log((1.0+2.0*POS_INV-2.0*div2_floor(W))*(1.0+2.0*POS_INV-2.0*div2_ceil(W))/((1.0+2.0*POS_INV+2.0*div2_ceil(W))*(1.0+2.0*POS_INV+2.0*div2_floor(W))));
       
 }
 
