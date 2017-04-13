@@ -24,7 +24,7 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-fname = "dat/dat_U1_Beta20_PFCB120_PARQ_SU2_METH2.h5"
+fname = "dat/dat_U1_Beta20_PFCB120_PARQ_SU2_METH1.h5"
 
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])

@@ -373,7 +373,7 @@ Suscept_updo_xph = (chi_0_xph_arr + chi_updo_xph_arr)
 if ('suscept_fun' in f):
     del f['suscept_fun']
 
-# HDF5 NEW SUBGROUP CREATION
+#e HDF5 NEW SUBGROUP CREATION
 
 suscept_grp = f.require_group("suscept_fun")
 

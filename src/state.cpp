@@ -557,12 +557,12 @@ dcomplex state_t::chi_pp_s( int W, int K, int s1_in, int s2_in, int s1_out, int 
 
 dcomplex state_t::chi_ph_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
-   return chi_ph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
+   return chi_ph(W,K,s1_in,s2_in,s1_out,s2_out)+chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
 }
 
 dcomplex state_t::chi_xph_s( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
-   return chi_xph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_ph(W,K,s1_in,s2_in,s1_out,s2_out); 
+   return chi_xph(W,K,s1_in,s2_in,s1_out,s2_out)+chi_ph(W,K,s1_in,s2_in,s1_out,s2_out); 
 }
 
 
@@ -575,12 +575,12 @@ dcomplex state_t::chi_pp_t( int W, int K, int s1_in, int s2_in, int s1_out, int 
 
 dcomplex state_t::chi_ph_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
-   return chi_ph(W,K,s1_in,s2_in,s1_out,s2_out)+chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
+   return chi_ph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_xph(W,K,s1_in,s2_in,s1_out,s2_out); 
 }
 
 dcomplex state_t::chi_xph_t( int W, int K, int s1_in, int s2_in, int s1_out, int s2_out ) const
 {   
-   return chi_xph(W,K,s1_in,s2_in,s1_out,s2_out)+chi_ph(W,K,s1_in,s2_in,s1_out,s2_out); 
+   return chi_xph(W,K,s1_in,s2_in,s1_out,s2_out)-chi_ph(W,K,s1_in,s2_in,s1_out,s2_out); 
 }
 
 /************************************************************************************************************

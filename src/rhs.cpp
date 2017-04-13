@@ -419,8 +419,7 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
    for( int W = -POS_BFREQ_COUNT_PHI; W < POS_BFREQ_COUNT_PHI + 1; ++W )
    {
       
-      int POS_INV_RANGE = POS_FERM_VERT_COUNT_EXACT;
-      //int POS_INV_RANGE = 5;
+      int POS_INV_RANGE = 8*POS_FERM_VERT_COUNT_EXACT;
       const int MAT_DIM = 2* POS_INV_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT; 
 
       gf_mat_t gam_t( boost::extents[ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] ); 
@@ -460,7 +459,6 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	       val += Gvec[div2_floor( W )-w_in-1 ][dif_k(K,k_in)]( s2_in,s4 )*Gvec[ div2_ceil( W )+w_in ][k_in]( s1_in,s3 )*
 		  (2.0 * vert_bare(s3,s4,s3p,s4p)+state_vec.P_pp_s(W,w_in,K,k_in,s3,s4,s3p,s4p)+state_vec.chi_pp_s(W,K,s3,s4,s3p,s4p))*
 		  0.5*vert_bare(s3p,s4p,s1_out,s2_out)*FUNC_PP(W,POS_INV_RANGE); //Check sign of UINT
-	       cout << "factor for correction" << FUNC_PP(W,POS_INV_RANGE) << endl;
 	       
 	       }
 
@@ -471,11 +469,8 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	       } );
          
 	 MapXcd( gam_s.data(), MAT_DIM, MAT_DIM ) = MapXcd( gam_s.data(), MAT_DIM, MAT_DIM ).inverse() * dcomplex(-4.0,0.0);
-	 //cout << MapXcd( gam_s.data(), MAT_DIM, MAT_DIM ) << "gamma_s" << endl;
-         //cout << MapXcd( corr_gamma_s.data(), MAT_DIM, MAT_DIM ) << "Correction gamma_s" << endl;
 	 MapXcd( corr_gamma_s.data(), MAT_DIM, MAT_DIM ) = MapXcd( gam_s.data(), MAT_DIM, MAT_DIM ) * MapXcd( corr_gamma_s.data(), MAT_DIM, MAT_DIM );
 	 
-	 //cout << MapXcd( corr_gamma_s.data(), MAT_DIM, MAT_DIM ) << "Corrected gamma_s" << endl;
 	 
 	 MapXcd( gam_t.data(), MAT_DIM, MAT_DIM ) = MapXcd( gam_t.data(), MAT_DIM, MAT_DIM ).inverse() * dcomplex(-4.0,0.0);
 	 MapXcd( gam_0.data(), MAT_DIM, MAT_DIM ) = MapXcd( gam_0.data(), MAT_DIM, MAT_DIM ).inverse() * dcomplex(2.0,0.0);
@@ -495,7 +490,6 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 			for( int s2 = 0; s2 < QN_COUNT; ++s2 )
 			   for( int s1p = 0; s1p < QN_COUNT; ++s1p )
 			      for( int s2p = 0; s2p < QN_COUNT; ++s2p ){
-				// cout << (gam_s[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]+gam_t[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]) << "GS+GT" << endl;
 				 gf_phi_pp[W][w_in][w_out][K][k_in][k_out][s1][s2][s1p][s2p] = 
 				    state_vec.vertx_pp( W, w_in, w_out, K, k_in, k_out, s1, s2, s1p, s2p ) - 
 				    0.5*(gam_s[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]+gam_t[w_in][k_in][s1][s2][w_out][k_out][s1p][s2p]); //GAMMA UPDO PP = (GAMMA_S + GAMMA_T)/2 
@@ -511,7 +505,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 #pragma omp parallel for schedule( dynamic )
    for( int W = -POS_BFREQ_COUNT_PHI; W < POS_BFREQ_COUNT_PHI + 1; ++W )
    {
-      int POS_INV_RANGE = POS_FERM_VERT_COUNT_EXACT;
+      int POS_INV_RANGE = 8*POS_FERM_VERT_COUNT_EXACT;
       const int MAT_DIM = 2* POS_INV_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT; 
 
       gf_mat_t gam_m( boost::extents[ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] ); 
@@ -636,8 +630,8 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 #pragma omp parallel for schedule( dynamic )
    for( int W = -POS_BFREQ_COUNT_PHI; W < POS_BFREQ_COUNT_PHI + 1; ++W )
    {
-      int  POS_INV_RANGE = POS_FERM_VERT_COUNT_EXACT; 
-      int  POS_ASY_RANGE = 2*POS_FERM_VERT_COUNT_EXACT;	 
+      int  POS_INV_RANGE = 2*POS_FERM_VERT_COUNT_EXACT; 
+      int  POS_ASY_RANGE = 12*POS_INV_RANGE;	 
       const int MAT_DIM = 2* POS_INV_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
       const int MAT_11_DIM = 2* POS_ASY_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
       const int MAT_10_DIM = POS_INV_RANGE * POS_ASY_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
@@ -664,7 +658,39 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	 gam_10_pp.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return 2.0*vert_bare( idx(2), idx(3), idx(6), idx(7) ); } );
 	 
 	 gam_corr_pp.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return dcomplex(0.0,0.0); } );
-	 gam_0_11_pp.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_0_pp( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } );
+	 gam_0_11_pp.init( [W,K,POS_INV_RANGE,&state_vec]( const gf_mat_t::idx_t& idx )
+	       { 
+	       int w = idx(0);
+	       int k = idx(1);
+
+	       int w_out = idx(4);
+	       int k_out = idx(5);
+
+	       int s3p = idx(2);
+	       int s4p = idx(3);
+	       int s1_out = idx(6);
+	       int s2_out = idx(7);
+
+	       int K_minus_k = dif_k( K, k ); 
+
+	       if ((w < 0) && (w_out < 0)){
+
+	          w = w-POS_INV_RANGE;
+		  w_out = w_out-POS_INV_RANGE;
+	       	  return state_vec.genchi_0_pp( W, w, w_out, K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) );
+	       }
+
+	       else if((w >= 0) && (w_out >= 0)){
+		   
+		   w = w+POS_INV_RANGE;
+		   w_out = w_out+POS_INV_RANGE;
+
+	       	  return state_vec.genchi_0_pp( W, w, w_out, K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) );
+	       
+	       }
+               else
+		  return dcomplex(0.0,0.0);
+   	} );
 
 	 gam_11_pp.init( [W,K,POS_INV_RANGE,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
 	       { 
@@ -699,7 +725,7 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 		   w_out = w_out+POS_INV_RANGE;
 
 	          return -1./BETA/BETA/2.0 * (state_vec.chi_ph_s(-w-w_out-(W+10000)%2-1,dif_k(K_minus_k,k_out),s3p,s4p,s1_out,s2_out) + 
-		         state_vec.chi_xph_s(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out))+ 2.0 * vert_bare(s3p,s4p,s1_out, s2_out) * state_vec.genchi_0_pp( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out ) +
+		         state_vec.chi_xph_s(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out)+ 2.0 * vert_bare(s3p,s4p,s1_out, s2_out)) * state_vec.genchi_0_pp( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out ) +
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       
 	       }
@@ -730,15 +756,12 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	       } ); 
 
 
-         cout << "init done"<< endl; 
 
-	 //MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
-	 //gam_11_pp *= gam_0_11_pp;
+	 MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
+	 gam_11_pp *= gam_0_11_pp;
 
-	 cout << "inverted correction" << endl;
-	 //MapXcd(  gam_corr_pp.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_10_pp.data(), MAT_11_DIM, MAT_DIM );
+	 MapXcd(  gam_corr_pp.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_11_pp.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_10_pp.data(), MAT_11_DIM, MAT_DIM );
 
-	 cout << "Multiplied by matrix 01" << endl;
 
          MapXcd(  gam_t_00_pp.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_t_00_pp.data(), MAT_DIM, MAT_DIM ).inverse();
 	 MapXcd(  gam_s_00_pp.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_s_00_pp.data(), MAT_DIM, MAT_DIM ).inverse();
@@ -752,11 +775,9 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	 gam_t_00_pp -= gam_0_00_pp;
 	 gam_s_00_pp += gam_0_00_pp;
 
-	 cout << "Non corrected gamma pp" << endl; 
 	 
-	 //MapXcd( gam_s_00_pp.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA/BETA/BETA/2.0*MapXcd(  gam_01_pp.data(), MAT_DIM, MAT_11_DIM ) * MapXcd(  gam_corr_pp.data(), MAT_11_DIM, MAT_DIM );
+	 MapXcd( gam_s_00_pp.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA/BETA/BETA/2.0*MapXcd(  gam_01_pp.data(), MAT_DIM, MAT_11_DIM ) * MapXcd(  gam_corr_pp.data(), MAT_11_DIM, MAT_DIM );
          
-	 cout << "Corrected gamma pp" << endl; 
 
 	 gam_t_00_pp *= BETA*BETA; 
 	 gam_s_00_pp *= BETA*BETA;
@@ -785,8 +806,8 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 #pragma omp parallel for schedule( dynamic )
    for( int W = -POS_BFREQ_COUNT_PHI; W < POS_BFREQ_COUNT_PHI + 1; ++W )
    {
-      int  POS_INV_RANGE = POS_FERM_VERT_COUNT_EXACT;
-      int  POS_ASY_RANGE = 2*POS_FERM_VERT_COUNT_EXACT;	 
+      int  POS_INV_RANGE = 2*POS_FERM_VERT_COUNT_EXACT;
+      int  POS_ASY_RANGE = 12*POS_INV_RANGE;	 
       const int MAT_DIM = 2* POS_INV_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
       const int MAT_11_DIM = 2* POS_ASY_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
       const int MAT_10_DIM = POS_INV_RANGE * POS_ASY_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT;
@@ -820,7 +841,42 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	 gam_m_01_ph.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return -vert_bare( idx(2), idx(3), idx(6), idx(7) ); } );
 	 gam_m_10_ph.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return -vert_bare( idx(2), idx(3), idx(6), idx(7) ); } );
 	 
-	 gam_0_11_ph.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_0_pp( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } );
+	 gam_0_11_ph.init( [W,K,POS_INV_RANGE,&state_vec]( const gf_mat_t::idx_t& idx )
+	       { 
+	       int w = idx(0);
+	       int k = idx(1);
+
+	       int w_out = idx(4);
+	       int k_out = idx(5);
+
+	       int s3p = idx(2);
+	       int s4p = idx(3);
+	       int s1_out = idx(6);
+	       int s2_out = idx(7);
+
+	       int K_plus_k = add_k( K, k ); 
+
+	       if ((w < 0) && (w_out<0)){
+
+	          w = w-POS_INV_RANGE;
+		  w_out = w_out-POS_INV_RANGE;
+	       
+		  return state_vec.genchi_0_ph( W, w, w_out, K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) );
+	          
+	       }
+
+	       if((w >= 0) && (w_out>=0)){
+		   w = w+POS_INV_RANGE;
+		   w_out = w+POS_INV_RANGE;
+
+		  return state_vec.genchi_0_ph( W, w, w_out, K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) );
+	       
+	       }
+	       else
+		  return dcomplex(0.0,0.0);
+   } );
+	       
+	       
 
 	 // Build 'Identity + weight_vec * G * G * F' matrixx
 	 gam_d_11_ph.init( [W,K,POS_INV_RANGE,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
@@ -845,7 +901,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	          w = w-POS_INV_RANGE;
 		  w_out = w_out-POS_INV_RANGE;
 	          
-	          return 1./BETA/BETA*(state_vec.chi_pp_d(w+w_out+(W+10000)%2,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
+	          return 1./BETA/BETA*(state_vec.chi_pp_d(w+w_out+(W+10000)%2+1,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
 		         state_vec.chi_xph_d(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out) + vert_bare(s3p,s4p,s1_out, s2_out))* state_vec.genchi_0_ph( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out )+
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       }
@@ -854,7 +910,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 		   w = w+POS_INV_RANGE;
 		   w_out = w+POS_INV_RANGE;
 
-	          return 1./BETA/BETA*(state_vec.chi_pp_d(w+w_out+(W+10000)%2,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
+	          return 1./BETA/BETA*(state_vec.chi_pp_d(w+w_out+(W+10000)%2+1,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
 		         state_vec.chi_xph_d(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out) + vert_bare(s3p,s4p,s1_out, s2_out))* state_vec.genchi_0_ph( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out )+
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       
@@ -866,7 +922,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 		   w = w-POS_INV_RANGE;
 		   w_out = w+POS_INV_RANGE;
 
-	          return 1./BETA/BETA*(state_vec.chi_pp_d(w+w_out+(W+10000)%2,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
+	          return 1./BETA/BETA*(state_vec.chi_pp_d(w+w_out+(W+10000)%2+1,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
 		         state_vec.chi_xph_d(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out) + vert_bare(s3p,s4p,s1_out, s2_out))* state_vec.genchi_0_ph( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out )+
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       }
@@ -876,7 +932,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 		   w = w+POS_INV_RANGE;
 		   w_out = w-POS_INV_RANGE;
 
-	          return 1./BETA/BETA*(state_vec.chi_pp_d(w+w_out+(W+10000)%2,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
+	          return 1./BETA/BETA*(state_vec.chi_pp_d(w+w_out+(W+10000)%2+1,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
 		         state_vec.chi_xph_d(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out) + vert_bare(s3p,s4p,s1_out, s2_out))* state_vec.genchi_0_ph( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out )+
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       }
@@ -907,7 +963,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	          w = w-POS_INV_RANGE;
 		  w_out = w_out-POS_INV_RANGE;
 	          
-	          return 1./BETA/BETA*(state_vec.chi_pp_m(w+w_out+(W+10000)%2,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
+	          return 1./BETA/BETA*(state_vec.chi_pp_m(w+w_out+(W+10000)%2+1,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
 		         state_vec.chi_xph_m(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out) - vert_bare(s3p,s4p,s1_out, s2_out))* state_vec.genchi_0_ph( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out )+
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       }
@@ -916,7 +972,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 		   w = w+POS_INV_RANGE;
 		   w_out = w_out+POS_INV_RANGE;
 
-	          return 1./BETA/BETA*(state_vec.chi_pp_m(w+w_out+(W+10000)%2,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
+	          return 1./BETA/BETA*(state_vec.chi_pp_m(w+w_out+(W+10000)%2+1,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
 		         state_vec.chi_xph_m(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out) - vert_bare(s3p,s4p,s1_out, s2_out))* state_vec.genchi_0_ph( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out )+
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       
@@ -928,7 +984,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 		   w = w-POS_INV_RANGE;
 		   w_out = w_out+POS_INV_RANGE;
 
-	          return 1./BETA/BETA*(state_vec.chi_pp_m(w+w_out+(W+10000)%2,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
+	          return 1./BETA/BETA*(state_vec.chi_pp_m(w+w_out+(W+10000)%2+1,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
 		         state_vec.chi_xph_m(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out) - vert_bare(s3p,s4p,s1_out, s2_out))* state_vec.genchi_0_ph( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out )+
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       }
@@ -938,23 +994,25 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 		   w = w+POS_INV_RANGE;
 		   w_out = w_out-POS_INV_RANGE;
 
-	          return 1./BETA/BETA*(state_vec.chi_pp_m(w+w_out+(W+10000)%2,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
+	          return 1./BETA/BETA*(state_vec.chi_pp_m(w+w_out+(W+10000)%2+1,add_k(K_plus_k,k_out),s3p,s4p,s1_out,s2_out) + 
 		         state_vec.chi_xph_m(w_out-w,dif_k(k_out,k),s3p,s4p,s1_out,s2_out) - vert_bare(s3p,s4p,s1_out, s2_out))* state_vec.genchi_0_ph( W, w, w_out, K, k, k_out, s3p, s4p, s1_out, s2_out )+
 		         1.0 * ( idx(0) == idx(4) ) * ( idx(1) == idx(5) ) * ( idx(2) == idx(6) ) * ( idx(3) == idx(7) );
 	       }
+	       else
+		  return dcomplex(0.0,0.0);
 	       } ); 
 
          
-	 //MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
+	 MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
 	
-	//MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
+	 MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) = MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ).inverse();
 	 
-	 //gam_d_11_ph *= gam_0_11_ph;
-	 //gam_m_11_ph *= gam_0_11_ph;
+	 gam_d_11_ph *= gam_0_11_ph;
+	 gam_m_11_ph *= gam_0_11_ph;
          
-	 //MapXcd(  gam_corr_d_10_ph.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_d_10_ph.data(), MAT_11_DIM, MAT_DIM );
+	 MapXcd(  gam_corr_d_10_ph.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_d_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_d_10_ph.data(), MAT_11_DIM, MAT_DIM );
 
-	 //MapXcd(  gam_corr_m_10_ph.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_m_10_ph.data(), MAT_11_DIM, MAT_DIM );
+	 MapXcd(  gam_corr_m_10_ph.data(), MAT_11_DIM, MAT_DIM ) = MapXcd(  gam_m_11_ph.data(), MAT_11_DIM, MAT_11_DIM ) * MapXcd(  gam_m_10_ph.data(), MAT_11_DIM, MAT_DIM );
          
 	 MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ).inverse();
 	 MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ) = MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ).inverse();
@@ -964,9 +1022,9 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	 gam_d_00_ph += gam_0_00_ph;
 	 gam_m_00_ph += gam_0_00_ph;
 
-	 //MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA/BETA/BETA* MapXcd(  gam_d_10_ph.data(), MAT_DIM, MAT_11_DIM )*MapXcd(  gam_corr_d_10_ph.data(), MAT_11_DIM, MAT_DIM );
+	 MapXcd(  gam_d_00_ph.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA/BETA/BETA* MapXcd(  gam_d_01_ph.data(), MAT_DIM, MAT_11_DIM )*MapXcd(  gam_corr_d_10_ph.data(), MAT_11_DIM, MAT_DIM );
          
-	 //MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA/BETA/BETA* MapXcd(  gam_m_10_ph.data(), MAT_DIM, MAT_11_DIM )*MapXcd(  gam_corr_m_10_ph.data(), MAT_11_DIM, MAT_DIM );
+	 MapXcd(  gam_m_00_ph.data(), MAT_DIM, MAT_DIM ) -= 1./BETA/BETA/BETA/BETA* MapXcd(  gam_m_01_ph.data(), MAT_DIM, MAT_11_DIM )*MapXcd(  gam_corr_m_10_ph.data(), MAT_11_DIM, MAT_DIM );
 
 	 gam_d_00_ph *= -BETA*BETA; 
 	 gam_m_00_ph *= -BETA*BETA;

@@ -105,7 +105,7 @@ int main ( int argc, char * argv[])
          if( count == 1 || count % 20 == 0 )
             write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
 
-      } while( diff > 1e-8 && diff < MAX_COUPLING ); 
+      } while( diff > 1e-13 && diff < MAX_COUPLING ); 
 
       if( diff >= MAX_COUPLING )
       {
