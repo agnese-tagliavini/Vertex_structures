@@ -16,7 +16,7 @@ const std::complex<double> I( 0.0, 1.0 );			///< Imaginary unit
 const double PI = 3.14159265358979323846; 			///< PI
 const double LN_10 = 2.30258509299;				///< Natural log of 10
 
-const int COUNT = 50; 
+const int COUNT = 50-10; 
 
 // ----- SE dimensions
 
@@ -28,7 +28,7 @@ const int FFREQ_COUNT_SIG = 2 * POS_FFREQ_COUNT_SIG;		///< Amount of frequencies
 const int POS_FFREQ_COUNT_PHI = COUNT;				///< Amount of positive fermionic frequencies in phi grid 
 const int FFREQ_COUNT_PHI = 2 * POS_FFREQ_COUNT_PHI;		///< Amount of fermionic frequencies in phi grid
 
-const int POS_BFREQ_COUNT_PHI = 75;			 	///< Amount of positive bosonic frequencies in phi grid 
+const int POS_BFREQ_COUNT_PHI = 75-10;			 	///< Amount of positive bosonic frequencies in phi grid 
 const int BFREQ_COUNT_PHI = 2 * POS_BFREQ_COUNT_PHI + 1;	///< Amount of bosonic frequencies in phi grid
 
 // ----- P dimensions
@@ -79,7 +79,7 @@ const int POS_PLOT_RANGE_VERT = 2*POS_PLOT_RANGE_PHI; 		///< Amount of positive 
 
 //------ Inversion ranges Bethe-Salpeter equations
 
-const int  POS_INV_RANGE = 2 * COUNT; 
+const int  POS_INV_RANGE = COUNT; 
 const int  POS_ASY_RANGE = 10 * POS_INV_RANGE;	 
 
 const int TAIL_LENGTH_ASY = POS_ASY_RANGE/10;

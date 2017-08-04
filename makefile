@@ -41,13 +41,13 @@ CFLAGS += -D INT_FLOW #			Interaction Flow
 #CFLAGS += -D RES_FLOW #		Reservoir cutoff scheme
 
 #------Choose if you want to use the self-consistent kernel functions (SELFCONSISTENCY) or the ED ones
-CFLAGS += -D SELFCONSISTENCY
+#CFLAGS += -D SELFCONSISTENCY
 
 #------Choose if you want to perform the Inversion of the Bethe-Salpeter Equations
-#CFLAGS += -D INVERSION_BSE
+CFLAGS += -D INVERSE_BSE
 
 #------Choose which method for the inversion of the Bethe-Salpeter Equations
-#CFLAGS += -D METHOD2 #Agnese's method
+CFLAGS += -D METHOD2 #Agnese's method
 #CFLAGS += -D METHOD1 #Stefan's method
 
 #--------------------------------------Compiler settings------------------------------------------

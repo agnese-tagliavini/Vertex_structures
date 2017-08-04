@@ -422,7 +422,6 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 #endif
    for( int W = -POS_BFREQ_COUNT_PHI; W < POS_BFREQ_COUNT_PHI + 1; ++W )
    {
-      
       const int MAT_DIM = 2 * POS_INV_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT; 
 
       gf_mat_t gam_t( boost::extents[ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] ); 
@@ -439,7 +438,7 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 	 gam_0.init([W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_0_pp( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } );
    
 	 // Build 'Identity + weight_vec * G * G * F' matrixx
-	 corr_gamma_s.init( [W,K,POS_INV_RANGE,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
+	 corr_gamma_s.init( [W,K,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
 	       { 
 	       dcomplex val( 0.0, 0.0 );
 
@@ -525,7 +524,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	 gam_d.init( [W,K,&state_vec]( const gf_mat_t::idx_t& idx ){ return state_vec.genchi_d( W, idx(0), idx(4), K, idx(1), idx(5), idx(2), idx(3), idx(6), idx(7) ); } );
 	 
 	 // Corrections to the density channel
-	 corr_gamma_d.init( [W,K,POS_INV_RANGE,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
+	 corr_gamma_d.init( [W,K,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
 	       { 
 	       dcomplex val( 0.0, 0.0 );
 
@@ -557,7 +556,7 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	       } ); 
 
 	 //Corrections to the magnetic channel
-	 corr_gamma_m.init( [W,K,POS_INV_RANGE,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
+	 corr_gamma_m.init( [W,K,&Gvec,&state_vec]( const gf_mat_t::idx_t& idx )
 	       { 
 	       dcomplex val( 0.0, 0.0 );
 
@@ -1007,11 +1006,11 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 	    
 	       corr_inv_d +=  1.0/BETA/BETA/BETA/BETA * (vert_bare(0,0,0,0)) * (vert_bare(0,0,0,0)) * 
 	                 gam_d_11_ph[w1][0][0][0][w2][0][0][0] *  gam_0_11_ph[w2][0][0][0][w2][0][0][0]
-			 * weight_vec_2d_asy[w1][w2];
+	        	 * weight_vec_2d_asy[w1][w2];
 	    
 	    corr_inv_m +=  1.0/BETA/BETA/BETA/BETA * (-vert_bare(0,0,0,0)) * (-vert_bare(0,0,0,0)) * 
 	                 gam_m_11_ph[w1][0][0][0][w2][0][0][0] *  gam_0_11_ph[w2][0][0][0][w2][0][0][0]
-			 * weight_vec_2d_asy[w1][w2];
+	        	 * weight_vec_2d_asy[w1][w2];
 	    }
 	 }
 

@@ -25,6 +25,9 @@ using namespace std;
 const int POS_FERM_VERT_COUNT_EXACT = 50;
 const int POS_BOS_VERT_COUNT_EXACT = 75;
 
+const int POS_FERM_VERT_COUNT_EXACT_SMALL = POS_FERM_VERT_COUNT_EXACT-10;
+const int POS_BOS_VERT_COUNT_EXACT_SMALL  = POS_BOS_VERT_COUNT_EXACT-10;
+
 const int POS_FERM_P_COUNT_EXACT = 120;
 const int POS_BOS_P_COUNT_EXACT = 180;
 
@@ -260,7 +263,9 @@ dcomplex Sig_init( const idx_1p_t& idx ) // initial values for Sigma
 {
 #ifdef READIN
    if ((idx(0) >= -POS_SIG_COUNT_EXACT) && (idx(0) <= POS_SIG_COUNT_EXACT - 1) )
-      return Sig_exact[idx(0)][idx(1)][idx(2)][idx(3)]; 
+      return Sig_exact[idx(0)][idx(1)][idx(2)][idx(3)];
+   else
+      return dcomplex(0.0,0.0); 
 #endif
 
    return 0.0;
@@ -277,6 +282,8 @@ dcomplex P_pp_init( const idx_P_t& idx ) // initial values for P function
    if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
       if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_pp[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
+   else
+      return dcomplex(0.0,0.0); 
 #endif
    return 0.0;
 }
@@ -287,6 +294,8 @@ dcomplex P_ph_init( const idx_P_t& idx ) // initial values for P function
    if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
       if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_ph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
+   else
+      return dcomplex(0.0,0.0); 
 #endif
    return 0.0;
 }
@@ -297,6 +306,8 @@ dcomplex P_xph_init( const idx_P_t& idx ) // initial values for P function
    if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
       if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_xph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
+   else
+      return dcomplex(0.0,0.0); 
 #endif
    return 0.0;
 }
@@ -305,6 +316,8 @@ dcomplex chi_pp_init( const idx_chi_t& idx ) // initial values for P function
 #ifndef SELFCONSISTENCY
    if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
       return chi_exact_pp[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
+   else
+      return dcomplex(0.0,0.0); 
 #endif
    return 0.0;
 }
@@ -313,6 +326,8 @@ dcomplex chi_ph_init( const idx_chi_t& idx ) // initial values for P function
 #ifndef SELFCONSISTENCY
    if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
       return chi_exact_ph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
+   else
+      return dcomplex(0.0,0.0); 
 #endif
    return 0.0;
 }
@@ -322,6 +337,8 @@ dcomplex chi_xph_init( const idx_chi_t& idx ) // initial values for P function
 #ifndef SELFCONSISTENCY
    if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
       return chi_exact_xph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
+   else
+      return dcomplex(0.0,0.0); 
 #endif
    return 0.0;
 }

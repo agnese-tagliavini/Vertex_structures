@@ -32,6 +32,7 @@ extern gf_phi_t genchi_exact_pp;
 extern gf_phi_t genchi_exact_ph; 
 extern gf_phi_t genchi_exact_xph;
 
+extern const int POS_FERM_VERT_COUNT_EXACT_SMALL, POS_BOS_VERT_COUNT_EXACT_SMALL;
 extern const int POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT, POS_SIG_COUNT_EXACT; 
 extern const int POS_FERM_P_COUNT_EXACT, POS_BOS_P_COUNT_EXACT, POS_BOS_CHI_COUNT_EXACT; 
 

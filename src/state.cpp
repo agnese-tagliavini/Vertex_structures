@@ -101,9 +101,9 @@ dcomplex state_t::vertx_pp( int W, int w_in, int w_out, int K, int k_in, int k_o
 
 #ifdef READIN
     //Return exact solution if available
-   if (  W  >= -POS_BOS_VERT_COUNT_EXACT && W  <= POS_BOS_VERT_COUNT_EXACT &&
-	 w_in  >= -POS_FERM_VERT_COUNT_EXACT && w_in  <= POS_FERM_VERT_COUNT_EXACT - 1 &&
-	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
+   if (  W  >= -POS_BOS_VERT_COUNT_EXACT_SMALL && W  <= POS_BOS_VERT_COUNT_EXACT_SMALL &&
+	 w_in  >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_in  <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 &&
+	 w_out >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_out <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 )
       return vert_exact_pp[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; //INPUT DATA FROM POMEROL-> WARNING: DIFFERENT NOTATION!!
 #endif
 
@@ -130,9 +130,9 @@ dcomplex state_t::vertx_ph( int W, int w_in, int w_out, int K, int k_in, int k_o
 
 #ifdef READIN
     //Return exact solution if available
-   if (  W  >= -POS_BOS_VERT_COUNT_EXACT && W  <= POS_BOS_VERT_COUNT_EXACT &&
-	 w_in  >= -POS_FERM_VERT_COUNT_EXACT && w_in  <= POS_FERM_VERT_COUNT_EXACT - 1 &&
-	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
+   if (  W  >= -POS_BOS_VERT_COUNT_EXACT_SMALL && W  <= POS_BOS_VERT_COUNT_EXACT_SMALL &&
+	 w_in  >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_in  <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 &&
+	 w_out >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_out <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 )
       return vert_exact_ph[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; 
 #endif
 
@@ -158,9 +158,9 @@ dcomplex state_t::vertx_xph( int W, int w_in, int w_out, int K, int k_in, int k_
 
 #ifdef READIN
     //Return exact solution if available
-   if (  W  >= -POS_BOS_VERT_COUNT_EXACT && W  <= POS_BOS_VERT_COUNT_EXACT &&
-	 w_in  >= -POS_FERM_VERT_COUNT_EXACT && w_in  <= POS_FERM_VERT_COUNT_EXACT - 1 &&
-	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
+   if (  W  >= -POS_BOS_VERT_COUNT_EXACT_SMALL && W  <= POS_BOS_VERT_COUNT_EXACT_SMALL &&
+	 w_in  >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_in  <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 &&
+	 w_out >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_out <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 )
       return vert_exact_xph[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; 
 #endif
 
