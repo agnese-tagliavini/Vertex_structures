@@ -6,7 +6,7 @@
  * 
  ****************************************************************************************************/
 
-
+#define EIGEN_STACK_ALLOCATION_LIMIT 0
 #include <frg.h>
 #include <params.h>
 #include <Eigen/Eigenvalues>
@@ -22,8 +22,13 @@ using namespace std;
 
 #ifdef READIN
 
-const int POS_FERM_VERT_COUNT_EXACT = 40;
-const int POS_BOS_VERT_COUNT_EXACT = 60;
+const int POS_FERM_VERT_COUNT_EXACT = 50;
+const int POS_BOS_VERT_COUNT_EXACT = 75;
+
+const int POS_FERM_P_COUNT_EXACT = 120;
+const int POS_BOS_P_COUNT_EXACT = 180;
+
+const int POS_BOS_CHI_COUNT_EXACT = 1000;
 
 gf_phi_t vert_exact_pp(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT); 
 gf_phi_t vert_exact_ph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
@@ -34,14 +39,22 @@ gf_phi_t genchi_exact_pp(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
 gf_phi_t genchi_exact_ph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
 gf_phi_t genchi_exact_xph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
 
+gf_P_t P_exact_pp(POS_FERM_P_COUNT_EXACT, POS_BOS_P_COUNT_EXACT); 
+gf_P_t P_exact_ph(POS_FERM_P_COUNT_EXACT, POS_BOS_P_COUNT_EXACT);
+gf_P_t P_exact_xph(POS_FERM_P_COUNT_EXACT, POS_BOS_P_COUNT_EXACT);
 
-const int POS_SIG_COUNT_EXACT = 160; 
+
+gf_chi_t chi_exact_pp( POS_BOS_CHI_COUNT_EXACT); 
+gf_chi_t chi_exact_ph( POS_BOS_CHI_COUNT_EXACT);
+gf_chi_t chi_exact_xph(POS_BOS_CHI_COUNT_EXACT);
+
+const int POS_SIG_COUNT_EXACT = 200; 
 gf_1p_t Sig_exact(POS_SIG_COUNT_EXACT); 
 
 void read_exact()
 {
    using namespace H5;
-   H5File input_file( "dat/U1.0_beta20.0_FFREQ_40_BFREQ_60.h5", H5F_ACC_RDONLY );
+   H5File input_file( "dat/H5FILES/BETA50/4SITES/U1/PREPROC/U_1.0_BETA_50.0_FFREQ_50_BFREQ_75.h5", H5F_ACC_RDONLY );
    cout << "Got file" << endl;
 
    Group vert_group =  input_file.openGroup("/VERT");
@@ -78,6 +91,34 @@ void read_exact()
    read( Sig_exact, Sig_group , "");
 
    cout << "SE" << endl;
+   
+   Group chi_group =  input_file.openGroup("/CHI"); 
+   
+   Group chi_group_pp =  chi_group.openGroup("PP");
+   read( chi_exact_pp, chi_group_pp, "_CHI_UPDO" );
+   cout << "Chi PP" << endl;
+   
+   Group chi_group_ph =  chi_group.openGroup("PH");
+   read( chi_exact_ph, chi_group_ph, "_CHI_UPDO" );
+   cout << "Chi PH" << endl;
+   
+   Group chi_group_xph =  chi_group.openGroup("XPH");
+   read( chi_exact_xph, chi_group_xph, "_CHI_UPDO" );
+   cout << "Chi XPH" << endl;
+   
+   Group P_group =  input_file.openGroup("/TRILEG"); 
+   
+   Group P_group_pp =  P_group.openGroup("PP");
+   read( P_exact_pp, P_group_pp, "_TRILEG_UPDO" );
+   cout << "P PP" << endl;
+   
+   Group P_group_ph =  P_group.openGroup("PH");
+   read( P_exact_ph, P_group_ph, "_TRILEG_UPDO" );
+   cout << "P PH" << endl;
+   
+   Group P_group_xph =  P_group.openGroup("XPH");
+   read( P_exact_xph, P_group_xph, "_TRILEG_UPDO" );
+   cout << "P XPH" << endl;
 }
 
 #endif
@@ -230,12 +271,58 @@ dcomplex phi_init( const idx_phi_t& idx ) // initial values for phi function
    return 0.0;
 }
 
-dcomplex P_init( const idx_P_t& idx ) // initial values for P function
+dcomplex P_pp_init( const idx_P_t& idx ) // initial values for P function
 {
+#ifndef SELFCONSISTENCY
+   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
+      if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
+      return P_exact_pp[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
+#endif
    return 0.0;
 }
 
-dcomplex chi_init( const idx_chi_t& idx ) // inital values for chi function
+dcomplex P_ph_init( const idx_P_t& idx ) // initial values for P function
 {
+#ifndef SELFCONSISTENCY
+   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
+      if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
+      return P_exact_ph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
+#endif
    return 0.0;
 }
+
+dcomplex P_xph_init( const idx_P_t& idx ) // initial values for P function
+{
+#ifndef SELFCONSISTENCY
+   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
+      if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
+      return P_exact_xph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
+#endif
+   return 0.0;
+}
+dcomplex chi_pp_init( const idx_chi_t& idx ) // initial values for P function
+{
+#ifndef SELFCONSISTENCY
+   if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
+      return chi_exact_pp[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
+#endif
+   return 0.0;
+}
+dcomplex chi_ph_init( const idx_chi_t& idx ) // initial values for P function
+{
+#ifndef SELFCONSISTENCY
+   if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
+      return chi_exact_ph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
+#endif
+   return 0.0;
+}
+
+dcomplex chi_xph_init( const idx_chi_t& idx ) // initial values for P function
+{
+#ifndef SELFCONSISTENCY
+   if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
+      return chi_exact_xph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
+#endif
+   return 0.0;
+}
+

@@ -6,7 +6,7 @@
  * 
  ****************************************************************************************************/
 
-
+#define EIGEN_STACK_ALLOCATION_LIMIT 0
 #include "mymath.h"
 #include <math.h>
 #include <iostream>
@@ -14,8 +14,8 @@
 #include <Eigen/Eigenvalues>
 //#include <gsl/gsl_odeiv2.h>
 //#include <gsl/gsl_integration.h>
-
-using std::cout; using std::endl; 
+#include <iomanip>
+using std::cout; using std::endl;
 
 // CONST //
 
@@ -295,13 +295,16 @@ std::vector<double> generate_tail_weights( int iMin, int tail_length, int fit_or
    std::vector<double> w_array(tail_length,0.0); 
    for( int i = 0; i < tail_length; ++i )
       for( int l = 0; l < fit_order; ++l )
-	 w_array[i] += MatInv(0,l) / pow(i + iMin, l); 
+	 w_array[i] += MatInv(l,0) / pow(i + iMin, l);//MatInv(0,l) 
 
    std::vector<double> tail_weights(tail_length,0.0);
-   for( int i = 0; i < tail_length; ++i )
-      for( int l = i; l < tail_length; ++l )
+   for( int i = 0; i < tail_length; ++i ){
+      for( int l = i; l < tail_length; ++l ){
 	 tail_weights[i] += w_array[l]; 
-
+      }
+//    cout <<  std::setprecision (15) << w_array[i] << endl;
+//    cout <<  std::setprecision (15) << tail_weights[i] << endl;
+}
    return tail_weights; 
 }
 
@@ -340,4 +343,25 @@ gf<double, 2> generate_2d_weights( int iMin, int tail_length, int fit_order )
    }
 
    return weight_vec; 
+}
+
+gf<double, 2> generate_2d_weights_asy( int iMin, int tail_length, int fit_order )
+{
+   std::vector<double> tail_weights = generate_tail_weights( iMin, tail_length, fit_order ); 
+
+   gf<double, 2> weight_vec_asy( boost::extents[ffreq(POS_ASY_RANGE)][ffreq(POS_ASY_RANGE)] ); 
+   weight_vec_asy.init( []( const gf<double, 2>::idx_t& idx ){ return 1.0; } ); 
+
+   for( int i = 0; i < tail_length; ++i )
+   {
+      for( int j = -iMin + POS_INV_RANGE - i - 1; j <= iMin - POS_INV_RANGE + i; ++j )
+      {
+	 weight_vec_asy[iMin - POS_INV_RANGE + i][j] = tail_weights[i]; 
+	 weight_vec_asy[-iMin + POS_INV_RANGE - i - 1][j] = tail_weights[i]; 
+	 weight_vec_asy[j][iMin - POS_INV_RANGE + i] = tail_weights[i]; 
+	 weight_vec_asy[j][-iMin + POS_INV_RANGE - i - 1] = tail_weights[i]; 
+      }
+   }
+
+   return weight_vec_asy; 
 }

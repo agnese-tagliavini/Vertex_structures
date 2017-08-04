@@ -31,20 +31,24 @@ CFLAGS += -D COMPRESS #						Compress HDF5 datafile
 #----Choose if input file to read
 CFLAGS += -D READIN
 
+#----Specify if you want to remove parallelization (TODO:remove -fopenmp, -lmpi, OPENMP)
+#CFLAG += -DSINGLETHREADED
+
 # -- Choose cuttoff scheme
 CFLAGS += -D INT_FLOW #			Interaction Flow
 #CFLAGS += -D EBERL_FLOW #		Eberlein Flow
 #CFLAGS += -D OMEGA_FLOW #		Omega flow according to Salmhofer/Gierig ( arxiv:1208.6131 )
 #CFLAGS += -D RES_FLOW #		Reservoir cutoff scheme
 
+#------Choose if you want to use the self-consistent kernel functions (SELFCONSISTENCY) or the ED ones
+CFLAGS += -D SELFCONSISTENCY
+
+#------Choose if you want to perform the Inversion of the Bethe-Salpeter Equations
+#CFLAGS += -D INVERSION_BSE
+
 #------Choose which method for the inversion of the Bethe-Salpeter Equations
 #CFLAGS += -D METHOD2 #Agnese's method
-CFLAGS += -D METHOD1 #Stefan's method
-#CFLAGS += -D METHOD3 # Brute force inversion
-
-# -- Higher order corrections
-#CFLAGS += -D KATANIN #			Use katanin scheme
-#CFLAGS += -D TWOLOOP #			Use twoloop corrections
+#CFLAGS += -D METHOD1 #Stefan's method
 
 #--------------------------------------Compiler settings------------------------------------------
 

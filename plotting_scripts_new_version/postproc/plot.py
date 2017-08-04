@@ -24,8 +24,9 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-fname = "dat/dat_U1_Beta20_PFCB120_PARQ_SU2_METH1.h5"
-
+#fname = "dat/dat_U1_Beta50_PFCB1000_PARQ_SU2_ED_DIVERGENT.h5"
+fname = "dat/dat_U1_Beta50_PFCB800_PARQ_SU2_SELFCON_new_version.h5" 
+#fname = "dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB800_PARQ_SU2_SELFCON.h5"
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
 
@@ -137,50 +138,6 @@ pl.savefig("plots/Giw.png", dpi=150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-#--------------------------------------FLOW OBSERVABLES ------------------------------------------
-
-#print("Plotting flowing observables ...")
-
-##--- Read
-#Lam_arr = np.array(f["/Flow_obs/LAM"])
-#meff_arr = np.array(f["/Flow_obs/EFF_MASS"])
-#meff_err_arr = np.array(f["/Flow_obs/ERR_EFF_MASS"])
-#maxCpl_arr = np.array(f["/Flow_obs/ABS_MAX_CPL"])
-
-#def TK( U ):
-    #return np.sqrt(U/2.0)*np.exp(-math.pi*U/8.0)
-
-#nrg_x = [ 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
-#nrg_y = [ 1, 1.01, 1.06, 1.14, 1.26, 1.42, 1.62, 1.88, 2.18, 2.56, 3.03, 4.32, 6.14, 8.74, 12.47, 17.78, 25.5, 36.5, 52.3, 74.9, 109.4, 158, 228, 328, 474, 681]
-
-#def plotEffM( use_pl ):
-    #pl.plot( Lam_arr, meff_arr, 'bx', ms=3, mew=0.2)
-    #use_pl.set_title( r"$m^*$" )
-    ##pl.plot( Lam_arr**2 * UINT, meff_arr, 'bx', ms=3, mew=0.2)
-    ##pl.plot( nrg_x, nrg_y, 'r--', ms=3, mew=0.2 )
-    ##pl.xlim([0,UINT])
-    ##pl.ylim([1.0,1.0/TK(UINT)])
-    ##pl.yscale('log')
-    #return
-
-#def plotObs( use_pl, y_arr, string ):
-    #pl.plot( Lam_arr, y_arr, 'bx', ms=3, mew=0.2)
-    #use_pl.set_title( string )
-    ##pl.plot( Lam_arr**2 * UINT, y_arr, 'bx', ms=3, mew=0.2)
-    ##pl.yscale('log')
-    #return
-
-#plotEffM( pl.subplot(2,1,1) )
-#pl.xlabel(r"$\Lambda$")
-#plotObs( pl.subplot(2,1,2), maxCpl_arr, r"Max Cpl")
-#pl.xlabel(r"$\Lambda$")
-
-#pl.tight_layout()
-
-#pl.savefig("plots/flow_obs.png", dpi=150)
-#pl.figure(dpi=100) # Reset dpi to default
-#pl.clf()
-
 #--------------------------------------VERTEX PLOTTING ------------------------------------------
 
 print("Plotting vertex ...")
@@ -225,12 +182,12 @@ def ImVertUpDown( w1, w2, w1p ):
 def ReVertUpUp( w1, w2, w1p ):
     if ( not check_bounds( w1, w2, w1p ) ):
             return float('nan')
-    return ReVertUpDown( w1, w2, w1p ) - ReVertUpDown( w1, w2, w1+w2-w1p-1 )
+    return ReVertUpDown( w1, w2, w1p ) - ReVertUpDown( w1, w2, w1+w2-w1p)
 
 def ImVertUpUp( w1, w2, w1p ):
     if ( not check_bounds( w1, w2, w1p ) ):
             return float('nan')
-    return ImVertUpDown( w1, w2, w1p ) - ImVertUpDown( w1, w2, w1+w2-w1p-1 )
+    return ImVertUpDown( w1, w2, w1p ) - ImVertUpDown( w1, w2, w1+w2-w1p)
 
 
 def plotVert( use_pl, zarr, string ):
@@ -531,7 +488,7 @@ pl.savefig("plots/genchi.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=6
+shift=65
 
 #--- Plot
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
@@ -682,7 +639,7 @@ def plotphi( use_pl, arr, string ):
 
 def plotphiupup( use_pl, string ):
     use_pl.set_aspect(1.0)
-    zarr = np.array([[ rephi_pp_updo(shift + (bdim-1)/2,n+fdim/2,m+fdim/2,0,0,0,0,0,0,0)-rephi_pp_updo(shift + (bdim-1)/2,n+fdim/2,-m-1-mymod_abs(shift + (bdim-1)/2)+fdim/2,0,0,0,0,0,0,0) for n in range(-fdimo2,fdimo2)] for m in range(-fdimo2,fdimo2)])
+    zarr = np.array([[ rephi_pp_updo(shift + (bdim-1)/2,n+fdim/2,m+fdim/2,0,0,0,0,0,0,0)-rephi_pp_updo(shift + (bdim-1)/2,n+fdim/2,-m-1+fdim/2,0,0,0,0,0,0,0) for n in range(-fdimo2,fdimo2)] for m in range(-fdimo2,fdimo2)])
     pl.pcolormesh( phigrid, phigrid, zarr )
     pl.ylim([min(phigrid),max(phigrid)])
     pl.xlim([min(phigrid),max(phigrid)])
@@ -747,7 +704,7 @@ shift=0
 
 #-------------------------------------GAMMA PLOTTING ------------------------------------------
 
-print("Plotting phi ...")
+print("Plotting gamma...")
 
 #--- Read
 regamma_pp = vert_mul * np.array(f["/gamma_func/RE_PP"])
@@ -815,7 +772,7 @@ pl.savefig("plots/gamma.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=6
+shift=20
 
 pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
@@ -843,6 +800,61 @@ pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
 shift=0
+#-------------------------------------GAMMA PLOTTING ------------------------------------------
+
+print("Plotting gamma spin-diagonalized...")
+
+#---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+def plotgamma( use_pl, arr, string ):
+    use_pl.set_aspect(1.0)
+    zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
+    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.ylim([min(phigrid),max(phigrid)])
+    pl.xlim([min(phigrid),max(phigrid)])
+    use_pl.set_title( string , fontsize=10 )
+    pl.colorbar(shrink=0.6) 
+    return
+
+#--- Plot 
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+
+plotgamma( pl.subplot(2,2,1),regamma_pp + regamma_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu, \nu', \omega =0}_{s}$" ) # flip sign of w_out
+pl.ylabel(r"$\nu'$")
+plotgamma( pl.subplot(2,2,2),regamma_pp - regamma_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu, \nu', \omega =0}_{t}$" ) # flip sign of w_out
+plotgamma( pl.subplot(2,2,3), 2*regamma_ph - regamma_xph, RE + r"\Gamma^{\nu, \nu', \omega =0}_{d}$" )
+pl.ylabel(r"$\nu'$")
+pl.xlabel(r"$\nu$")
+plotgamma( pl.subplot(2,2,4), - regamma_xph, RE + r"\Gamma^{\nu, \nu', \omega =0}_{m}$" )
+pl.xlabel(r"$\nu$")
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/gamma_spindiag.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
+
+shift=20
+
+pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+
+plotgamma( pl.subplot(2,2,1),regamma_pp + regamma_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu, \nu', \omega =0}_{s}$" ) # flip sign of w_out
+pl.ylabel(r"$\nu'$")
+plotgamma( pl.subplot(2,2,2),regamma_pp - regamma_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu, \nu', \omega =0}_{t}$" ) # flip sign of w_out
+plotgamma( pl.subplot(2,2,3), 2*regamma_ph - regamma_xph, RE + r"\Gamma^{\nu, \nu', \omega =0}_{d}$" )
+pl.ylabel(r"$\nu'$")
+pl.xlabel(r"$\nu$")
+plotgamma( pl.subplot(2,2,4), - regamma_xph, RE + r"\Gamma^{\nu, \nu', \omega =0}_{m}$" )
+pl.xlabel(r"$\nu$")
+
+pl.tight_layout()
+
+pl.tight_layout()
+
+#--- Save to file
+pl.savefig("plots/gamma_spindiag_shift.png", dpi = 150)
+pl.figure(dpi=100) # Reset dpi to default
+pl.clf()
 #--------------------------------------Chi PLOTTING ------------------------------------------
 
 print("Plotting chi functions ...")
@@ -858,7 +870,7 @@ rechi_xph = vert_mul * np.array(f["/chi_func/RE_XPH"])
 imchi_xph = vert_mul * np.array(f["/chi_func/IM_XPH"])
 fdim_bos = bosgrid.shape[0]
 
-x_range_fact = 0.3
+x_range_fact = 1.0
 
 #--- Helper functions
 def plotchi( use_pl, arr, title ):

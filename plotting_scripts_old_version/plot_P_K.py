@@ -3,7 +3,8 @@
 #---------------------------------------------------------------------------------------
 #
 #NOTE:              This script plots Plus and Karrsch functions after the self-consistency
-#                   No plots saved
+#                   No plots saved: here asymptotics functions obtained by means of the 
+#                   python script
 #
 #--------------------------------------IMPORTS ------------------------------------------
 

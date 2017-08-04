@@ -16,7 +16,7 @@
 // -------- System independent 
 
 double UINT	=	1.0;	///< Bare interaction
-double BETA 	=	20.0;	///< Inverse Temperature 
+double BETA 	=	50.0;	///< Inverse Temperature 
 double B	=	0.0;	///< Zeeman splitting
 
 

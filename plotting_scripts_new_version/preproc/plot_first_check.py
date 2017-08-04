@@ -1,7 +1,19 @@
 #!/usr/bin/python
 
-#--------------------------------------IMPORTS ------------------------------------------
+#=============================================================================================================
+#
+#                       Plottings script for Pomerol results before extracting the asymptotics
+#                       and inverting the Bethe-Salpeter equations
+#
+#                       CONTENTS:
+#                       - Self-energy
+#                       - Vertex in all channels
+#                       - Generalized susceptibility in all channels
+#                       - 2P Green's function in all channels
+#
+#============================================================================================================
 
+#--------------------------------------IMPORTS ------------------------------------------
 import h5py
 import matplotlib.pyplot as pl
 import numpy as np
@@ -22,7 +34,7 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-fname = "/home/agnese/Coding/Vertex_structures/dat/U1.0_beta20.0_FFREQ_40_BFREQ_60_noQN_idx.h5"
+fname = "/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA26/4SITES/U1/PREPROC/U1.0_BETA_26.0_FFREQ_50_BFREQ_75_noQN_idx.h5"
 
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
@@ -56,10 +68,10 @@ os.system('mv plots/R.png plots/prev_R.png 2> log/plot.log')
 print "Check UINT and BETA in plot.py!"
 
 U =  1.0          # follows order in script_conversion_hdf5_demetrio.py
-beta = 20.0
+beta = 26.0
 pi = math.pi
 
-shift=32
+shift=30
 
 #-----------------------------------GREEN'S FUNCTION--------------------------
 

@@ -1,5 +1,14 @@
 #!/usr/bin/python
 
+#===================================================================================================================
+#
+#                   NOTE: Plotting script for the outputs of Vienna's TU ED program
+#                   
+#                   CONTENTS:
+#                   - Full veretx in PP PH and XPH channels
+#                   - Generalized susceptibility in all channels
+#
+#===================================================================================================================
 #--------------------------------------IMPORTS ------------------------------------------
 
 import h5py
@@ -60,168 +69,6 @@ beta = 26.0
 pi = math.pi
 
 shift=0
-
-##-----------------------------------GREEN'S FUNCTION--------------------------
-#
-#print("Plotting Green function ...")
-#
-#
-##--- Read
-#Giwgrid = np.array(f["/Giw/fgrid"])
-#reGiw = f["/Giw/RE"]
-#imGiw = f["/Giw/IM"]
-#fdim = reGiw.shape[0]
-#
-#
-##--- Helper functions
-#
-#def plotGiw( use_pl, arr, string ):
-#    pl.plot( Giwgrid, arr, 'bx', ms=3, mew=0.2)
-##    pl.xlim([1.2*min(vertgrid),1.2*max(vertgrid)])
-#    use_pl.set_title(string)
-#    return
-#
-#def plotGiwRe( use_pl ):
-#    plotGiw( use_pl, reGiw[:], r"$\operatorname{Re}G(i\omega)$")
-#    return
-#
-#def plotGiwIm( use_pl ):
-#    plotGiw( use_pl, imGiw[:], r"$\operatorname{Im}G(i\omega)$")
-#    return
-#
-#pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))))
-#
-#plotGiwRe( pl.subplot(1,2,1) ) 
-#pl.xlabel(r"$\omega_n$",fontsize=8)
-#plotGiwIm( pl.subplot(1,2,2) ) 
-#pl.xlabel(r"$\omega_n$",fontsize=8)
-#
-#pl.tight_layout()
-#
-##--- Save to file
-#pl.savefig("plots/Giw.png", dpi=150)
-#pl.figure(dpi=100) # Reset dpi to default
-#pl.clf()
-#
-#
-##-----------------------------------SE FUNCTION--------------------------
-#
-#print("Plotting SE ...")
-#
-#
-##--- Read
-#Siggrid = np.array(f["/Sig/fgrid"])
-#reSig = f["/Sig/RE"]
-#imSig = f["/Sig/IM"]
-#fdim = reSig.shape[0]
-#
-#
-##--- Helper functions
-#
-#def plotSig( use_pl, arr, string ):
-#    pl.plot( Siggrid, arr, 'bx', ms=3, mew=0.2)
-##    pl.xlim([1.2*min(vertgrid),1.2*max(vertgrid)])
-#    use_pl.set_title(string)
-#    return
-#
-#def plotSigRe( use_pl ):
-#    plotGiw( use_pl, reSig[:], r"$\operatorname{Re}\Sigma(i\omega)$")
-#    return
-#
-#def plotSigIm( use_pl ):
-#    plotGiw( use_pl, imSig[:], r"$\operatorname{Im}\Sigma(i\omega)$")
-#    return
-#
-#pl.suptitle(r"$U=$" + str('{0:.3f}'.format(float(U))) + r"     $\beta=$" + str('{0:.3f}'.format(float(beta))))
-#
-#plotSigRe( pl.subplot(1,2,1) ) 
-#pl.xlabel(r"$\omega_n$",fontsize=8)
-#plotSigIm( pl.subplot(1,2,2) ) 
-#pl.xlabel(r"$\omega_n$",fontsize=8)
-#
-#pl.tight_layout()
-#
-##--- Save to file
-#pl.savefig("plots/Sig.png", dpi=150)
-#pl.figure(dpi=100) # Reset dpi to default
-#pl.clf()
-#
-
-##--------------------------------------VERTEX PLOTTING ------------------------------------------
-#
-#print("Plotting vertex ...")
-#
-#
-##VERTEX
-#
-#re_f_upup_ph = f["VERT/PH/RE_F_UPUP"][:]
-#re_f_updo_ph = f["VERT/PH/RE_F_UPDO"][:]
-#re_f_upup_xph = f["VERT/XPH/RE_F_UPUP"][:]
-#re_f_updo_xph = f["VERT/XPH/RE_F_UPDO"][:]
-#re_f_upup_pp = f["VERT/PP/RE_F_UPUP"][:]
-#re_f_updo_pp = f["VERT/PP/RE_F_UPDO"][:]
-#
-#
-#im_f_upup_ph = f["VERT/PH/IM_F_UPUP"][:]
-#im_f_updo_ph = f["VERT/PH/IM_F_UPDO"][:]
-#im_f_upup_xph = f["VERT/XPH/IM_F_UPUP"][:]
-#im_f_updo_xph = f["VERT/XPH/IM_F_UPDO"][:]
-#im_f_upup_pp = f["VERT/PP/IM_F_UPUP"][:]
-#im_f_updo_pp = f["VERT/PP/IM_F_UPDO"][:]
-#
-## We assume all the channels to have the same B/F grids
-#
-#fgrid = f["VERT/PH/fgrid"][:].shape[0] 
-#bgrid = f["VERT/PH/bgrid"][:].shape[0]
-#
-#N_bose = (bgrid-1)/2 # to create a bosonic frequency grid from -N_bose to N_bose
-#N_fermi= (fgrid)/2   # to create a fermionic frequency grid from -N_fermi to N_fermi
-#print N_bose
-#print N_fermi
-#
-#def isInside(i,j,k):
-#    return abs(i) <= N_bose and j >= -N_fermi and j < N_fermi and k >= -N_fermi and k < N_fermi
-#
-#
-##-------------------------------- FUNCTION DEFINITION--------------------------------------
-#
-## 
-## Update the asymptotic structures (for the moment firt oder diagrams outside) for the VERTEX IN ALL CHANNELS
-#
-#def f_upup_fun_ph(i,j,k):
-#    if isInside(i,j,k):
-#        return re_f_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_ph[i + N_bose, j+N_fermi, k + N_fermi]
-#    else:
-#          return 0.0 
-#
-#def f_updo_fun_ph(i,j,k):
-#    if isInside(i,j,k):
-#        return re_f_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_ph[i + N_bose, j+N_fermi, k + N_fermi]
-#    else:
-#        return U
-#
-#def f_upup_fun_pp(i,j,k):
-#    if isInside(i,j,k):
-#        return re_f_upup_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-#    else:
-#        return 0.0
-#
-#def f_updo_fun_pp(i,j,k):
-#    if isInside(i,j,k):
-#        return re_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_pp[i + N_bose, j+N_fermi, k + N_fermi]
-#    else:
-#        return U
-#def f_upup_fun_xph(i,j,k):
-#    if isInside(i,j,k):
-#        return re_f_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_upup_xph[i + N_bose, j+N_fermi, k + N_fermi]
-#    else:
-#        return 0.0
-#def f_updo_fun_xph(i,j,k):
-#    if isInside(i,j,k):
-#        return re_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]+1j*im_f_updo_xph[i + N_bose, j+N_fermi, k + N_fermi]
-#    else:
-#        return U
-#
 
 #---------------------------------------------------------------------------------------------------------
 #

@@ -140,7 +140,6 @@ dcomplex state_t::vertx_ph( int W, int w_in, int w_out, int K, int k_in, int k_o
    if( forced_zero_check( s1_in, s2_in, s1_out, s2_out ) )							// check wether element should be forced to zero
       return dcomplex( 0.0, 0.0 );
 #endif
-
    int W_pp  = w_in + w_out + ( W + 100000 ) % 2 + 1;
    int W_xph  = w_out - w_in;
 

@@ -91,7 +91,9 @@ class symmetry_grp_t
 
       void init( gf<dcomplex,ndims>& gf_obj, init_func_t init_func )
       {
+#ifndef SINGLETHREADED 
 #pragma omp parallel for schedule( dynamic )
+#endif
 	 for( int i = 0; i < symm_classes.size(); ++i )
 	 {
 	    dcomplex val = init_func( gf_obj.get_idx( symm_classes[i][0].idx ) ); 

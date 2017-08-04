@@ -20,11 +20,21 @@ extern gf_phi_t vert_exact_pp;
 extern gf_phi_t vert_exact_ph; 
 extern gf_phi_t vert_exact_xph;
 
+extern gf_P_t P_exact_pp;
+extern gf_P_t P_exact_ph; 
+extern gf_P_t P_exact_xph;
+
+extern gf_chi_t chi_exact_pp;
+extern gf_chi_t chi_exact_ph; 
+extern gf_chi_t chi_exact_xph;
+
 extern gf_phi_t genchi_exact_pp;
 extern gf_phi_t genchi_exact_ph; 
 extern gf_phi_t genchi_exact_xph;
 
 extern const int POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT, POS_SIG_COUNT_EXACT; 
+extern const int POS_FERM_P_COUNT_EXACT, POS_BOS_P_COUNT_EXACT, POS_BOS_CHI_COUNT_EXACT; 
+
 void read_exact(); 
 
 #ifdef NO_MOMENTA
@@ -40,8 +50,14 @@ dcomplex vert_bare( const idx_2p_t& idx );				///< Return initial vertex value f
 
 dcomplex Sig_init( const idx_1p_t& idx );					///< Return initial self-energy value for given index object
 dcomplex phi_init( const idx_phi_t& idx ); 
-dcomplex P_init( const idx_P_t& idx ); 
-dcomplex chi_init( const idx_chi_t& idx );				///< Return initial vertex value for chiasch functions
+
+dcomplex P_pp_init( const idx_P_t& idx ); 
+dcomplex P_ph_init( const idx_P_t& idx ); 
+dcomplex P_xph_init( const idx_P_t& idx ); 
+
+dcomplex chi_pp_init( const idx_chi_t& idx );				///< Return initial vertex value for chiasch functions
+dcomplex chi_ph_init( const idx_chi_t& idx );				///< Return initial vertex value for chiasch functions
+dcomplex chi_xph_init( const idx_chi_t& idx );				///< Return initial vertex value for chiasch functions
 
 dcomplex asympt_GG_pp( int W, double Lam = LAM_FIN );	///< Give estimate for the integral 1/2/PI * G(W/2-w-1,Lam) * G(W/2+w,Lam) for the outside region N \ [ -POS_INT_RANGE, POS_INT_RANGE )
 dcomplex asympt_GG_ph( int W, double Lam = LAM_FIN );	///< Give estimate for the integral 1/2/PI * G(w-W/2,Lam) * G(w+W/2,Lam) for the outside region N \ [ -POS_INT_RANGE, POS_INT_RANGE )

@@ -56,8 +56,9 @@ double jos_curr( const state_t& state_vec )
 
    gf_1p_mat_t Gvec( POS_1P_RANGE ); 
    Gvec.init( boost::bind( &state_t::GMat, boost::ref(state_vec), _1, LAM_FIN ) ); // Initialize big Green function vector 
-
+#ifndef SINGLETHREADED 
 #pragma omp parallel for schedule(dynamic) reduction(+:val)
+#endif
    for( int w = -POS_1P_RANGE; w < POS_1P_RANGE; ++w ) 
       for( int k = 0; k < PATCH_COUNT; ++k )
       {

@@ -49,6 +49,7 @@ class rhs_t 		///< Functor to specify the rhs calculation for both the self-ener
       
       static gf<double, 1> weight_vec; 
       static gf<double, 2> weight_vec_2d; 
+      //static gf<double, 2> weight_vec_2d_asy; 
 
 };
 

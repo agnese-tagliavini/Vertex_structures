@@ -1,5 +1,20 @@
 #!/usr/bin/python
 
+#=======================================================================================================================
+#                   
+#               NOTE: Plotting script for plotting pomerol results after self-consistency to calculate asymptotic
+#                     functions and the inversion of the Bethe-Salpeter equations
+#
+#               CONTENTS: 
+#               - Green's function
+#               - P function (kernel 2)
+#               - chi function (kernel 1)
+#               - Full vertex function in PP PH and XPH channels
+#               - 2P reducible vertex (Phi) in all channels 
+#               - 2P irreducible vertex (Gammma) in all channels
+#               - Fully 2P irreducible vertex (Lambda) in all channels
+#
+#======================================================================================================================
 #--------------------------------------IMPORTS ------------------------------------------
 
 import h5py

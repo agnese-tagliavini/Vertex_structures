@@ -65,14 +65,16 @@ int main ( int argc, char * argv[])
    state_vec.gf_phi_ph().init( phi_init ); 
    state_vec.gf_phi_xph().init( phi_init ); 
 
-   state_vec.gf_P_pp().init( P_init ); 
-   state_vec.gf_P_ph().init( P_init ); 
-   state_vec.gf_P_xph().init( P_init ); 
+   state_vec.gf_P_pp().init( P_pp_init ); 
+   state_vec.gf_P_ph().init( P_ph_init ); 
+   state_vec.gf_P_xph().init( P_xph_init ); 
 
-   state_vec.gf_chi_pp().init( chi_init ); 
-   state_vec.gf_chi_ph().init( chi_init ); 
-   state_vec.gf_chi_xph().init( chi_init ); 
+   state_vec.gf_chi_pp().init( chi_pp_init ); 
+   state_vec.gf_chi_ph().init( chi_ph_init ); 
+   state_vec.gf_chi_xph().init( chi_xph_init ); 
 
+#ifdef SELFCONSISTENCY   
+   
    cout << " Starting scale-dependent PARQUET solver... "  << endl << endl;
    bool success = true; 
 
@@ -84,7 +86,7 @@ int main ( int argc, char * argv[])
 
       state_t state_vec_old;
       double diff; 
-      double damping = 0.00; 
+      double damping = 0.0; 
       int count = 0; 
 
       do
@@ -102,10 +104,12 @@ int main ( int argc, char * argv[])
          cout << diff << endl << endl; 
 
          // Output intermediate files
-         if( count == 1 || count % 20 == 0 )
-            write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
+    //     if( count == 1 || count % 20 == 0 )
+    //        write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
 
-      } while( diff > 1e-13 && diff < MAX_COUPLING ); 
+      } while(count < 1); // ONE SHOT CALCULATION 
+	 
+      //} while( diff > 1e-13 && diff < MAX_COUPLING ); 
 
       if( diff >= MAX_COUPLING )
       {
@@ -117,16 +121,25 @@ int main ( int argc, char * argv[])
          cout << " converged after " << count << " iterations " << endl << endl; 
          success = true; 
       }
-
-      cout << " Calculating phi functions by inverse ... " << endl;
-
-      gf_1p_mat_t Gvec( POS_1P_RANGE ); 
-      Gvec.init( bind( &state_t::GMat, boost::cref(state_vec), _1, Lam ) ); // Initialize big Green function vector 
-
-      rhs_t::phi_pp_inverse( state_vec, state_vec.gf_phi_pp(), Gvec, LAM_FIN ); 
-      rhs_t::phi_ph_xph_inverse( state_vec, state_vec.gf_phi_ph(), state_vec.gf_phi_xph(), Gvec, LAM_FIN ); 
-
    }
+
+#else    
+   cout << "(ED)Exact Kernel functions ... read from file  ... " << endl;
+   
+      
+#endif
+
+#ifdef INVERSE_BSE
+   cout << " Calculating phi functions by inverse ... " << endl;
+
+   gf_1p_mat_t Gvec( POS_1P_RANGE ); 
+   
+   Gvec.init( bind( &state_t::GMat, boost::cref(state_vec), _1, 1.0 ) ); // Initialize big Green function vector 
+
+   rhs_t::phi_pp_inverse( state_vec, state_vec.gf_phi_pp(), Gvec, LAM_FIN ); 
+   rhs_t::phi_ph_xph_inverse( state_vec, state_vec.gf_phi_ph(), state_vec.gf_phi_xph(), Gvec, LAM_FIN ); 
+
+#endif
 
  // ------ Write output file
 
@@ -163,13 +176,22 @@ int main ( int argc, char * argv[])
    FILE_NAME.append("_SU2"); 
 
 #ifdef METHOD2
-   cout << "write meth2" << endl;
    FILE_NAME.append("_METH2"); 
 
 #elif METHOD1
    FILE_NAME.append("_METH1");
 #endif
-  
+
+#ifdef SELFCONSISTENCY
+   FILE_NAME.append("_SELFCON");
+#else 
+    FILE_NAME.append("_ED");
+#endif
+
+#ifdef INVRSION_BSE
+    FILE_NAME.append("_IBSE");
+#endif 
+
    if( !success ) FILE_NAME.append("_DIVERGENT"); 
 
    FILE_NAME.append(".h5"); 

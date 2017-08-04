@@ -117,6 +117,7 @@ double integrate_QAGS_SIN( intFuncP_QAGS fw, void* q, double err );
 std::vector<double> generate_tail_weights( int iMin, int tail_length, int fit_order ); 
 gf<double, 1> generate_weights( int iMin, int tail_length, int fit_order ); 
 gf<double, 2> generate_2d_weights( int iMin, int tail_length, int fit_order ); 
+gf<double, 2> generate_2d_weights_asy( int iMin, int tail_length, int fit_order ); 
 
 template< typename value_t >
 boost::function< value_t ( boost::function< value_t ( int i ) > ) > generate_sum_func( int iMin, int tail_length, int fit_order )

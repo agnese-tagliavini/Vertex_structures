@@ -8,6 +8,7 @@
 
 #pragma once
 
+#define EIGEN_STACK_ALLOCATION_LIMIT 0
 #include <complex>
 #include <Eigen/Core>
 #include <vector>
@@ -105,8 +106,8 @@ class gf_P_t : public gf< dcomplex, 8 > 		///< Container type for two-particle c
    public:
       using base_t = gf< dcomplex, 8 >; 
 
-      gf_P_t():
-	 base_t( boost::extents[bfreq(POS_BFREQ_COUNT_P)][ffreq(POS_FFREQ_COUNT_P)]
+      gf_P_t(int pos_freq_count_ = POS_FFREQ_COUNT_P, int pos_bfreq_count_ = POS_BFREQ_COUNT_P ):
+	 base_t( boost::extents[bfreq(pos_bfreq_count_)][ffreq(pos_freq_count_)]
 	       [PATCH_COUNT][PATCH_COUNT]
 	       [QN_COUNT][QN_COUNT][QN_COUNT][QN_COUNT] )
    {}
