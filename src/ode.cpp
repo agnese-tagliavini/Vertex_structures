@@ -106,11 +106,53 @@ int main ( int argc, char * argv[])
          // Output intermediate files
     //     if( count == 1 || count % 20 == 0 )
     //        write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
+      } while( diff > 1e-13 && diff < MAX_COUPLING ); // FULL SELF-CONSISTENCY 
+      if( diff >= MAX_COUPLING )
+      {
+         cout << " DIVERGENT! " << endl << endl; 
+         success = false; 
+      }
+      else
+      {
+         cout << " converged after " << count << " iterations " << endl << endl; 
+         success = true; 
+      }
+   }
 
+#elif defined ONESHOT
+   
+   cout << " Starting scale-dependent PARQUET solver... "  << endl << endl;
+   bool success = true; 
+
+   vector<double> Lam_list = { 1.0 }; 
+
+   for( double Lam: Lam_list )
+   {
+      cout << " Starting one-shot calculation of the asymptotic functions " << Lam << endl << endl; 
+
+      state_t state_vec_old;
+      double diff; 
+      double damping = 0.0; 
+      int count = 0; 
+
+      do
+      {
+         count++; 
+         cout << " Iteration " << count << endl; 
+         state_vec_old = state_vec; 
+
+         // --- Update state_vec
+         rhs( state_vec_old, state_vec, Lam ); 
+         cout << " ... Damping with factor " << damping << endl;
+         state_vec = state_vec_old * damping + state_vec * ( 1.0 - damping ); 
+         cout << " ... Calculating difference ... ";
+         diff = norm( state_vec - state_vec_old ); 
+         cout << diff << endl << endl; 
+
+         // Output intermediate files
+    //     if( count == 1 || count % 20 == 0 )
+    //        write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
       } while(count < 1); // ONE SHOT CALCULATION 
-	 
-      //} while( diff > 1e-13 && diff < MAX_COUPLING ); 
-
       if( diff >= MAX_COUPLING )
       {
          cout << " DIVERGENT! " << endl << endl; 
@@ -186,6 +228,10 @@ int main ( int argc, char * argv[])
    FILE_NAME.append("_SELFCON");
 #else 
     FILE_NAME.append("_ED");
+#endif
+
+#ifdef ONESHOT
+    FILE_NAME.append("_ONESHOT");
 #endif
 
 #ifdef INVRSION_BSE

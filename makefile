@@ -30,6 +30,7 @@ CFLAGS += -D COMPRESS #						Compress HDF5 datafile
 
 #----Choose if input file to read
 CFLAGS += -D READIN
+CFLAGS += -D ONESHOT 
 
 #----Specify if you want to remove parallelization (TODO:remove -fopenmp, -lmpi, OPENMP)
 #CFLAG += -DSINGLETHREADED
@@ -44,10 +45,10 @@ CFLAGS += -D INT_FLOW #			Interaction Flow
 #CFLAGS += -D SELFCONSISTENCY
 
 #------Choose if you want to perform the Inversion of the Bethe-Salpeter Equations
-CFLAGS += -D INVERSE_BSE
+#CFLAGS += -D INVERSE_BSE
 
 #------Choose which method for the inversion of the Bethe-Salpeter Equations
-CFLAGS += -D METHOD2 #Agnese's method
+#CFLAGS += -D METHOD2 #Agnese's method
 #CFLAGS += -D METHOD1 #Stefan's method
 
 #--------------------------------------Compiler settings------------------------------------------

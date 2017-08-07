@@ -279,6 +279,7 @@ dcomplex phi_init( const idx_phi_t& idx ) // initial values for phi function
 dcomplex P_pp_init( const idx_P_t& idx ) // initial values for P function
 {
 #ifndef SELFCONSISTENCY
+#elif ndefined ONESHOT
    if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
       if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_pp[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
@@ -291,6 +292,7 @@ dcomplex P_pp_init( const idx_P_t& idx ) // initial values for P function
 dcomplex P_ph_init( const idx_P_t& idx ) // initial values for P function
 {
 #ifndef SELFCONSISTENCY
+#elif ndefined ONESHOT
    if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
       if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_ph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
@@ -303,6 +305,7 @@ dcomplex P_ph_init( const idx_P_t& idx ) // initial values for P function
 dcomplex P_xph_init( const idx_P_t& idx ) // initial values for P function
 {
 #ifndef SELFCONSISTENCY
+#elif ndefined ONESHOT
    if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
       if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_xph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
@@ -314,6 +317,7 @@ dcomplex P_xph_init( const idx_P_t& idx ) // initial values for P function
 dcomplex chi_pp_init( const idx_chi_t& idx ) // initial values for P function
 {
 #ifndef SELFCONSISTENCY
+#elif ndefined ONESHOT
    if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
       return chi_exact_pp[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
    else
@@ -324,6 +328,7 @@ dcomplex chi_pp_init( const idx_chi_t& idx ) // initial values for P function
 dcomplex chi_ph_init( const idx_chi_t& idx ) // initial values for P function
 {
 #ifndef SELFCONSISTENCY
+#elif ndefined ONESHOT
    if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
       return chi_exact_ph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
    else
@@ -335,6 +340,7 @@ dcomplex chi_ph_init( const idx_chi_t& idx ) // initial values for P function
 dcomplex chi_xph_init( const idx_chi_t& idx ) // initial values for P function
 {
 #ifndef SELFCONSISTENCY
+#elif ndefined ONESHOT
    if ((idx(0) >= -POS_BOS_CHI_COUNT_EXACT) && (idx(0) <= POS_BOS_CHI_COUNT_EXACT) )
       return chi_exact_xph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)]; 
    else
