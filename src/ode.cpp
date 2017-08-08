@@ -106,7 +106,7 @@ int main ( int argc, char * argv[])
          // Output intermediate files
     //     if( count == 1 || count % 20 == 0 )
     //        write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
-      } while( diff > 1e-13 && diff < MAX_COUPLING ); // FULL SELF-CONSISTENCY 
+      } while( diff > 1e-9 && diff < MAX_COUPLING ); // FULL SELF-CONSISTENCY 
       if( diff >= MAX_COUPLING )
       {
          cout << " DIVERGENT! " << endl << endl; 
@@ -218,7 +218,7 @@ int main ( int argc, char * argv[])
    FILE_NAME.append("_SU2"); 
 
 #ifdef METHOD2
-   FILE_NAME.append("_METH2"); 
+   FILE_NAME.append("REDU10_METH2"); 
 
 #elif METHOD1
    FILE_NAME.append("_METH1");

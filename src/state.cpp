@@ -204,15 +204,15 @@ dcomplex state_t::genchi_pp( int W, int w_in, int w_out, int K, int k_in, int k_
    if( forced_zero_check( s1_in, s2_in, s1_out, s2_out ) )							// check wether element should be forced to zero
       return dcomplex( 0.0, 0.0 );
 #endif
-//#ifdef READIN
-   // //Return exact solution if available
-   //if (  W  >= -POS_BOS_VERT_COUNT_EXACT && W  <= POS_BOS_VERT_COUNT_EXACT &&
-   //      w_in  >= -POS_FERM_VERT_COUNT_EXACT && w_in  <= POS_FERM_VERT_COUNT_EXACT - 1 &&
-   //      w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 ){
-   //   return genchi_exact_pp[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; //INPUT DATA FROM POMEROL-> WARNING: DIFFERENT NOTATION!!
-   //  }
+#ifdef READIN
+    //Return exact solution if available
+   if (  W  >= -POS_BOS_VERT_COUNT_EXACT_SMALL && W  <= POS_BOS_VERT_COUNT_EXACT_SMALL &&
+         w_in  >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_in  <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 &&
+         w_out >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_out <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 ){
+      return genchi_exact_pp[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; //INPUT DATA FROM POMEROL-> WARNING: DIFFERENT NOTATION!!
+     }
    
-//#endif
+#endif
 
    return G(w_val(div2_floor(W)-w_in-1),mom_grid[dif_k(K,k_in)].first,mom_grid[dif_k(K,k_in)].second,Lam,SigMat(div2_floor(W)-w_in-1,dif_k(K,k_in)))(s2_in,s2_in)*G(w_val(w_in+div2_ceil(W)),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(w_in+div2_ceil(W),k_in))(s1_in,s1_in)*vertx_pp(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_floor(W)-w_out-1),mom_grid[dif_k(K,k_out)].first,mom_grid[dif_k(K,k_out)].second,Lam,SigMat(div2_floor(W)-w_out-1,dif_k(K,k_out)))(s1_out,s1_out)*G(w_val(w_out+div2_ceil(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out+div2_ceil(W),k_out))(s2_out,s2_out);
 
@@ -226,13 +226,13 @@ dcomplex state_t::genchi_ph( int W, int w_in, int w_out, int K, int k_in, int k_
    if( forced_zero_check( s1_in, s2_in, s1_out, s2_out ) )							// check wether element should be forced to zero
       return dcomplex( 0.0, 0.0 );
 #endif
-//#ifdef READIN
-//    //Return exact solution if available
-//   if (  W  >= -POS_BOS_VERT_COUNT_EXACT && W  <= POS_BOS_VERT_COUNT_EXACT  &&
-//	 w_in  >= -POS_FERM_VERT_COUNT_EXACT && w_in  <= POS_FERM_VERT_COUNT_EXACT - 1 &&
-//	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
-//      return genchi_exact_ph[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; 
-//#endif
+#ifdef READIN
+    //Return exact solution if available
+   if (  W  >= -POS_BOS_VERT_COUNT_EXACT_SMALL && W  <= POS_BOS_VERT_COUNT_EXACT_SMALL  &&
+	 w_in  >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_in  <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 &&
+	 w_out >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_out <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 )
+      return genchi_exact_ph[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; 
+#endif
 
    return G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_in)*G(w_val(w_out+div2_ceil(W)),mom_grid[add_k(K,k_out)].first,mom_grid[add_k(K,k_out)].second,Lam,SigMat(w_out+div2_ceil(W),add_k(K,k_out)))(s2_in,s2_in)*vertx_ph(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_ceil(W)+w_in),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(div2_ceil(W)+w_in,add_k(K,k_in)))(s1_out,s1_out)*G(w_val(w_out-div2_floor(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out-div2_floor(W),k_out))(s2_out,s2_out);
 }
@@ -245,13 +245,13 @@ dcomplex state_t::genchi_xph( int W, int w_in, int w_out, int K, int k_in, int k
    if( forced_zero_check( s1_in, s2_in, s1_out, s2_out ) )							// check wether element should be forced to zero
       return dcomplex( 0.0, 0.0 );
 #endif
-//#ifdef READIN
-//    //Return exact solution if available
-//   if (  W  >= -POS_BOS_VERT_COUNT_EXACT && W  <= POS_BOS_VERT_COUNT_EXACT &&
-//	 w_in  >= -POS_FERM_VERT_COUNT_EXACT && w_in  <= POS_FERM_VERT_COUNT_EXACT - 1 &&
-//	 w_out >= -POS_FERM_VERT_COUNT_EXACT && w_out <= POS_FERM_VERT_COUNT_EXACT - 1 )
-//      return genchi_exact_xph[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; 
-//#endif
+#ifdef READIN
+    //Return exact solution if available
+   if (  W  >= -POS_BOS_VERT_COUNT_EXACT_SMALL && W  <= POS_BOS_VERT_COUNT_EXACT_SMALL &&
+	 w_in  >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_in  <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 &&
+	 w_out >= -POS_FERM_VERT_COUNT_EXACT_SMALL && w_out <= POS_FERM_VERT_COUNT_EXACT_SMALL - 1 )
+      return genchi_exact_xph[W][w_in][w_out][K][k_in][k_out][s1_in][s2_in][s1_out][s2_out]; 
+#endif
    if((w_in == w_out) && (k_in == k_out) && (s1_in == s1_out) && (s2_in == s2_out)){
    
       return BETA*G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_out)*G(w_val(w_in+div2_ceil(W)),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(w_in+div2_ceil(W),add_k(K,k_in)))(s2_in,s2_out) + G(w_val(-div2_floor(W)+w_in),mom_grid[k_in].first,mom_grid[k_in].second,Lam,SigMat(-div2_floor(W)+w_in,k_in))(s1_in,s1_in)*G(w_val(w_out+div2_ceil(W)),mom_grid[add_k(K,k_out)].first,mom_grid[add_k(K,k_out)].second,Lam,SigMat(w_out+div2_ceil(W),add_k(K,k_out)))(s2_in,s2_in)*vertx_xph(W,w_in,w_out,K,k_in,k_out,s1_in,s2_in,s1_out,s2_out)* G(w_val(div2_ceil(W)+w_in),mom_grid[add_k(K,k_in)].first,mom_grid[add_k(K,k_in)].second,Lam,SigMat(div2_ceil(W)+w_in,add_k(K,k_in)))(s2_out,s2_out)*G(w_val(w_out-div2_floor(W)),mom_grid[k_out].first,mom_grid[k_out].second,Lam,SigMat(w_out-div2_floor(W),k_out))(s1_out,s1_out);

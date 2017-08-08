@@ -24,9 +24,10 @@ def run(command):
 
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
-#fname = "dat/dat_U1_Beta50_PFCB1000_PARQ_SU2_ED_DIVERGENT.h5"
-fname = "dat/dat_U1_Beta50_PFCB800_PARQ_SU2_SELFCON_new_version.h5" 
+#fname = "../../dat/dat_U1_Beta50_PFCB1000_PARQ_SU2_ED_DIVERGENT.h5"
+fname = "../../dat/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_ED_DIVERGENT.h5" 
 #fname = "dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB800_PARQ_SU2_SELFCON.h5"
+
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
 

@@ -166,7 +166,7 @@ dcomplex rhs_t::eval_diag_chi_pp( const idx_chi_t& idx, const state_t& state_vec
 		  			{
 					     // Particle particle channel
 						val += (state_vec.genchi_pp(W, w, wp, K, k, kp, s3, s4, s5p, s6p )
-						      +state_vec.genchi_pp(W, w, -wp -1-( W + 100000 ) % 2, K, k, kp, s3, s4, s5p, s6p ) + 
+						      +state_vec.genchi_pp(W, w, -wp -1, K, k, kp, s3, s4, s5p, s6p ) + 
 						      2*state_vec.genchi_0_pp(W, w, wp, K, k, kp, s3, s4, s5p, s6p))
 						     * weight_vec_2d[w][wp];  // Do not use 1d fitting here!!
 
@@ -422,6 +422,7 @@ void rhs_t::phi_pp_inverse( const state_t& state_vec, gf_phi_t& gf_phi_pp, const
 #endif
    for( int W = -POS_BFREQ_COUNT_PHI; W < POS_BFREQ_COUNT_PHI + 1; ++W )
    {
+      int POS_INV_RANGE = 8*POS_FERM_VERT_COUNT_EXACT;
       const int MAT_DIM = 2 * POS_INV_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT; 
 
       gf_mat_t gam_t( boost::extents[ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] ); 
@@ -508,6 +509,8 @@ void rhs_t::phi_ph_xph_inverse( const state_t& state_vec, gf_phi_t& gf_phi_ph, g
 #endif
    for( int W = -POS_BFREQ_COUNT_PHI; W < POS_BFREQ_COUNT_PHI + 1; ++W )
    {
+
+      int POS_INV_RANGE = 2*POS_FERM_VERT_COUNT_EXACT;	///< Amount of positive bosonic frequencies in P grid 
       const int MAT_DIM = 2 * POS_INV_RANGE * PATCH_COUNT * QN_COUNT * QN_COUNT; 
 
       gf_mat_t gam_m( boost::extents[ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT][ffreq(POS_INV_RANGE)][PATCH_COUNT][QN_COUNT][QN_COUNT] ); 

@@ -34,7 +34,6 @@ const int BFREQ_COUNT_PHI = 2 * POS_BFREQ_COUNT_PHI + 1;	///< Amount of bosonic 
 
 // ----- P dimensions
 
-//const int POS_FFREQ_COUNT_P = 2*COUNT;		        ///< Amount of positive fermionic frequencies in P grid
 #ifdef SELFCONSISTENCY
 const int POS_FFREQ_COUNT_P = 2 * COUNT; 
 #elif defined ONESHOT
@@ -43,7 +42,6 @@ const int POS_FFREQ_COUNT_P = 25;
 const int POS_FFREQ_COUNT_P = 120;
 #endif
 const int FFREQ_COUNT_P = 2 * POS_FFREQ_COUNT_P;		///< Amount of fermionic frequencies in P grid                                                                                   
-//const int POS_BFREQ_COUNT_P = 2*POS_BFREQ_COUNT_PHI;	///< Amount of positive bosonic frequencies in P grid 
 #ifdef SELFCONSISTENCY
 const int POS_BFREQ_COUNT_P = 3 * POS_FFREQ_COUNT_P / 2;
 #elif defined ONESHOT
@@ -59,11 +57,9 @@ const int POS_INT_RANGE = 2 * FFREQ_COUNT_SIG;
 #elif defined ONESHOT
 const int POS_INT_RANGE = COUNT;
 #else
-const int POS_INT_RANGE = 2 * POS_BFREQ_COUNT_P;		///< Positive range for internal integrations
+const int POS_INT_RANGE = 2 * FFREQ_COUNT_SIG;		///< Positive range for internal integrations
 #endif
-//const int POS_INT_RANGE = COUNT-1;
-const int TAIL_LENGTH = POS_INT_RANGE/5;
-//POS_INT_RANGE / 10; 			///< Length of tail used for fitting matsubara sum
+const int TAIL_LENGTH = POS_INT_RANGE/8;
 const int FIT_ORDER = 4; 					///< Fit tail function has exponents one lower than this constant
 
 // ----- chi dimensions
@@ -82,16 +78,16 @@ const int POS_1P_RANGE = POS_BFREQ_COUNT_CHI + POS_INT_RANGE; 	///< Positive ran
 
 // ----- Output ranges
 
-const int POS_PLOT_RANGE_PHI = 1.5* POS_FFREQ_COUNT_PHI; 	///< Amount of positive frequencies in phi output grid
+const int POS_PLOT_RANGE_PHI = 2* POS_FFREQ_COUNT_PHI; 	///< Amount of positive frequencies in phi output grid
 const int POS_PLOT_RANGE_VERT = 2*POS_PLOT_RANGE_PHI; 		///< Amount of positive frequencies in vertex output grid
 
 //------ Inversion ranges Bethe-Salpeter equations
 
-const int  POS_INV_RANGE = COUNT; 
-const int  POS_ASY_RANGE = 10 * POS_INV_RANGE;	 
+//const int  POS_INV_RANGE = COUNT; 
+const int  POS_ASY_RANGE = 3 * POS_INV_RANGE;	 
 
-const int TAIL_LENGTH_ASY = POS_ASY_RANGE/5;
-const int FIT_ORDER_ASY = 5; 					///< Fit tail function has exponents one lower than this constant
+const int TAIL_LENGTH_ASY = POS_ASY_RANGE/8;
+const int FIT_ORDER_ASY = 4; 					///< Fit tail function has exponents one lower than this constant
 
 #ifdef NO_MOMENTA
 const int PATCH_COUNT = 1;					///< Amount of k-patches
