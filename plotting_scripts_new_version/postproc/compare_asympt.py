@@ -42,9 +42,9 @@ most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
 #------COMPARISON METHOD 1 WITH AND WITHOUT CORRECTIONS -> CONVERGENCE WITH RESPECT TO THE INVERSION RANGE 
 
-fname1 = "../dat/dat_U1_Beta26_PFCB37_PARQ_SU2_METH1_INVR1xVERTR_ASYR10xINVR_1IT_NOWEIGHTS.h5"
-fname2 = "../dat/dat_U1_Beta26_PFCB150_PARQ_SU2_METH1_INVR1xVERTR_ASYR10xINVR.h5"
-fname3 = "../dat/dat_U1_Beta26_PFCB37_PARQ_SU2_METH1_INVR1xVERTR_ASYR10xINVR_1IT.h5"
+fname1 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB45_PARQ_SU2_METH2_INVR1xCOUNT_CORR_ED_ONESHOT.h5" 
+fname2 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_CORR_ED.h5" 
+fname3 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB90_PARQ_SU2_METH2_INVR1xCOUNT_CORR_SELFCON.h5"
 
 
 #------ DECIDE WHICH COMPARISON YOU WANT TO ANALYZE
@@ -87,13 +87,22 @@ shift=0
 
 #--------------------------------------GENERAL PLOT SETTINGS------------------------------------------
 
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
-#pl.rc('text', usetex=True)
-#pl.rc('text.latex', preamble='\usepackage{amsmath}')
+pl.rc('xtick', labelsize=10) 
+pl.rc('ytick', labelsize=10) 
+pl.rc('text', usetex=True)
+pl.rc('text.latex', preamble='\usepackage{amsmath}')
 
 RE = r"$\operatorname{Re}"
 IM = r"$\operatorname{Im}"
+
+
+def cm2inch(*tupl):
+    inch = 2.54
+    if isinstance(tupl[0], tuple):
+        return tuple(i/inch for i in tupl[0])
+    else:
+        return tuple(i/inch for i in tupl)
+
 
 
 #-------------------------------------P PLOTTING ------------------------------------------
@@ -147,119 +156,117 @@ Pgrid_3 = np.array([(1*n+1)*pi/BETA for n in range(-fdimo23,fdimo23)])
 Pgrid_plot = np.array([(2*n+1)*pi/BETA for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))])
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
-def plotP_axis( use_pl, arr1, arr2, arr3, string ):
+def plotP_axis( use_pl, arr1, arr2, arr3, string, legend ):
     zarr1 = np.array([ arr1[shift + (bdim1-1)/2,n,0,0,0,0,0,0] for n in range(fdim1)])
     zarr2 = np.array([ arr2[shift + (bdim2-1)/2,n,0,0,0,0,0,0] for n in range(fdim2)])
     zarr3 = np.array([ arr3[shift + (bdim3-1)/2,n,0,0,0,0,0,0] for n in range(fdim3)])
-    pl.plot( Pgrid_1, zarr1, marker = 'o', linestyle='-', color='r', ms=3, mew=0.2, label=r"NoW")
-    pl.plot( Pgrid_2, zarr2, marker = 'o',linestyle='-', color='b',ms=3, mew=0.2, label=r"SelfC")
-    pl.plot( Pgrid_3, zarr3, marker = 'o',linestyle='-', color='g', ms=3, mew=0.2, label=r"WithW")
+    pl.plot( Pgrid_1, zarr1,linestyle='None', marker = 'o',  color='r', ms=3, mew=0.3, label=r"Oneshot")
+    pl.plot( Pgrid_2, zarr2,linestyle='None', marker = 'd',  color='b', ms=3, mew=0.3, label=r"ED")
+    pl.plot( Pgrid_3, zarr3,linestyle='None', marker = 'x',  color='g', ms=3, mew=0.3, label=r"Selfcons")
     pl.xlim([min(Pgrid_plot),max(Pgrid_plot)])
-    use_pl.set_title( string , fontsize=10 )
-    pl.legend(prop={'size':5})
+    pl.xticks([ ])
+    use_pl.set_title( string , fontsize=12 )
+    if(legend):
+        pl.legend(prop={'size':7})
 
     return
 
 
 #--- Plot along \nu'=0 
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
 
-plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"P^{\nu, omega =0}_{s}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"P^{\nu, \omega =0}_{t}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"P^{\nu, \omega =0}_{d}$" )
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"P^{\nu,\omega =0}_{m}$" )
-pl.xlabel(r"$\nu$")
-
-pl.tight_layout()
-
-#--- Save to file
-pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 150)
-pl.figure(dpi=100) # Reset dpi to default
-pl.clf()
-
-shift=1
-
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
-
-plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"P^{\nu, omega =0}_{s}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"P^{\nu, \omega =0}_{t}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"P^{\nu, \omega =0}_{d}$" )
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"P^{\nu,\omega =0}_{m}$" )
-pl.xlabel(r"$\nu$")
+fig = pl.figure(figsize=cm2inch(18.0,6.0))
+plotP_axis( pl.subplot(1,3,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"\lambda^{\nu, \omega =0}_{s}$", False) # flip sign of w_out
+#plotP_axis( pl.subplot1331,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"\lambda^{\nu, \omega =0}_{t}$", True) # flip sign of w_out
+plotP_axis( pl.subplot(1,3,2), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"\lambda^{\nu, \omega =0}_{d}$",False )
+#pl.xlabel(r"$\nu$", fontsize=10)
+plotP_axis( pl.subplot(1,3,3), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"\lambda^{\nu,\omega =0}_{m}$",True )
+#pl.xlabel(r"$\nu$", fontsize=10)
 
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 150)
+pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 200)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=2
-
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
-
-plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"P^{\nu, omega =0}_{s}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"P^{\nu, \omega =0}_{t}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"P^{\nu, \omega =0}_{d}$" )
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"P^{\nu,\omega =0}_{m}$" )
-pl.xlabel(r"$\nu$")
-
-pl.tight_layout()
-
-#--- Save to file
-pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 150)
-pl.figure(dpi=100) # Reset dpi to default
-pl.clf()
-
-shift=4
-
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
-
-plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"P^{\nu, omega =0}_{s}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"P^{\nu, \omega =0}_{t}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"P^{\nu, \omega =0}_{d}$" )
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"P^{\nu,\omega =0}_{m}$" )
-pl.xlabel(r"$\nu$")
-
-pl.tight_layout()
-
-#--- Save to file
-pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 150)
-pl.figure(dpi=100) # Reset dpi to default
-pl.clf()
-
-shift=8
-
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
-
-plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"P^{\nu, omega =0}_{s}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"P^{\nu, \omega =0}_{t}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"P^{\nu, \omega =0}_{d}$" )
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"P^{\nu,\omega =0}_{m}$" )
-pl.xlabel(r"$\nu$")
-
-pl.tight_layout()
-
-#--- Save to file
-pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 150)
-pl.figure(dpi=100) # Reset dpi to default
-pl.clf()
+#shift=1
+#
+##pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+#
+#fig = pl.figure(figsize=cm2inch(12.0,12.0))
+#plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"\lambda^{\nu, \omega =0}_{s}$", False) # flip sign of w_out
+#plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"\lambda^{\nu, \omega =0}_{t}$", True) # flip sign of w_out
+#plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"\lambda^{\nu, \omega =0}_{d}$",False )
+#pl.xlabel(r"$\nu$", fontsize=10)
+#plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"\lambda^{\nu,\omega =0}_{m}$",False )
+#pl.xlabel(r"$\nu$", fontsize=10)
+#
+#pl.tight_layout()
+#
+##--- Save to file
+#pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 200)
+#pl.figure(dpi=100) # Reset dpi to default
+#pl.clf()
+#
+#shift=2
+#
+##pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+#
+#fig = pl.figure(figsize=cm2inch(12.0,12.0))
+#plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"\lambda^{\nu, \omega =0}_{s}$", False) # flip sign of w_out
+#plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"\lambda^{\nu, \omega =0}_{t}$", True) # flip sign of w_out
+#plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"\lambda^{\nu, \omega =0}_{d}$",False )
+#pl.xlabel(r"$\nu$", fontsize=10)
+#plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"\lambda^{\nu,\omega =0}_{m}$",False )
+#pl.xlabel(r"$\nu$", fontsize=10)
+#
+#pl.tight_layout()
+#
+##--- Save to file
+#pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 200)
+#pl.figure(dpi=100) # Reset dpi to default
+#pl.clf()
+#
+#shift=4
+#
+##pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+#
+#fig = pl.figure(figsize=cm2inch(12.0,12.0))
+#plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"\lambda^{\nu, \omega =0}_{s}$", False) # flip sign of w_out
+#plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"\lambda^{\nu, \omega =0}_{t}$", True) # flip sign of w_out
+#plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"\lambda^{\nu, \omega =0}_{d}$",False )
+#pl.xlabel(r"$\nu$", fontsize=10)
+#plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"\lambda^{\nu,\omega =0}_{m}$",False )
+#pl.xlabel(r"$\nu$", fontsize=10)
+#
+#pl.tight_layout()
+#
+##--- Save to file
+#pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 200)
+#pl.figure(dpi=100) # Reset dpi to default
+#pl.clf()
+#
+#shift=8
+#
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+#
+#plotP_axis( pl.subplot(2,2,1), reP_pp1 + reP_pp1, reP_pp2 + reP_pp2, reP_pp3 + reP_pp3, RE + r"\lambda^{\nu, \omega =8}_{s}$" , False) # flip sign of w_out
+#pl.xlabel(r"$\nu$")
+#plotP_axis( pl.subplot(2,2,2), reP_pp1 - reP_pp1, reP_pp2 - reP_pp2, reP_pp3 - reP_pp3, RE + r"\lambda^{\nu, \omega =8}_{t}$" ,True) # flip sign of w_out
+#pl.xlabel(r"$\nu$")
+#plotP_axis( pl.subplot(2,2,3), 2*reP_ph1 - reP_xph1, 2*reP_ph2 - reP_xph2, 2*reP_ph3 - reP_xph3, RE + r"\lambda^{\nu, \omega =8}_{d}$" , False)
+#pl.xlabel(r"$\nu$")
+#plotP_axis( pl.subplot(2,2,4), - reP_xph1, - reP_xph2, - reP_xph3, RE + r"\lambda^{\nu,\omega =8}_{m}$" , False)
+#pl.xlabel(r"$\nu$")
+#
+#pl.tight_layout()
+#
+##--- Save to file
+#pl.savefig("plots/P_comparison_Om="+str(shift)+".png", dpi = 150)
+#pl.figure(dpi=100) # Reset dpi to default
+#pl.clf()
 
 shift=0
 #-------------------------------------P PLOTTING DIFFERENCES WITH RESPECT TO THE FULL SELF-CONSISTENT CALCULATION ------------------------------------------
@@ -303,35 +310,36 @@ def diff_reP_xph3(W,w):
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
 
-def plotP_axis( use_pl, arr1, arr2, arr3, string ):
-    #pl.plot( Pgrid_plot, arr1, marker = 'o', linestyle='-', color='r', ms=3, mew=0.2, label=r"NoW")
-    pl.plot( Pgrid_plot, arr2, marker = 'o',linestyle='-', color='b',ms=3, mew=0.2, label=r"SelfC")
-    pl.plot( Pgrid_plot, arr3, marker = 'o',linestyle='-', color='g', ms=3, mew=0.2, label=r"WithW")
+def plotP_axis( use_pl, arr1, arr2, arr3, string,legend):
+    pl.plot( Pgrid_plot, arr1,linestyle = 'None', marker = 'o', color='r', ms=3, mew=0.5, label=r"Oneshot")
+    pl.plot( Pgrid_plot, arr2,linestyle = 'None', marker = 'd', color='b', ms=3, mew=0.5, label=r"ED")
+    pl.plot( Pgrid_plot, arr3,linestyle = 'None', marker = 'x', color='g', ms=3, mew=0.5, label=r"Selfcons")
     pl.xlim([min(Pgrid_plot),max(Pgrid_plot)])
-    use_pl.set_title( string , fontsize=10 )
-    pl.legend(prop={'size':5})
+    use_pl.set_title( string , fontsize=12 )
+    if(legend):
+        pl.legend(prop={'size':7})
 
     return
 
 #--- Plot along axis \nu'=0
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
-plotP_axis( pl.subplot(2,2,1), np.array([diff_reP_pp1(shift,n) + diff_reP_pp1(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([diff_reP_pp2(shift,n) + diff_reP_pp2(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([diff_reP_pp3(shift,n) + diff_reP_pp3(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), RE + r"P^{\nu, \omega =0}_{s}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,2), np.array([diff_reP_pp1(shift,n) - diff_reP_pp1(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([diff_reP_pp2(shift,n) - diff_reP_pp2(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([diff_reP_pp3(shift,n) - diff_reP_pp3(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), RE + r"P^{\nu, \omega =0}_{t}$" ) # flip sign of w_out
+fig = pl.figure(figsize=cm2inch(18.0,6.0))
+plotP_axis( pl.subplot(1,3,1), np.array([diff_reP_pp1(shift,n) + diff_reP_pp1(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([diff_reP_pp2(shift,n) + diff_reP_pp2(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([diff_reP_pp3(shift,n) + diff_reP_pp3(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), RE + r"\delta \lambda^{\nu, \omega =0}_{s}$", False ) # flip sign of w_out
+pl.xlabel(r"$\nu$", fontsize=10)
+#plotP_axis( pl.subplot(1,3,2), np.array([diff_reP_pp1(shift,n) - diff_reP_pp1(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([diff_reP_pp2(shift,n) - diff_reP_pp2(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([diff_reP_pp3(shift,n) - diff_reP_pp3(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), RE + r"\delta \lambda^{\nu, \omega =0}_{t}$", True) # flip sign of w_out
 
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,3), np.array([2*diff_reP_ph1(shift,n) - diff_reP_xph1(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([2*diff_reP_ph2(shift,n) - diff_reP_xph2(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([2*diff_reP_ph3(shift,n) - diff_reP_xph3(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), RE + r"P^{\nu, \omega =0}_{d}$" ) # flip sign of w_out
+plotP_axis( pl.subplot(1,3,2), np.array([2*diff_reP_ph1(shift,n) - diff_reP_xph1(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([2*diff_reP_ph2(shift,n) - diff_reP_xph2(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([2*diff_reP_ph3(shift,n) - diff_reP_xph3(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), RE + r"\delta \lambda^{\nu, \omega =0}_{d}$" , False) # flip sign of w_out
 
-pl.xlabel(r"$\nu$")
-plotP_axis( pl.subplot(2,2,4), np.array([- diff_reP_xph1(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([- diff_reP_xph2(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([ - diff_reP_xph3(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), RE + r"P^{\nu, \omega =0}_{m}$" ) # flip sign of w_out
+pl.xlabel(r"$\nu$", fontsize=10)
+plotP_axis( pl.subplot(1,3,3), np.array([- diff_reP_xph1(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([- diff_reP_xph2(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), np.array([ - diff_reP_xph3(shift,n) for n in range(-min(fdimo21,fdimo22,fdimo23),min(fdimo21,fdimo22,fdimo23))]), RE + r"\delta \lambda^{\nu, \omega =0}_{m}$" , False) # flip sign of w_out
 
-pl.xlabel(r"$\nu$")
+pl.xlabel(r"$\nu$", fontsize=10)
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/DeltaP_comparison_Om="+str(shift)+".png", dpi = 150)
+pl.savefig("plots/DeltaP_comparison_Om="+str(shift)+".png", dpi = 200)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -385,37 +393,38 @@ chigrid_3 = np.array([(2*n)*pi/BETA for n in range(-bdimo23,bdimo23+1)])
 chigrid_plot = np.array([(2*n)*pi/BETA for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)])
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
-def plotchi_axis( use_pl, arr1, arr2, arr3, string ):
+def plotchi_axis( use_pl, arr1, arr2, arr3, string,legend ):
     zarr1 = np.array([ arr1[n ,0,0,0,0,0] for n in range(bdim1)])
     zarr2 = np.array([ arr2[n ,0,0,0,0,0] for n in range(bdim2)])
     zarr3 = np.array([ arr3[n ,0,0,0,0,0] for n in range(bdim3)])
-    pl.plot( chigrid_1, zarr1, marker = 'o', linestyle='-', color='r', ms=3, mew=0.2, label=r"NoW")
-    pl.plot( chigrid_2, zarr2, marker = 'o',linestyle='-', color='b',ms=3, mew=0.2, label=r"SelfC")
-    pl.plot( chigrid_3, zarr3, marker = 'o',linestyle='-', color='g', ms=3, mew=0.2, label=r"WithW")
+    pl.plot( chigrid_1, zarr1, linestyle='None', marker = 'o',  color='r', ms=3, mew=0.5, label=r"Oneshot")
+    pl.plot( chigrid_2, zarr2, linestyle='None', marker = 'd',  color='b', ms=3, mew=0.5, label=r"ED")
+    pl.plot( chigrid_3, zarr3, linestyle='None', marker = 'x',  color='g', ms=3, mew=0.5, label=r"Selfcons")
     pl.xlim([min(chigrid_plot),max(chigrid_plot)])
-    use_pl.set_title( string , fontsize=10 )
-    pl.legend(prop={'size':5})
+    pl.xticks([ ])
+    use_pl.set_title( string , fontsize=12 )
+    if(legend):
+        pl.legend(prop={'size':7})
 
     return
 
 
 #--- Plot along \nu'=0 
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
 
-plotchi_axis( pl.subplot(2,2,1), rechi_pp1 + rechi_pp1, rechi_pp2 + rechi_pp2, rechi_pp3 + rechi_pp3, RE + r"\chi^{ omega}_{s}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotchi_axis( pl.subplot(2,2,2), rechi_pp1 - rechi_pp1, rechi_pp2 - rechi_pp2, rechi_pp3 - rechi_pp3, RE + r"\chi^{ \omega }_{t}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotchi_axis( pl.subplot(2,2,3), 2*rechi_ph1 - rechi_xph1, 2*rechi_ph2 - rechi_xph2, 2*rechi_ph3 - rechi_xph3, RE + r"chi^{ \omega }_{d}$" )
-pl.xlabel(r"$\nu$")
-plotchi_axis( pl.subplot(2,2,4), - rechi_xph1, - rechi_xph2, - rechi_xph3, RE + r"\chi^{\omega}_{m}$" )
-pl.xlabel(r"$\nu$")
+fig = pl.figure(figsize=cm2inch(18.0,6.0))
+plotchi_axis( pl.subplot(1,3,1), rechi_pp1 + rechi_pp1, rechi_pp2 + rechi_pp2, rechi_pp3 + rechi_pp3, RE + r"\chi^{ \omega}_{s}$", False ) # flip sign of w_out
+#plotchi_axis( pl.subplot(1,3,2), rechi_pp1 - rechi_pp1, rechi_pp2 - rechi_pp2, rechi_pp3 - rechi_pp3, RE + r"\chi^{ \omega }_{t}$", True ) # flip sign of w_out
+plotchi_axis( pl.subplot(1,3,2), 2*rechi_ph1 - rechi_xph1, 2*rechi_ph2 - rechi_xph2, 2*rechi_ph3 - rechi_xph3, RE + r"\chi^{ \omega }_{d}$" , False)
+#pl.xlabel(r"$\omega$", fontsize=10)
+plotchi_axis( pl.subplot(1,3,3), - rechi_xph1, - rechi_xph2, - rechi_xph3, RE + r"\chi^{\omega}_{m}$" , True)
+#pl.xlabel(r"$\omega$", fontsize=10)
 
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/chi_comparison.png", dpi = 150)
+pl.savefig("plots/chi_comparison.png", dpi = 200)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -460,32 +469,33 @@ def diff_rechi_xph3(W):
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
 
-def plotchi_axis( use_pl, arr1, arr2, arr3, string ):
-    #pl.plot( chigrid_plot, arr1, marker = 'o', linestyle='-', color='r', ms=3, mew=0.2, label=r"NoW")
-    pl.plot( chigrid_plot, arr2, marker = 'o',linestyle='-', color='b',ms=3, mew=0.2, label=r"SelfC")
-    pl.plot( chigrid_plot, arr3, marker = 'o',linestyle='-', color='g', ms=3, mew=0.2, label=r"WithW")
+def plotchi_axis( use_pl, arr1, arr2, arr3, string,legend ):
+    pl.plot( chigrid_plot, arr1,linestyle='None', marker = 'o', color='r', ms=3, mew=0.5, label=r"Oneshot")
+    pl.plot( chigrid_plot, arr2,linestyle='None', marker = 'd', color='b', ms=3, mew=0.5, label=r"ED")
+    pl.plot( chigrid_plot, arr3,linestyle='None', marker = 'x', color='g', ms=3, mew=0.5, label=r"Selfcons")
     pl.xlim([min(chigrid_plot),max(chigrid_plot)])
-    use_pl.set_title( string , fontsize=10 )
-    pl.legend(prop={'size':5})
+    use_pl.set_title( string , fontsize=12 )
+    if(legend):
+        pl.legend(prop={'size':7})
 
     return
 
 #--- Plot along axis \nu'=0
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"")
 
-plotchi_axis( pl.subplot(2,2,1), np.array([diff_rechi_pp1(n) + diff_rechi_pp1(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([diff_rechi_pp2(n) + diff_rechi_pp2(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([diff_rechi_pp3(n) + diff_rechi_pp3(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), RE + r"\chi^{ \omega}_{s}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotchi_axis( pl.subplot(2,2,2), np.array([diff_rechi_pp1(n) - diff_rechi_pp1(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([diff_rechi_pp2(n) - diff_rechi_pp2(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([diff_rechi_pp3(n) - diff_rechi_pp3(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), RE + r"\chi^{ \omega}_{t}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotchi_axis( pl.subplot(2,2,3), np.array([2*diff_rechi_ph1(n) - diff_rechi_xph1(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([2*diff_rechi_ph2(n) - diff_rechi_xph2(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([2*diff_rechi_ph3(n) - diff_rechi_xph3(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), RE + r"\chi^{\omega}_{d}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
-plotchi_axis( pl.subplot(2,2,4), np.array([ - diff_rechi_xph1(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([- diff_rechi_xph2(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([ - diff_rechi_xph3(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), RE + r"\chi^{\omega}_{m}$" ) # flip sign of w_out
-pl.xlabel(r"$\nu$")
+fig = pl.figure(figsize=cm2inch(18.0,6.0))
+plotchi_axis( pl.subplot(1,3,1), np.array([diff_rechi_pp1(n) + diff_rechi_pp1(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([diff_rechi_pp2(n) + diff_rechi_pp2(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([diff_rechi_pp3(n) + diff_rechi_pp3(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), RE + r"\delta \chi^{ \omega}_{s}$", False ) # flip sign of w_out
+pl.xlabel(r"$\omega$", fontsize=10)
+#plotchi_axis( pl.subplot(1,3,2), np.array([diff_rechi_pp1(n) - diff_rechi_pp1(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([diff_rechi_pp2(n) - diff_rechi_pp2(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([diff_rechi_pp3(n) - diff_rechi_pp3(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), RE + r"\delta \chi^{ \omega}_{t}$", True) # flip sign of w_out
+plotchi_axis( pl.subplot(1,3,2), np.array([2*diff_rechi_ph1(n) - diff_rechi_xph1(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([2*diff_rechi_ph2(n) - diff_rechi_xph2(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([2*diff_rechi_ph3(n) - diff_rechi_xph3(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), RE + r"\delta \chi^{\omega}_{d}$" , False) # flip sign of w_out
+pl.xlabel(r"$\omega$", fontsize=10)
+plotchi_axis( pl.subplot(1,3,3), np.array([ - diff_rechi_xph1(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([- diff_rechi_xph2(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), np.array([ - diff_rechi_xph3(n) for n in range(-min(bdimo21,bdimo22,bdimo23),min(bdimo21,bdimo22,bdimo23)+1)]), RE + r"\delta \chi^{\omega}_{m}$" , False) # flip sign of w_out
+pl.xlabel(r"$\omega$", fontsize=10)
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/Deltachi_comparison.png", dpi = 150)
+pl.savefig("plots/Deltachi_comparison.png", dpi = 200)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 

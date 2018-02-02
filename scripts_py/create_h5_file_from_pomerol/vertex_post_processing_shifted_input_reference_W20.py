@@ -44,12 +44,12 @@ from _functools import partial
 
 #---------------------------------------------------------------------------------
 
-U=2.5
+U=1.0
 MU= 0.0 # half-filling
 BETA=50.0
 
-FFREQ = 60 #fermionic frequencies in the mixed notation
-BFREQ = 90 #bosonic frequency transfer in the mixed notation
+FFREQ = 120 #fermionic frequencies in the mixed notation
+BFREQ = 20   #bosonic frequency transfer in the mixed notation
 
 CHI_BFREQ_ED = 1000
 TRI_FFREQ_ED = 210 
@@ -72,10 +72,10 @@ def run(command):
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
-if ('/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/U2p5/PREPROC/U'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5'):
-    os.system('rm -r /home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/U2p5/PREPROC/U_'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5')
+if ('/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/reference_U1_W20/PREPROC/U'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5'):
+    os.system('rm -r /home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/reference_U1_W20/PREPROC/U_'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5')
 
-f = h5py.File('/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/U2p5/PREPROC/U_'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5', 'w')   # Create the datafile.h5
+f = h5py.File('/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/reference_U1_W20/PREPROC/U_'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5', 'w')   # Create the datafile.h5
 
 #---------------------------------------------------------------------------------
 #GF
@@ -117,7 +117,7 @@ f.create_dataset('Sig/fgrid', data=fgrid_arr, dtype='float64', compression="gzip
 #---------------------------------------------------------------------------------------------------------
 #--------------------------------------- 2PGF PP------------------------------------------------------------
 
-twopgf_updo = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_pp_shift.dat')
+twopgf_updo = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_pp_shift_W20.dat')
 print twopgf_updo.shape
 ffreq_pp = FFREQ
 #int(0.5*(np.transpose(twopgf_updo)[1,:].max()*BETA/pi))+1
@@ -128,30 +128,33 @@ print bfreq_pp
 
 
 def re_2pgf_updo_pp(wb,wf,wf1):
-	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 3]
+    if(wb == 20):
+        return 	twopgf_updo[(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 3]
 
 def re_2pgf_upup_pp(wb,wf,wf1):
-	return 	re_2pgf_updo_pp(wb,wf,wf1)-re_2pgf_updo_pp(wb,wf,-wf1-1)
+    if(wb == 20):
+        return 	re_2pgf_updo_pp(wb,wf,wf1)-re_2pgf_updo_pp(wb,wf,-wf1-1)
 
 def im_2pgf_updo_pp(wb,wf,wf1):
-	return 	twopgf_updo[(2*ffreq_pp)*(2*ffreq_pp)*(wb+bfreq_pp)+(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 4]
+    if(wb ==20):
+        return 	twopgf_updo[(2*ffreq_pp)*(wf+ffreq_pp)+ (wf1+ffreq_pp), 4]
 
 def im_2pgf_upup_pp(wb,wf,wf1):
-
-	return 	im_2pgf_updo_pp(wb,wf,wf1)-im_2pgf_updo_pp(wb,wf,-wf1-1)
+    if(wb == 20):
+        return 	im_2pgf_updo_pp(wb,wf,wf1)-im_2pgf_updo_pp(wb,wf,-wf1-1)
 
 # ----------define arrays to store in hdf5 file
 
-re_2pgf_arr_upup_pp = np.array([[[[[[[[[[re_2pgf_upup_pp(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+re_2pgf_arr_upup_pp = np.array([[[[[[[[[[re_2pgf_upup_pp(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-im_2pgf_arr_upup_pp = np.array([[[[[[[[[[im_2pgf_upup_pp(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range (0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+im_2pgf_arr_upup_pp = np.array([[[[[[[[[[im_2pgf_upup_pp(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range (0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-re_2pgf_arr_updo_pp = np.array([[[[[[[[[[re_2pgf_updo_pp(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)] for ip in range (0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+re_2pgf_arr_updo_pp = np.array([[[[[[[[[[re_2pgf_updo_pp(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)] for ip in range (0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-im_2pgf_arr_updo_pp = np.array([[[[[[[[[[im_2pgf_updo_pp(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range (0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+im_2pgf_arr_updo_pp = np.array([[[[[[[[[[im_2pgf_updo_pp(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range (0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
 fgrid_arr_pp = np.array([(2*m +1)*pi/BETA for m in range (-ffreq_pp,ffreq_pp)])
-bgrid_arr_pp = np.array([(2*n)*pi/BETA for n in range (-bfreq_pp,bfreq_pp+1)])
+bgrid_arr_pp = np.array([(2*n)*pi/BETA for n in range (bfreq_pp,bfreq_pp+1)])
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
@@ -188,13 +191,13 @@ def chi_t_pp(wb,wf,wf1):
 
 # ----------define arrays to store in hdf5 file
 
-re_chi_arr_upup_pp = np.array([[[[[[[[[[chi_upup_pp(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+re_chi_arr_upup_pp = np.array([[[[[[[[[[chi_upup_pp(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-im_chi_arr_upup_pp = np.array([[[[[[[[[[chi_upup_pp(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+im_chi_arr_upup_pp = np.array([[[[[[[[[[chi_upup_pp(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-re_chi_arr_updo_pp = np.array([[[[[[[[[[chi_updo_pp(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+re_chi_arr_updo_pp = np.array([[[[[[[[[[chi_updo_pp(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-im_chi_arr_updo_pp = np.array([[[[[[[[[[chi_updo_pp(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+im_chi_arr_updo_pp = np.array([[[[[[[[[[chi_updo_pp(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
@@ -225,13 +228,13 @@ def f_updo_pp(wb,wf,wf1):
 
 # ----------define arrays to store in hdf5 file
 
-re_f_arr_upup_pp = np.array([[[[[[[[[[f_upup_pp(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+re_f_arr_upup_pp = np.array([[[[[[[[[[f_upup_pp(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-im_f_arr_upup_pp = np.array([[[[[[[[[[f_upup_pp(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+im_f_arr_upup_pp = np.array([[[[[[[[[[f_upup_pp(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-re_f_arr_updo_pp = np.array([[[[[[[[[[f_updo_pp(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+re_f_arr_updo_pp = np.array([[[[[[[[[[f_updo_pp(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
-im_f_arr_updo_pp = np.array([[[[[[[[[[f_updo_pp(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (-bfreq_pp,bfreq_pp+1)] )
+im_f_arr_updo_pp = np.array([[[[[[[[[[f_updo_pp(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_pp,ffreq_pp)] for m in range (bfreq_pp,bfreq_pp+1)] )
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
@@ -250,8 +253,8 @@ f.create_dataset('VERT/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compressio
 
 #--------------------------------------- 2PGF PH------------------------------------------------------------
 
-twopgf_updo_ph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_ph_shift.dat')
-twopgf_updo_xph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_xph_shift.dat')
+twopgf_updo_ph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_ph_shift_W20.dat')
+twopgf_updo_xph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_xph_shift_W20.dat')
 ffreq_ph = FFREQ 
 #int(0.5*(np.transpose(twopgf_updo_ph_l)[1,:].max()*BETA/pi-1))+1
 print ffreq_ph
@@ -260,29 +263,33 @@ bfreq_ph = BFREQ
 print bfreq_ph
 
 def re_2pgf_upup_ph(wb,wf,wf1):
-	return 	twopgf_updo_ph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 3]-twopgf_updo_xph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 3]
+    if(wb==20):
+        return 	twopgf_updo_ph_l[(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 3]-twopgf_updo_xph_l[(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 3]
 
 def re_2pgf_updo_ph(wb,wf,wf1):
-	return 	twopgf_updo_ph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 3]
+    if(wb == 20):
+        return 	twopgf_updo_ph_l[(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 3]
 
 def im_2pgf_upup_ph(wb,wf,wf1):
-	return 	twopgf_updo_ph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 4]-twopgf_updo_xph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 4]
+    if(wb == 20):
+        return 	twopgf_updo_ph_l[(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 4]-twopgf_updo_xph_l[(2*ffreq_ph)*(wf+ffreq_ph) + (wf1+ffreq_ph), 4]
 
 def im_2pgf_updo_ph(wb,wf,wf1):
-	return 	twopgf_updo_ph_l[(2*ffreq_ph)*(2*ffreq_ph)*(wb+bfreq_ph)+(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 4]
+    if(wb == 20):
+        return 	twopgf_updo_ph_l[(2*ffreq_ph)*(wf+ffreq_ph)+ (wf1+ffreq_ph), 4]
 
 # ----------define arrays to store in hdf5 file
 
-re_2pgf_arr_upup_ph = np.array([[[[[[[[[[re_2pgf_upup_ph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+re_2pgf_arr_upup_ph = np.array([[[[[[[[[[re_2pgf_upup_ph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-im_2pgf_arr_upup_ph = np.array([[[[[[[[[[im_2pgf_upup_ph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+im_2pgf_arr_upup_ph = np.array([[[[[[[[[[im_2pgf_upup_ph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-re_2pgf_arr_updo_ph = np.array([[[[[[[[[[re_2pgf_updo_ph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+re_2pgf_arr_updo_ph = np.array([[[[[[[[[[re_2pgf_updo_ph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-im_2pgf_arr_updo_ph = np.array([[[[[[[[[[im_2pgf_updo_ph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+im_2pgf_arr_updo_ph = np.array([[[[[[[[[[im_2pgf_updo_ph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
 fgrid_arr_ph = np.array([(2*m +1)*pi/BETA for m in range (-ffreq_ph,ffreq_ph)])
-bgrid_arr_ph = np.array([(2*n)*pi/BETA for n in range (-bfreq_ph,bfreq_ph+1)])
+bgrid_arr_ph = np.array([(2*n)*pi/BETA for n in range (bfreq_ph,bfreq_ph+1)])
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
@@ -317,13 +324,13 @@ def tpgf_m_ph(wb,wf,wf1):
 
 # ----------define arrays to store in hdf5 file
 
-re_chi_arr_upup_ph = np.array([[[[[[[[[[chi_upup_ph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+re_chi_arr_upup_ph = np.array([[[[[[[[[[chi_upup_ph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-im_chi_arr_upup_ph = np.array([[[[[[[[[[chi_upup_ph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+im_chi_arr_upup_ph = np.array([[[[[[[[[[chi_upup_ph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-re_chi_arr_updo_ph = np.array([[[[[[[[[[chi_updo_ph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+re_chi_arr_updo_ph = np.array([[[[[[[[[[chi_updo_ph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-im_chi_arr_updo_ph = np.array([[[[[[[[[[chi_updo_ph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+im_chi_arr_updo_ph = np.array([[[[[[[[[[chi_updo_ph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_ph,ffreq_ph )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
@@ -355,13 +362,13 @@ def f_updo_ph(wb,wf,wf1):
 
 # ----------define arrays to store in hdf5 file
 
-re_f_arr_upup_ph = np.array([[[[[[[[[[f_upup_ph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+re_f_arr_upup_ph = np.array([[[[[[[[[[f_upup_ph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-im_f_arr_upup_ph = np.array([[[[[[[[[[f_upup_ph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+im_f_arr_upup_ph = np.array([[[[[[[[[[f_upup_ph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-re_f_arr_updo_ph = np.array([[[[[[[[[[f_updo_ph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+re_f_arr_updo_ph = np.array([[[[[[[[[[f_updo_ph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
-im_f_arr_updo_ph = np.array([[[[[[[[[[f_updo_ph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (-bfreq_ph,bfreq_ph+1)] )
+im_f_arr_updo_ph = np.array([[[[[[[[[[f_updo_ph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_pp,ffreq_pp )] for n in range (-ffreq_ph,ffreq_ph)] for m in range (bfreq_ph,bfreq_ph+1)] )
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
@@ -387,29 +394,33 @@ bfreq_xph = BFREQ
 print bfreq_xph
 
 def re_2pgf_upup_xph(wb,wf,wf1):
-    return 	twopgf_updo_xph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 3]-twopgf_updo_ph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 3]
+    if(wb == 20):
+        return 	twopgf_updo_xph_l[(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 3]-twopgf_updo_ph_l[(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 3]
 
 def re_2pgf_updo_xph(wb,wf,wf1):
-	return 	twopgf_updo_xph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 3]
+    if(wb == 20):
+        return 	twopgf_updo_xph_l[(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 3]
 
 def im_2pgf_upup_xph(wb,wf,wf1):
-	return  twopgf_updo_xph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 4]-twopgf_updo_ph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 4]
+    if(wb == 20):
+	return  twopgf_updo_xph_l[(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 4]-twopgf_updo_ph_l[(2*ffreq_xph)*(wf+ffreq_xph) + (wf1+ffreq_xph), 4]
 
 def im_2pgf_updo_xph(wb,wf,wf1):
-	return 	 twopgf_updo_xph_l[(2*ffreq_xph)*(2*ffreq_xph)*(wb+bfreq_xph)+(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 4]
+    if(wb == 20):
+        return 	 twopgf_updo_xph_l[(2*ffreq_xph)*(wf+ffreq_xph)+ (wf1+ffreq_xph), 4]
 
 # ----------define arrays to store in hdf5 file
 
-re_2pgf_arr_upup_xph = np.array([[[[[[[[[[re_2pgf_upup_xph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+re_2pgf_arr_upup_xph = np.array([[[[[[[[[[re_2pgf_upup_xph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-im_2pgf_arr_upup_xph = np.array([[[[[[[[[[im_2pgf_upup_xph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+im_2pgf_arr_upup_xph = np.array([[[[[[[[[[im_2pgf_upup_xph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-re_2pgf_arr_updo_xph = np.array([[[[[[[[[[re_2pgf_updo_xph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+re_2pgf_arr_updo_xph = np.array([[[[[[[[[[re_2pgf_updo_xph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-im_2pgf_arr_updo_xph = np.array([[[[[[[[[[im_2pgf_updo_xph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+im_2pgf_arr_updo_xph = np.array([[[[[[[[[[im_2pgf_updo_xph(m,n,p) for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
 fgrid_arr_xph = np.array([(2*m +1)*pi/BETA for m in range (-ffreq_xph,ffreq_xph)])
-bgrid_arr_xph = np.array([(2*n)*pi/BETA for n in range (-bfreq_xph,bfreq_xph+1)])
+bgrid_arr_xph = np.array([(2*n)*pi/BETA for n in range (bfreq_xph,bfreq_xph+1)])
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
@@ -435,13 +446,13 @@ def chi_updo_xph(wb,wf,wf1):
 
 # ----------define arrays to store in hdf5 file
 
-re_chi_arr_upup_xph = np.array([[[[[[[[[[chi_upup_xph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+re_chi_arr_upup_xph = np.array([[[[[[[[[[chi_upup_xph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-im_chi_arr_upup_xph = np.array([[[[[[[[[[chi_upup_xph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+im_chi_arr_upup_xph = np.array([[[[[[[[[[chi_upup_xph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-re_chi_arr_updo_xph = np.array([[[[[[[[[[chi_updo_xph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+re_chi_arr_updo_xph = np.array([[[[[[[[[[chi_updo_xph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-im_chi_arr_updo_xph = np.array([[[[[[[[[[chi_updo_xph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+im_chi_arr_updo_xph = np.array([[[[[[[[[[chi_updo_xph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 f.create_dataset('GENCHI/XPH/RE_GENCHI_UPUP', data=re_chi_arr_upup_xph, dtype='float64', compression="gzip", compression_opts=4)
@@ -471,13 +482,13 @@ def f_updo_xph(wb,wf,wf1):
 
 # ----------define arrays to store in hdf5 file
 
-re_f_arr_upup_xph = np.array([[[[[[[[[[f_upup_xph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+re_f_arr_upup_xph = np.array([[[[[[[[[[f_upup_xph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-im_f_arr_upup_xph = np.array([[[[[[[[[[f_upup_xph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+im_f_arr_upup_xph = np.array([[[[[[[[[[f_upup_xph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-re_f_arr_updo_xph = np.array([[[[[[[[[[f_updo_xph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+re_f_arr_updo_xph = np.array([[[[[[[[[[f_updo_xph(m,n,p).real for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
-im_f_arr_updo_xph = np.array([[[[[[[[[[f_updo_xph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (-bfreq_xph,bfreq_xph+1)] )
+im_f_arr_updo_xph = np.array([[[[[[[[[[f_updo_xph(m,n,p).imag for i in range (0,QN_COUNT)] for j in range (0,QN_COUNT)]for ip in range(0,QN_COUNT)] for jp in range (0,QN_COUNT)] for q in range (0,PATCH_COUNT)] for k in range (0,PATCH_COUNT)] for kp in range (0,PATCH_COUNT)] for p in range (-ffreq_xph,ffreq_xph )] for n in range (-ffreq_xph,ffreq_xph)] for m in range (bfreq_xph,bfreq_xph+1)] )
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
@@ -501,7 +512,7 @@ f.create_dataset('VERT/XPH/bgrid', data=bgrid_arr_xph, dtype='float64', compress
 
 #----------------------------- CHI PP PH XPH -----------------------------
 
-chi = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/chi_asympt')
+#chi = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/chi_asympt')
 
 bfreq_pp = CHI_BFREQ_ED
 print bfreq_pp
@@ -509,39 +520,51 @@ print bfreq_pp
 
 def re_chi_updo_pp(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 5]/BETA/BETA
+        #return U*U*chi[wb, 5]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 5]/BETA/BETA 
+        #return U*U*chi[-wb, 5]/BETA/BETA 
+        return 0.0; 
 
 def im_chi_updo_pp(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 6]/BETA/BETA
+        #return U*U*chi[wb, 6]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 6]/BETA/BETA
+        #return U*U*chi[-wb, 6]/BETA/BETA
+        return 0.0; 
 
 def re_chi_updo_ph(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 3]/BETA/BETA
+        #return U*U*chi[wb, 3]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 3]/BETA/BETA 
+        #return U*U*chi[-wb, 3]/BETA/BETA 
+        return 0.0; 
 
 def im_chi_updo_ph(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 4]/BETA/BETA
+        #return U*U*chi[wb, 4]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 4]/BETA/BETA
+        #return U*U*chi[-wb, 4]/BETA/BETA
+        return 0.0; 
 
 def re_chi_upup_ph(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 1]/BETA/BETA
+        #return U*U*chi[wb, 1]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 1]/BETA/BETA 
+        #return U*U*chi[-wb, 1]/BETA/BETA 
+        return 0.0; 
 
 def im_chi_upup_ph(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 2]/BETA/BETA
+        #return U*U*chi[wb, 2]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 2]/BETA/BETA
+        #return U*U*chi[-wb, 2]/BETA/BETA
+        return 0.0; 
 
 # ----------define arrays to store in hdf5 file -> FROM HERE OBJECT IN THE SHIFTED NOTATION!!
 
@@ -600,7 +623,7 @@ f.create_dataset('CHI/XPH/bgrid', data=bgrid_arr_ph, dtype='float64', compressio
 
 #----------------------------- TRILEG PP -----------------------------
 
-trileg_pp = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/trileg_pp.dat')
+#trileg_pp = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/trileg_pp.dat')
 
 ffreq_pp = TRI_FFREQ_ED
 print ffreq_pp
@@ -609,13 +632,15 @@ print bfreq_pp
 
 
 def re_trileg_updo_pp(wb,wf):
-	return 	-U*(trileg_pp[(2*ffreq_pp)*(wb+bfreq_pp) + (wf+ffreq_pp), 2] - 1) - re_chi_updo_pp(wb)
+	#return 	-U*(trileg_pp[(2*ffreq_pp)*(wb+bfreq_pp) + (wf+ffreq_pp), 2] - 1) - re_chi_updo_pp(wb)
+        return 0.0; 
 
 def re_trileg_upup_pp(wb,wf):
 	return 	0.0
 
 def im_trileg_updo_pp(wb,wf):
-	return 	-U*(trileg_pp[(2*ffreq_pp)*(wb+bfreq_pp)+ (wf+ffreq_pp), 3] - 1) - im_chi_updo_pp(wb) 
+	#return 	-U*(trileg_pp[(2*ffreq_pp)*(wb+bfreq_pp)+ (wf+ffreq_pp), 3] - 1) - im_chi_updo_pp(wb) 
+        return 0.0; 
 
 def im_trileg_upup_pp(wb,wf):
 	return 	0.0
@@ -649,7 +674,7 @@ f.create_dataset('TRILEG/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compress
 #
 #---------------------------------------------------------------------------------------
 
-trileg_ph = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/trileg.dat')
+#trileg_ph = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/trileg.dat')
 
 ffreq_ph = TRI_FFREQ_ED
 print ffreq_ph
@@ -658,16 +683,20 @@ print bfreq_ph
 
 
 def re_trileg_updo_ph(wb,wf):
-	return 	U*(trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph) + (wf+ffreq_ph), 2] + 1) - re_chi_updo_ph(wb) 
+	#return 	U*(trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph) + (wf+ffreq_ph), 2] + 1) - re_chi_updo_ph(wb) 
+        return 0.0; 
 
 def re_trileg_upup_ph(wb,wf):
-	return 	U*trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph) + (wf+ffreq_ph), 4] - re_chi_upup_ph(wb) 
+	#return 	U*trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph) + (wf+ffreq_ph), 4] - re_chi_upup_ph(wb) 
+        return 0.0; 
 
 def im_trileg_updo_ph(wb,wf):
-	return 	U*(trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph)+ (wf+ffreq_ph), 3] + 1) - im_chi_updo_ph(wb)
+	#return 	U*(trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph)+ (wf+ffreq_ph), 3] + 1) - im_chi_updo_ph(wb)
+        return 0.0; 
 
 def im_trileg_upup_ph(wb,wf):
-	return U*trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph)+ (wf+ffreq_ph), 5] - im_chi_upup_ph(wb)
+	#return U*trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph)+ (wf+ffreq_ph), 5] - im_chi_upup_ph(wb)
+        return 0.0; 
 
 # ----------define arrays to store in hdf5 file -> FROM HERE OBJECT IN THE SHIFTED NOTATION!!
 

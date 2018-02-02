@@ -17,11 +17,13 @@ const double PI = 3.14159265358979323846; 			///< PI
 const double LN_10 = 2.30258509299;				///< Natural log of 10
 
 const int REDU = 0; 
-const int COUNT = 50-REDU; 
+const int COUNT = 60-REDU; 
+//const int COUNT = 120-REDU; 
 
 // ----- SE dimensions
 
-const int POS_FFREQ_COUNT_SIG = 200;				///< Amount of positive frequencies in self-energy grid
+const int POS_FFREQ_COUNT_SIG = 240;				///< Amount of positive frequencies in self-energy grid
+//const int POS_FFREQ_COUNT_SIG = 480;				///< Amount of positive frequencies in self-energy grid
 const int FFREQ_COUNT_SIG = 2 * POS_FFREQ_COUNT_SIG;		///< Amount of frequencies in self-energy grid
 
 // ----- phi dimensions
@@ -29,45 +31,53 @@ const int FFREQ_COUNT_SIG = 2 * POS_FFREQ_COUNT_SIG;		///< Amount of frequencies
 const int POS_FFREQ_COUNT_PHI = COUNT;				///< Amount of positive fermionic frequencies in phi grid 
 const int FFREQ_COUNT_PHI = 2 * POS_FFREQ_COUNT_PHI;		///< Amount of fermionic frequencies in phi grid
 
-const int POS_BFREQ_COUNT_PHI = 75-REDU;			 	///< Amount of positive bosonic frequencies in phi grid 
+//const int POS_BFREQ_COUNT_PHI = 0;			 	///< Amount of positive bosonic frequencies in phi grid 
+const int POS_BFREQ_COUNT_PHI = 90-REDU;			 	///< Amount of positive bosonic frequencies in phi grid 
 const int BFREQ_COUNT_PHI = 2 * POS_BFREQ_COUNT_PHI + 1;	///< Amount of bosonic frequencies in phi grid
 
 // ----- P dimensions
 
 #ifdef SELFCONSISTENCY
-const int POS_FFREQ_COUNT_P = 2 * COUNT; 
+//const int POS_FFREQ_COUNT_P = 2 * COUNT; 
+const int POS_FFREQ_COUNT_P = COUNT; 
 #elif defined ONESHOT
-const int POS_FFREQ_COUNT_P = 25;
+//const int POS_FFREQ_COUNT_P = 30;
+const int POS_FFREQ_COUNT_P = 60;
 #else
 const int POS_FFREQ_COUNT_P = 120;
+//const int POS_FFREQ_COUNT_P = 2 * COUNT; 
 #endif
 const int FFREQ_COUNT_P = 2 * POS_FFREQ_COUNT_P;		///< Amount of fermionic frequencies in P grid                                                                                   
 #ifdef SELFCONSISTENCY
-const int POS_BFREQ_COUNT_P = 3 * POS_FFREQ_COUNT_P / 2;
+//const int POS_BFREQ_COUNT_P = 2 * POS_BFREQ_COUNT_PHI;
+const int POS_BFREQ_COUNT_P =  POS_BFREQ_COUNT_PHI;
 #elif defined ONESHOT
 const int POS_BFREQ_COUNT_P = POS_FFREQ_COUNT_P / 2;
 #else
 const int POS_BFREQ_COUNT_P = 180;
+//const int POS_BFREQ_COUNT_P = 2 * POS_BFREQ_COUNT_PHI;
 #endif
 const int BFREQ_COUNT_P = 2 * POS_BFREQ_COUNT_P + 1;		///< Amount of bosonic frequencies in P grid
 
 // ----- internal integration range and green function grid
 #ifdef SELFCONSISTENCY 
-const int POS_INT_RANGE = 2 * FFREQ_COUNT_SIG;
+const int POS_INT_RANGE = 2 * POS_BFREQ_COUNT_P;
 #elif defined ONESHOT
 const int POS_INT_RANGE = COUNT;
 #else
-const int POS_INT_RANGE = 2 * FFREQ_COUNT_SIG;		///< Positive range for internal integrations
+const int POS_INT_RANGE = 4 * POS_BFREQ_COUNT_P;
+//const int POS_INT_RANGE = 2 * FFREQ_COUNT_SIG;		///< Positive range for internal integrations
 #endif
 const int TAIL_LENGTH = POS_INT_RANGE/8;
 const int FIT_ORDER = 4; 					///< Fit tail function has exponents one lower than this constant
 
 // ----- chi dimensions
 #ifdef SELFCONSISTENCY 
-const int POS_BFREQ_COUNT_CHI =  POS_INT_RANGE;
+const int POS_BFREQ_COUNT_CHI =  POS_BFREQ_COUNT_P;
 #elif defined ONESHOT
 const int POS_BFREQ_COUNT_CHI = POS_BFREQ_COUNT_PHI/2;
 #else 
+//const int POS_BFREQ_COUNT_CHI =  POS_BFREQ_COUNT_P;
 const int POS_BFREQ_COUNT_CHI = 1000; 		///< Amount of positive bosonic frequencies in chi grid
 #endif
 const int BFREQ_COUNT_CHI = 2 * POS_BFREQ_COUNT_CHI + 1;	///< Amount of bosonic frequencies in chi grid
@@ -78,15 +88,15 @@ const int POS_1P_RANGE = POS_BFREQ_COUNT_CHI + POS_INT_RANGE; 	///< Positive ran
 
 // ----- Output ranges
 
-const int POS_PLOT_RANGE_PHI = 2* POS_FFREQ_COUNT_PHI; 	///< Amount of positive frequencies in phi output grid
-const int POS_PLOT_RANGE_VERT = 2*POS_PLOT_RANGE_PHI; 		///< Amount of positive frequencies in vertex output grid
+const int POS_PLOT_RANGE_PHI =  1.5*POS_FFREQ_COUNT_PHI; 	///< Amount of positive frequencies in phi output grid
+const int POS_PLOT_RANGE_VERT = POS_PLOT_RANGE_PHI; 		///< Amount of positive frequencies in vertex output grid
 
 //------ Inversion ranges Bethe-Salpeter equations
 
-//const int  POS_INV_RANGE = COUNT; 
-const int  POS_ASY_RANGE = 3 * POS_INV_RANGE;	 
+const int  POS_INV_RANGE = COUNT; 
+const int  POS_ASY_RANGE = 10 * POS_INV_RANGE;	 
 
-const int TAIL_LENGTH_ASY = POS_ASY_RANGE/8;
+const int TAIL_LENGTH_ASY = POS_ASY_RANGE/10;
 const int FIT_ORDER_ASY = 4; 					///< Fit tail function has exponents one lower than this constant
 
 #ifdef NO_MOMENTA
@@ -102,7 +112,7 @@ const int QN_COUNT = 1;						///< Amount of possible tuples of the discrete quan
 
 const double ERR_ABS = 1e-8;		///< Absolute error for ODE routines
 const double ERR_REL = 1e-6;		///< Relative error for ODE routines
-const double MAX_COUPLING = 1e+3; 	///< If this coupling is exceeded in the vertex function the ODE solver will abort
+const double MAX_COUPLING = 1e+4; 	///< If this coupling is exceeded in the vertex function the ODE solver will abort
 
 #define 	ERR_STEPPER 		runge_kutta_cash_karp54
 const std::string ERR_STEPPER_STRING( "runge_kutta_cash_karp54" ); 

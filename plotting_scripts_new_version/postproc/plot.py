@@ -3,6 +3,7 @@
 #--------------------------------------IMPORTS ------------------------------------------
 
 import h5py
+from matplotlib.font_manager import FontProperties
 import matplotlib.pyplot as pl
 import numpy as np
 import os
@@ -25,8 +26,9 @@ def run(command):
 most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
 #fname = "../../dat/dat_U1_Beta50_PFCB1000_PARQ_SU2_ED_DIVERGENT.h5"
-fname = "../../dat/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_ED_DIVERGENT.h5" 
-#fname = "dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB800_PARQ_SU2_SELFCON.h5"
+#fname = "../../dat/dat_U1_Beta50_PFCB37_PARQ_SU2_METH2_INVR1xCOUNT_ED_ONESHOT.h5" 
+#fname = "../../dat/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_W0_CORR_ED.h5" 
+fname = "../../dat/H5FILES/BETA50/4SITES/U2p5/POSTPROC/dat_U2p5_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_CORR_ED.h5"
 
 if len(sys.argv) > 1:
     fname = str(sys.argv[1])
@@ -63,11 +65,21 @@ PHI =   parVals[6]
 shift=0
 
 #--------------------------------------GENERAL PLOT SETTINGS------------------------------------------
+#font0 = FontProperties()
+#font = font0.copy()
+#font.set_style('italic')
+#font.set_weight('bold')
+#font.set_size('medium')
 
-pl.rc('xtick', labelsize=9) 
-pl.rc('ytick', labelsize=9) 
-#pl.rc('text', usetex=True)
-#pl.rc('text.latex', preamble='\usepackage{amsmath}')
+pl.rc('font', family='normal')
+pl.rc('font', style='normal')
+pl.rc('font', weight='normal')
+pl.rc('font', size=20)
+pl.rc('text', usetex=True)
+pl.rc('xtick', labelsize=20) 
+pl.rc('ytick', labelsize=20) 
+pl.rc('text', usetex=True)
+pl.rc('text.latex', preamble='\usepackage{amsmath}')
 
 RE = r"$\operatorname{Re}"
 IM = r"$\operatorname{Im}"
@@ -86,18 +98,21 @@ fdim = resig.shape[0]
 
 
 #--- Helper functions
+fig = pl.figure(figsize=(16, 5))
+
 def plotSig( use_pl, arr, string ):
     pl.plot( siggrid, arr[:,0,0,0], 'bx', ms=3, mew=0.2)
     pl.xlim([min(siggrid),max(siggrid)])
     use_pl.set_title(string)
     return
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS))
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS),  y=1.08)
 
 #--- Plot physical
-plotSig( pl.subplot(2,2,1), resig, RE + "\Sigma(i\omega)$" ) 
-plotSig( pl.subplot(2,2,2), imsig, IM + "\Sigma(i\omega)$" ) 
-
+plotSig( pl.subplot(1,2,1), resig, RE + "\Sigma(i\omega)$" ) 
+pl.xlabel(r"$\omega_n$")
+plotSig( pl.subplot(1,2,2), imsig, IM + "\Sigma(i\omega)$" ) 
+pl.xlabel(r"$\omega_n$")
 pl.tight_layout()
 
 #--- Save to file
@@ -118,18 +133,20 @@ fdim = reGiw.shape[0]
 
 
 #--- Helper functions
+
+fig = pl.figure(figsize=(16, 5))
 def plotGiw( use_pl, arr, string ):
     pl.plot( Giwgrid, arr[:,0,0,0], 'bx', ms=3, mew=0.2)
     pl.xlim([min(Giwgrid),max(Giwgrid)])
     use_pl.set_title(string)
     return
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS))
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS))
 
 #--- Plot physical
-plotGiw( pl.subplot(2,2,1), reGiw, RE + "G(i\omega)$" ) 
+plotGiw( pl.subplot(1,2,1), reGiw, RE + "G(i\omega)$" ) 
 pl.xlabel(r"$\omega_n$")
-plotGiw( pl.subplot(2,2,2), imGiw, IM + "G(i\omega)$" ) 
+plotGiw( pl.subplot(1,2,2), imGiw, IM + "G(i\omega)$" ) 
 pl.xlabel(r"$\omega_n$")
 
 pl.tight_layout()
@@ -191,53 +208,54 @@ def ImVertUpUp( w1, w2, w1p ):
     return ImVertUpDown( w1, w2, w1p ) - ImVertUpDown( w1, w2, w1+w2-w1p)
 
 
+fig = pl.figure(figsize=(24, 18))
 def plotVert( use_pl, zarr, string ):
     use_pl.set_aspect(1.0)
-    pl.pcolormesh( vertgrid, vertgrid, np.ma.masked_where( np.isnan(zarr), zarr ) )
+    pl.pcolormesh( vertgrid, vertgrid, np.ma.masked_where( np.isnan(zarr), zarr ), cmap=pl.cm.jet )
     pl.ylim([min(vertgrid),max(vertgrid)])
     pl.xlim([min(vertgrid),max(vertgrid)])
-    use_pl.set_title( string , fontsize=10)
+    use_pl.set_title( string , fontsize=20)
     pl.colorbar(shrink=0.6) 
     return
 
 def plotUpUpVertRePP( use_pl ):
-    title = RE + "\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
+    title = RE + r"\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
     zarr = np.array([[ ReVertUpUp(n,shift+neg(n),shift+neg(m)) for n in range(fdim)] for m in range(fdim)])
     plotVert( use_pl, zarr, title )
     return
 
 def plotUpDownVertRePP( use_pl ):
-    title = RE + "\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
+    title = RE + r"\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{PP}-\omega_n,\omega_m)$"
     zarr = np.array([[ ReVertUpDown(n,shift+neg(n),shift+neg(m)) for n in range(fdim)] for m in range(fdim)])
     plotVert( use_pl, zarr, title )
     return
 
 def plotUpUpVertRePH( use_pl ):
-    title = RE + "\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{PH}+\omega_m,\Omega_{PH}+\omega_n)$"
+    title = RE + r"\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{PH}+\omega_m,\Omega_{PH}+\omega_n)$"
     zarr = np.array([[ ReVertUpUp(n,m+shift,n+shift) for n in range(fdim)] for m in range(fdim)])
     plotVert( use_pl, zarr, title )
     return
 
 def plotUpDownVertRePH( use_pl ):
-    title = RE + "\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{PH}+\omega_m,\Omega_{PH}+\omega_n)$"
+    title = RE + r"\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{PH}+\omega_m,\Omega_{PH}+\omega_n)$"
     zarr = np.array([[ ReVertUpDown(n,m+shift,n+shift) for n in range(fdim)] for m in range(fdim)])
     plotVert( use_pl, zarr, title )
     return
 
 def plotUpUpVertReXPH( use_pl ):
-    title = RE + "\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{XPH}+\omega_m,\omega_m)$"
+    title = RE + r"\gamma_{2,\uparrow\uparrow}(\omega_n,\Omega_{XPH}+\omega_m,\omega_m)$"
     zarr = np.array([[ ReVertUpUp(n,m+shift,m) for n in range(fdim)] for m in range(fdim)])
     plotVert( use_pl, zarr, title )
     return
 
 def plotUpDownVertReXPH( use_pl ):
-    title = RE + "\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{XPH}+\omega_m,\omega_m)$"
+    title = RE + r"\gamma_{2,\uparrow\downarrow}(\omega_n,\Omega_{XPH}+\omega_m,\omega_m)$"
     zarr = np.array([[ ReVertUpDown(n,m+shift,m) for n in range(fdim)] for m in range(fdim)])
     plotVert( use_pl, zarr, title )
     return
 
 #--- Plot
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
 
 plotUpUpVertRePP( pl.subplot(2,3,1) )
 pl.ylabel(r"$\omega_m$")
@@ -257,10 +275,11 @@ pl.savefig("plots/Vert.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=6
+shift=0
 
+fig = pl.figure(figsize=(24, 18))
 #--- Plot
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\gamma_{2}(\omega_1,\omega_2,\omega_1')$")
 
 #--- Plot Physical
 plotUpUpVertRePP( pl.subplot(2,3,1) )
@@ -275,11 +294,10 @@ plotUpDownVertRePH( pl.subplot(2,3,5) )
 pl.xlabel(r"$\omega_n$")
 plotUpDownVertReXPH( pl.subplot(2,3,6) )
 pl.xlabel(r"$\omega_n$")
-
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/Vert_shift.png", dpi = 150)
+pl.savefig("plots/Vert_shift_"+str(shift)+".png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -343,12 +361,14 @@ def ImLambdaUpUp( w1, w2, w1p ):
     return ImLambdaUpDown( w1, w2, w1p ) - ImLambdaUpDown( w2, w1, w1p )
 
 
+fig = pl.figure(figsize=(24, 18))
+
 def plotLambda( use_pl, zarr, string ):
     use_pl.set_aspect(1.0)
-    pl.pcolormesh( lambdagrid, lambdagrid, np.ma.masked_where( np.isnan(zarr), zarr ) )
+    pl.pcolormesh( lambdagrid, lambdagrid, np.ma.masked_where( np.isnan(zarr), zarr ), cmap=pl.cm.jet)
     pl.ylim([min(lambdagrid),max(lambdagrid)])
     pl.xlim([min(lambdagrid),max(lambdagrid)])
-    use_pl.set_title( string , fontsize=10)
+    use_pl.set_title( string , fontsize=20)
     pl.colorbar(shrink=0.6) 
     return
 
@@ -390,7 +410,7 @@ def plotUpDownLambdaRePHX( use_pl ):
 
 
 #--- plot
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\Lambda(\omega_1,\omega_2,\omega_1')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\Lambda(\omega_1,\omega_2,\omega_1')$")
 
 plotUpUpLambdaRePP( pl.subplot(2,3,1) )
 pl.ylabel(r"$\omega_m$")
@@ -405,7 +425,6 @@ plotUpDownLambdaRePHX( pl.subplot(2,3,6) )
 pl.xlabel(r"$\omega_n$")
 pl.tight_layout()
 
-shift=6
 
 #--- Save to file
 pl.savefig("plots/Lambda.png", dpi = 150)
@@ -413,7 +432,11 @@ pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
 #--- plot
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\Lambda(\omega_1,\omega_2,\omega_1')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega_{\rm PP}=\Omega_{\rm PH}=\Omega_{\rm xPH}=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\Lambda(\omega_1,\omega_2,\omega_1')$")
+
+shift=0
+
+fig = pl.figure(figsize=(24, 18))
 
 plotUpUpLambdaRePP( pl.subplot(2,3,1) )
 pl.ylabel(r"$\omega_m$")
@@ -429,7 +452,7 @@ pl.xlabel(r"$\omega_n$")
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/Lambda_shift.png", dpi = 150)
+pl.savefig("plots/Lambda_shift="+str(shift)+".png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -450,21 +473,23 @@ imgenchi_xph = vert_mul * np.array(f["/genchi_func/IM_XPH"])
 bdim = regenchi_pp.shape[0]
 fdim = regenchi_pp.shape[1]
 
-genchigrid = np.array(f["/genchi_func/fgrid"])
+genchigrid = np.array([(2*i+1)*pi/BETA for i in range(-fdim/2, fdim/2)])
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+
+fig = pl.figure(figsize=(24, 18))
 def plotgenchi( use_pl, arr, string ):
     use_pl.set_aspect(1.0)
     zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
-    pl.pcolormesh( genchigrid, genchigrid, zarr )
+    pl.pcolormesh( genchigrid, genchigrid, zarr,cmap=pl.cm.jet )
     pl.ylim([min(genchigrid),max(genchigrid)])
     pl.xlim([min(genchigrid),max(genchigrid)])
-    use_pl.set_title( string , fontsize=10 )
+    use_pl.set_title( string , fontsize=20 )
     pl.colorbar(shrink=0.6) 
     return
 
 #--- Plot 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
 
 plotgenchi( pl.subplot(2,3,1), regenchi_pp - regenchi_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\chi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -489,10 +514,11 @@ pl.savefig("plots/genchi.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=65
+shift=0
 
+fig = pl.figure(figsize=(24, 18))
 #--- Plot
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
 
 plotgenchi( pl.subplot(2,3,1), regenchi_pp - regenchi_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -513,7 +539,7 @@ pl.xlabel(r"$\omega$")
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/genchi_shift.png", dpi = 150)
+pl.savefig("plots/genchi_shift_"+str(shift)+".png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -537,18 +563,20 @@ fdim = revert_pp.shape[1]
 vertgrid = np.array(f["/vert_func/fgrid"])
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+
+fig = pl.figure(figsize=(24, 18))
 def plotvert( use_pl, arr, string ):
     use_pl.set_aspect(1.0)
     zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
-    pl.pcolormesh( vertgrid, vertgrid, zarr )
+    pl.pcolormesh( vertgrid, vertgrid, zarr,cmap=pl.cm.jet )
     pl.ylim([min(vertgrid),max(vertgrid)])
     pl.xlim([min(vertgrid),max(vertgrid)])
-    use_pl.set_title( string , fontsize=10 )
+    use_pl.set_title( string , fontsize=20 )
     pl.colorbar(shrink=0.6) 
     return
 
 #--- Plot 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
 
 plotvert( pl.subplot(2,3,1), revert_pp - revert_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -573,10 +601,11 @@ pl.savefig("plots/vert.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=6
+shift=0
+fig = pl.figure(figsize=(24, 18))
 
 #--- Plot
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $F(\Omega,\omega,\omega')$")
 
 plotvert( pl.subplot(2,3,1), revert_pp - revert_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -597,7 +626,7 @@ pl.xlabel(r"$\omega$")
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/vert_shift.png", dpi = 150)
+pl.savefig("plots/vert_shift_"+str(shift)+".png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -628,27 +657,30 @@ def rephi_pp_updo( W, w, wp, K, k, kp , s1, s2, s3, s4 ):
     return rephi_pp[W,w,wp,K,k,kp,s1,s2,s3,s4]
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+
+
+fig = pl.figure(figsize=(24, 18))
 def plotphi( use_pl, arr, string ):
     use_pl.set_aspect(1.0)
     zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
-    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.pcolormesh( phigrid, phigrid, zarr,cmap=pl.cm.jet )
     pl.ylim([min(phigrid),max(phigrid)])
     pl.xlim([min(phigrid),max(phigrid)])
-    use_pl.set_title( string , fontsize=10 )
+    use_pl.set_title( string , fontsize=20 )
     pl.colorbar(shrink=0.6) 
     return
 
 def plotphiupup( use_pl, string ):
     use_pl.set_aspect(1.0)
     zarr = np.array([[ rephi_pp_updo(shift + (bdim-1)/2,n+fdim/2,m+fdim/2,0,0,0,0,0,0,0)-rephi_pp_updo(shift + (bdim-1)/2,n+fdim/2,-m-1+fdim/2,0,0,0,0,0,0,0) for n in range(-fdimo2,fdimo2)] for m in range(-fdimo2,fdimo2)])
-    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.pcolormesh( phigrid, phigrid, zarr,cmap=pl.cm.jet )
     pl.ylim([min(phigrid),max(phigrid)])
     pl.xlim([min(phigrid),max(phigrid)])
-    use_pl.set_title( string , fontsize=10 )
+    use_pl.set_title( string , fontsize=20 )
     pl.colorbar(shrink=0.6) 
     return
 #--- Plot 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
 plotphiupup( pl.subplot(2,3,1), RE + r"\phi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -673,10 +705,11 @@ pl.savefig("plots/phi.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=6
+shift=0
+fig = pl.figure(figsize=(24, 18))
 
 #--- Plot
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
 plotphiupup( pl.subplot(2,3,1),  RE + r"\phi^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -697,7 +730,7 @@ pl.xlabel(r"$\omega$")
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/phi_shift.png", dpi = 150)
+pl.savefig("plots/phi_shift_"+str(shift)+".png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -728,27 +761,29 @@ def regamma_pp_updo( W, w, wp, K, k, kp , s1, s2, s3, s4 ):
     return regamma_pp[W,w,wp,K,k,kp,s1,s2,s3,s4]
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+
+fig = pl.figure(figsize=(24, 18))
 def plotgamma( use_pl, arr, string ):
     use_pl.set_aspect(1.0)
     zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
-    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.pcolormesh( phigrid, phigrid, zarr, cmap=pl.cm.jet )
     pl.ylim([min(phigrid),max(phigrid)])
     pl.xlim([min(phigrid),max(phigrid)])
-    use_pl.set_title( string , fontsize=10 )
+    use_pl.set_title( string , fontsize=20 )
     pl.colorbar(shrink=0.6) 
     return
 
 def plotgammaupup( use_pl, string ):
     use_pl.set_aspect(1.0)
-    zarr = np.array([[ regamma_pp_updo(shift + (bdim-1)/2,n+fdim/2,m+fdim/2,0,0,0,0,0,0,0)-regamma_pp_updo(shift + (bdim-1)/2,n+fdim/2,-m-1-mymod_abs(shift + (bdim-1)/2)+fdim/2,0,0,0,0,0,0,0) for n in range(-fdimo2,fdimo2)] for m in range(-fdimo2,fdimo2)])
-    pl.pcolormesh( phigrid, phigrid, zarr )
+    zarr = np.array([[ regamma_pp_updo(shift + (bdim-1)/2,n+fdim/2,m+fdim/2,0,0,0,0,0,0,0)-regamma_pp_updo(shift + (bdim-1)/2,n+fdim/2,-m-1+fdim/2,0,0,0,0,0,0,0) for n in range(-fdimo2,fdimo2)] for m in range(-fdimo2,fdimo2)])
+    pl.pcolormesh( phigrid, phigrid, zarr,cmap=pl.cm.jet )
     pl.ylim([min(phigrid),max(phigrid)])
     pl.xlim([min(phigrid),max(phigrid)])
-    use_pl.set_title( string , fontsize=10 )
+    use_pl.set_title( string , fontsize=20 )
     pl.colorbar(shrink=0.6) 
     return
 #--- Plot 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
 plotgammaupup( pl.subplot(2,3,1), RE + r"\Gamma^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -773,9 +808,10 @@ pl.savefig("plots/gamma.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=20
+shift=0
+fig = pl.figure(figsize=(24, 18))
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $\phi(\Omega,\omega,\omega')$")
 
 plotgammaupup( pl.subplot(2,3,1), RE + r"\Gamma^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -796,7 +832,7 @@ pl.xlabel(r"$\omega$")
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/gamma_shift.png", dpi = 150)
+pl.savefig("plots/gamma_shift_"+str(shift)+".png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -806,18 +842,20 @@ shift=0
 print("Plotting gamma spin-diagonalized...")
 
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
+
+fig = pl.figure(figsize=(18, 20))
 def plotgamma( use_pl, arr, string ):
     use_pl.set_aspect(1.0)
     zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
-    pl.pcolormesh( phigrid, phigrid, zarr )
+    pl.pcolormesh( phigrid, phigrid, zarr,cmap=pl.cm.jet )
     pl.ylim([min(phigrid),max(phigrid)])
     pl.xlim([min(phigrid),max(phigrid)])
-    use_pl.set_title( string , fontsize=10 )
+    use_pl.set_title( string , fontsize=20 )
     pl.colorbar(shrink=0.6) 
     return
 
 #--- Plot 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
 
 plotgamma( pl.subplot(2,2,1),regamma_pp + regamma_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu, \nu', \omega =0}_{s}$" ) # flip sign of w_out
 pl.ylabel(r"$\nu'$")
@@ -835,9 +873,10 @@ pl.savefig("plots/gamma_spindiag.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=20
+shift=0
+fig = pl.figure(figsize=(18, 20))
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$")
 
 plotgamma( pl.subplot(2,2,1),regamma_pp + regamma_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu, \nu', \omega =0}_{s}$" ) # flip sign of w_out
 pl.ylabel(r"$\nu'$")
@@ -853,7 +892,7 @@ pl.tight_layout()
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/gamma_spindiag_shift.png", dpi = 150)
+pl.savefig("plots/gamma_spindiag_shift_"+str(shift)+".png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 #--------------------------------------Chi PLOTTING ------------------------------------------
@@ -874,13 +913,14 @@ fdim_bos = bosgrid.shape[0]
 x_range_fact = 1.0
 
 #--- Helper functions
+fig = pl.figure(figsize=(24, 18))
 def plotchi( use_pl, arr, title ):
     pl.plot(bosgrid, arr[:,0,0,0,0,0], 'b-', ms=3, mew=0.2)
     pl.xlim([x_range_fact*min(bosgrid),x_range_fact*max(bosgrid)])
     use_pl.set_title(title)
     return
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) + "  BEPs ")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) + "  BEPs ")
 
 plotchi( pl.subplot(2,3,1), rechi_pp - rechi_pp, RE + r"\chi^{PP}_{\uparrow\uparrow}$" )
 plotchi( pl.subplot(2,3,2), rechi_ph - rechi_xph, RE + r"\chi^{PH}_{\uparrow\uparrow}$" )
@@ -919,6 +959,8 @@ Pgrid = np.array(f["/P_func/fgrid"])
 x_range_fact = 1.0
 
 #--- Helper functions
+fig = pl.figure(figsize=(24, 18))
+
 def plotP_Omega( W, arr, color ):
     pl.plot(Pgrid + (W % 2) * math.pi/BETA, arr[W + (bdim-1)/2,:,0,0,0,0,0,0], color, ms=3, mew=0.2, label=r"$\Omega=" + str(W*2) + r"\pi/\beta$")
 
@@ -928,15 +970,15 @@ def plotP( use_pl, arr, title, legend ):
     plotP_Omega( 2, arr, 'b-' ) 
     plotP_Omega( 8, arr, 'c-' ) 
     plotP_Omega( 16, arr, 'm-' ) 
-    #plotP_Omega( 32, arr, 'y-' ) 
+    plotP_Omega( 32, arr, 'y-' ) 
     pl.xlim([x_range_fact*min(Pgrid),x_range_fact*max(Pgrid)])
     if ( legend ):
-        pl.legend(prop={'size':7})
+        pl.legend(prop={'size':13})
 
     use_pl.set_title(title)
     return
 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) + "  BEPs ")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) + "  BEPs ")
 
 plotP( pl.subplot(2,3,1), reP_pp - reP_pp, RE + r"P^{PP}_{\uparrow\uparrow}$", True )
 plotP( pl.subplot(2,3,2), reP_ph - reP_xph, RE + r"P^{PH}_{\uparrow\uparrow}$", False )
@@ -973,19 +1015,20 @@ fdim = reR_pp.shape[1]
 Rgrid = np.array(f["/R_func/fgrid"])
 
 #---  Helper functions 
+fig = pl.figure(figsize=(24, 18))
 def plotR( use_pl, arr, string ):
     use_pl.set_aspect(1.0)
     zarr = np.array([[ arr[shift + (bdim-1)/2,n,m,0,0,0,0,0,0,0] for n in range(fdim)] for m in range(fdim)])
-    pl.pcolormesh( Rgrid, Rgrid, zarr )
+    pl.pcolormesh( Rgrid, Rgrid, zarr,cmap=pl.cm.jet )
     pl.ylim([min(Rgrid),max(Rgrid)])
     pl.xlim([min(Rgrid),max(Rgrid)])
-    use_pl.set_title( string , fontsize=10 )
+    use_pl.set_title( string , fontsize=20 )
     pl.colorbar(shrink=0.6) 
     return
 
 
 #--- Plot 
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $R(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $R(\Omega,\omega,\omega')$")
 
 plotR( pl.subplot(2,3,1), reR_pp - reR_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"R^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
 pl.ylabel(r"$\omega'$")
@@ -1010,10 +1053,11 @@ pl.savefig("plots/R.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
-shift=6
+shift=0
+fig = pl.figure(figsize=(24, 18))
 
 #--- Plot
-pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $R(\Omega,\omega,\omega')$")
+#pl.suptitle(r"$U=$" + str(UINT) + r"     $\beta=$" + str(BETA) + r"     $\epsilon=$" + str(EPS) +  r"     $\Omega=$" + str(shift) + r"$*2\pi/\beta$" + r"     Notation: $R(\Omega,\omega,\omega')$")
 
 
 plotR( pl.subplot(2,3,1), reR_pp - reR_pp[:,:,::-1,:,:,:,:,:,:,:], RE + r"R^{PP}_{\uparrow\uparrow}(\Omega_{PP},\omega,\omega')$" ) # flip sign of w_out
@@ -1035,7 +1079,7 @@ pl.xlabel(r"$\omega$")
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/R_shift.png", dpi = 150)
+pl.savefig("plots/R_shift_"+str(shift)+".png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 

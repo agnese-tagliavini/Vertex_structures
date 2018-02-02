@@ -30,8 +30,8 @@ CFLAGS += -D COMPRESS #						Compress HDF5 datafile
 
 #----Choose if input file to read
 CFLAGS += -D READIN
-CFLAGS += -D ONESHOT 
-
+#CFLAGS += -D ONESHOT 
+#CFLAGS += -D EDASYMPT
 #----Specify if you want to remove parallelization (TODO:remove -fopenmp, -lmpi, OPENMP)
 #CFLAG += -DSINGLETHREADED
 
@@ -45,12 +45,12 @@ CFLAGS += -D INT_FLOW #			Interaction Flow
 #CFLAGS += -D SELFCONSISTENCY
 
 #------Choose if you want to perform the Inversion of the Bethe-Salpeter Equations
-#CFLAGS += -D INVERSE_BSE
+CFLAGS += -D INVERSE_BSE
 
 #------Choose which method for the inversion of the Bethe-Salpeter Equations
-#CFLAGS += -D METHOD2 #Agnese's method
+CFLAGS += -D METHOD2 #Agnese's method
 #CFLAGS += -D METHOD1 #Stefan's method
-
+#CFLAGS += -D CORRECTIONS
 #--------------------------------------Compiler settings------------------------------------------
 
 CFLAGS += -std=c++11 -D OPENMP -fopenmp #			General compiler flags
@@ -61,7 +61,8 @@ RUNFLAGS := -O3 #						Compiler flags for quick compile and run
 OPTIMIZEFLAGS := -flto -march=native -O3 #			GCC Compiler flags for optimal speed
 #OPTIMIZEFLAGS := -O3 -fp-model fast=2 -xHost # -no-prec-div #	Intel Compiler flags for optimal speed
 H5LIB := $(shell h5c++ -show|cut -d ' ' -f2-) #			HDF5 libraries
-LIB := -lgsl -lgslcblas -lm $(H5LIB) -fopenmp -lmpi #		Library flags
+LIB := -lgsl -lgslcblas -lm $(H5LIB) -fopenmp 
+#-lmpi #		Library flags
 INC := -I include #						Additional include paths
 INC += -I /usr/include/eigen3 		#Additional include paths
 INC += -I /usr/include/hdf5/serial/ #Additional include paths

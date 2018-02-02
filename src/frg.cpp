@@ -22,8 +22,10 @@ using namespace std;
 
 #ifdef READIN
 
-const int POS_FERM_VERT_COUNT_EXACT = 50;
-const int POS_BOS_VERT_COUNT_EXACT = 75;
+const int POS_FERM_VERT_COUNT_EXACT = 60;
+const int POS_BOS_VERT_COUNT_EXACT = 90;
+//const int POS_FERM_VERT_COUNT_EXACT = 120;
+//const int POS_BOS_VERT_COUNT_EXACT = 0;
 
 const int POS_FERM_VERT_COUNT_EXACT_SMALL = POS_FERM_VERT_COUNT_EXACT-REDU;
 const int POS_BOS_VERT_COUNT_EXACT_SMALL  = POS_BOS_VERT_COUNT_EXACT-REDU;
@@ -33,14 +35,14 @@ const int POS_BOS_P_COUNT_EXACT = 180;
 
 const int POS_BOS_CHI_COUNT_EXACT = 1000;
 
-gf_phi_t vert_exact_pp(POS_FERM_VERT_COUNT_EXACT_SMALL, POS_BOS_VERT_COUNT_EXACT_SMALL); 
-gf_phi_t vert_exact_ph(POS_FERM_VERT_COUNT_EXACT_SMALL, POS_BOS_VERT_COUNT_EXACT_SMALL);
-gf_phi_t vert_exact_xph(POS_FERM_VERT_COUNT_EXACT_SMALL, POS_BOS_VERT_COUNT_EXACT_SMALL);
+gf_phi_t vert_exact_pp(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT); 
+gf_phi_t vert_exact_ph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
+gf_phi_t vert_exact_xph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
 
 
-gf_phi_t genchi_exact_pp(POS_FERM_VERT_COUNT_EXACT_SMALL, POS_BOS_VERT_COUNT_EXACT_SMALL); 
-gf_phi_t genchi_exact_ph(POS_FERM_VERT_COUNT_EXACT_SMALL, POS_BOS_VERT_COUNT_EXACT_SMALL);
-gf_phi_t genchi_exact_xph(POS_FERM_VERT_COUNT_EXACT_SMALL, POS_BOS_VERT_COUNT_EXACT_SMALL);
+gf_phi_t genchi_exact_pp(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT); 
+gf_phi_t genchi_exact_ph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
+gf_phi_t genchi_exact_xph(POS_FERM_VERT_COUNT_EXACT, POS_BOS_VERT_COUNT_EXACT);
 
 gf_P_t P_exact_pp(POS_FERM_P_COUNT_EXACT, POS_BOS_P_COUNT_EXACT); 
 gf_P_t P_exact_ph(POS_FERM_P_COUNT_EXACT, POS_BOS_P_COUNT_EXACT);
@@ -51,13 +53,15 @@ gf_chi_t chi_exact_pp( POS_BOS_CHI_COUNT_EXACT);
 gf_chi_t chi_exact_ph( POS_BOS_CHI_COUNT_EXACT);
 gf_chi_t chi_exact_xph(POS_BOS_CHI_COUNT_EXACT);
 
-const int POS_SIG_COUNT_EXACT = 200; 
+const int POS_SIG_COUNT_EXACT = 240; 
+//const int POS_SIG_COUNT_EXACT = 480; 
 gf_1p_t Sig_exact(POS_SIG_COUNT_EXACT); 
 
 void read_exact()
 {
    using namespace H5;
-   H5File input_file( "dat/H5FILES/BETA50/4SITES/U1/PREPROC/U_1.0_BETA_50.0_FFREQ_50_BFREQ_75.h5", H5F_ACC_RDONLY );
+   H5File input_file( "dat/H5FILES/BETA50/4SITES/U1p75/PREPROC/U_1.75_BETA_50.0_FFREQ_60_BFREQ_90.h5", H5F_ACC_RDONLY );
+   //H5File input_file_1("dat/H5FILES/BETA50/4SITES/U1/PREPROC/U_1.0_BETA_50.0_FFREQ_60_BFREQ_90.h5", H5F_ACC_RDONLY );
    cout << "Got file" << endl;
 
    Group vert_group =  input_file.openGroup("/VERT");
@@ -283,8 +287,7 @@ dcomplex P_pp_init( const idx_P_t& idx ) // initial values for P function
 #elif defined ONESHOT
    return 0.0;
 #else
-   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
-      if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
+   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) && (idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_pp[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
    else
       return dcomplex(0.0,0.0); 
@@ -298,8 +301,7 @@ dcomplex P_ph_init( const idx_P_t& idx ) // initial values for P function
 #elif defined ONESHOT
    return 0.0;
 #else
-   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
-      if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
+   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT)  && (idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_ph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
    else
       return dcomplex(0.0,0.0); 
@@ -313,8 +315,7 @@ dcomplex P_xph_init( const idx_P_t& idx ) // initial values for P function
 #elif defined ONESHOT
    return 0.0;
 #else
-   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT) )
-      if ((idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
+   if ((idx(0) >= -POS_BOS_P_COUNT_EXACT) && (idx(0) <= POS_BOS_P_COUNT_EXACT)  && (idx(1) >= -POS_FERM_P_COUNT_EXACT) && (idx(1) <= POS_FERM_P_COUNT_EXACT - 1) ) 
       return P_exact_xph[idx(0)][idx(1)][idx(2)][idx(3)][idx(4)][idx(5)][idx(6)][idx(7)]; 
    else
       return dcomplex(0.0,0.0); 

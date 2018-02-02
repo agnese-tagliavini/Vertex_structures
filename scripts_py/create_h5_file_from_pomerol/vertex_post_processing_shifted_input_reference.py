@@ -44,12 +44,12 @@ from _functools import partial
 
 #---------------------------------------------------------------------------------
 
-U=2.5
+U=1.0
 MU= 0.0 # half-filling
 BETA=50.0
 
-FFREQ = 60 #fermionic frequencies in the mixed notation
-BFREQ = 90 #bosonic frequency transfer in the mixed notation
+FFREQ = 120 #fermionic frequencies in the mixed notation
+BFREQ = 0   #bosonic frequency transfer in the mixed notation
 
 CHI_BFREQ_ED = 1000
 TRI_FFREQ_ED = 210 
@@ -72,10 +72,10 @@ def run(command):
 
 #----------------------------------------Create HDF5 files-----------------------------------------
 
-if ('/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/U2p5/PREPROC/U'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5'):
-    os.system('rm -r /home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/U2p5/PREPROC/U_'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5')
+if ('/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/reference_U1/PREPROC/U'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5'):
+    os.system('rm -r /home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/reference_U1/PREPROC/U_'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5')
 
-f = h5py.File('/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/U2p5/PREPROC/U_'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5', 'w')   # Create the datafile.h5
+f = h5py.File('/home/agnese/Coding/Vertex_structures/dat/H5FILES/BETA50/4SITES/reference_U1/PREPROC/U_'+ str(U)+'_BETA_'+ str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_' + str(BFREQ)+'.h5', 'w')   # Create the datafile.h5
 
 #---------------------------------------------------------------------------------
 #GF
@@ -117,7 +117,7 @@ f.create_dataset('Sig/fgrid', data=fgrid_arr, dtype='float64', compression="gzip
 #---------------------------------------------------------------------------------------------------------
 #--------------------------------------- 2PGF PP------------------------------------------------------------
 
-twopgf_updo = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_pp_shift.dat')
+twopgf_updo = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_pp_shift_W0.dat')
 print twopgf_updo.shape
 ffreq_pp = FFREQ
 #int(0.5*(np.transpose(twopgf_updo)[1,:].max()*BETA/pi))+1
@@ -250,8 +250,8 @@ f.create_dataset('VERT/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compressio
 
 #--------------------------------------- 2PGF PH------------------------------------------------------------
 
-twopgf_updo_ph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_ph_shift.dat')
-twopgf_updo_xph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_xph_shift.dat')
+twopgf_updo_ph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_ph_shift_W0.dat')
+twopgf_updo_xph_l = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/2pgf_updo_xph_shift_W0.dat')
 ffreq_ph = FFREQ 
 #int(0.5*(np.transpose(twopgf_updo_ph_l)[1,:].max()*BETA/pi-1))+1
 print ffreq_ph
@@ -501,7 +501,7 @@ f.create_dataset('VERT/XPH/bgrid', data=bgrid_arr_xph, dtype='float64', compress
 
 #----------------------------- CHI PP PH XPH -----------------------------
 
-chi = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/chi_asympt')
+#chi = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/chi_asympt')
 
 bfreq_pp = CHI_BFREQ_ED
 print bfreq_pp
@@ -509,39 +509,51 @@ print bfreq_pp
 
 def re_chi_updo_pp(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 5]/BETA/BETA
+        #return U*U*chi[wb, 5]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 5]/BETA/BETA 
+        #return U*U*chi[-wb, 5]/BETA/BETA 
+        return 0.0; 
 
 def im_chi_updo_pp(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 6]/BETA/BETA
+        #return U*U*chi[wb, 6]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 6]/BETA/BETA
+        #return U*U*chi[-wb, 6]/BETA/BETA
+        return 0.0; 
 
 def re_chi_updo_ph(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 3]/BETA/BETA
+        #return U*U*chi[wb, 3]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 3]/BETA/BETA 
+        #return U*U*chi[-wb, 3]/BETA/BETA 
+        return 0.0; 
 
 def im_chi_updo_ph(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 4]/BETA/BETA
+        #return U*U*chi[wb, 4]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 4]/BETA/BETA
+        #return U*U*chi[-wb, 4]/BETA/BETA
+        return 0.0; 
 
 def re_chi_upup_ph(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 1]/BETA/BETA
+        #return U*U*chi[wb, 1]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 1]/BETA/BETA 
+        #return U*U*chi[-wb, 1]/BETA/BETA 
+        return 0.0; 
 
 def im_chi_upup_ph(wb):
     if(wb >= 0):
-        return U*U*chi[wb, 2]/BETA/BETA
+        #return U*U*chi[wb, 2]/BETA/BETA
+        return 0.0; 
     else:
-        return U*U*chi[-wb, 2]/BETA/BETA
+        #return U*U*chi[-wb, 2]/BETA/BETA
+        return 0.0; 
 
 # ----------define arrays to store in hdf5 file -> FROM HERE OBJECT IN THE SHIFTED NOTATION!!
 
@@ -600,7 +612,7 @@ f.create_dataset('CHI/XPH/bgrid', data=bgrid_arr_ph, dtype='float64', compressio
 
 #----------------------------- TRILEG PP -----------------------------
 
-trileg_pp = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/trileg_pp.dat')
+#trileg_pp = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/trileg_pp.dat')
 
 ffreq_pp = TRI_FFREQ_ED
 print ffreq_pp
@@ -609,13 +621,15 @@ print bfreq_pp
 
 
 def re_trileg_updo_pp(wb,wf):
-	return 	-U*(trileg_pp[(2*ffreq_pp)*(wb+bfreq_pp) + (wf+ffreq_pp), 2] - 1) - re_chi_updo_pp(wb)
+	#return 	-U*(trileg_pp[(2*ffreq_pp)*(wb+bfreq_pp) + (wf+ffreq_pp), 2] - 1) - re_chi_updo_pp(wb)
+        return 0.0; 
 
 def re_trileg_upup_pp(wb,wf):
 	return 	0.0
 
 def im_trileg_updo_pp(wb,wf):
-	return 	-U*(trileg_pp[(2*ffreq_pp)*(wb+bfreq_pp)+ (wf+ffreq_pp), 3] - 1) - im_chi_updo_pp(wb) 
+	#return 	-U*(trileg_pp[(2*ffreq_pp)*(wb+bfreq_pp)+ (wf+ffreq_pp), 3] - 1) - im_chi_updo_pp(wb) 
+        return 0.0; 
 
 def im_trileg_upup_pp(wb,wf):
 	return 	0.0
@@ -649,7 +663,7 @@ f.create_dataset('TRILEG/PP/bgrid', data=bgrid_arr_pp, dtype='float64', compress
 #
 #---------------------------------------------------------------------------------------
 
-trileg_ph = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/trileg.dat')
+#trileg_ph = np.loadtxt('/home/agnese/Coding/Vertex_structures/dat/pomerol/4SITES/U_'+str(U)+'_BETA_'+str(BETA)+'_FFREQ_'+ str(FFREQ)+'_BFREQ_'+ str(BFREQ)+'/trileg.dat')
 
 ffreq_ph = TRI_FFREQ_ED
 print ffreq_ph
@@ -658,16 +672,20 @@ print bfreq_ph
 
 
 def re_trileg_updo_ph(wb,wf):
-	return 	U*(trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph) + (wf+ffreq_ph), 2] + 1) - re_chi_updo_ph(wb) 
+	#return 	U*(trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph) + (wf+ffreq_ph), 2] + 1) - re_chi_updo_ph(wb) 
+        return 0.0; 
 
 def re_trileg_upup_ph(wb,wf):
-	return 	U*trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph) + (wf+ffreq_ph), 4] - re_chi_upup_ph(wb) 
+	#return 	U*trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph) + (wf+ffreq_ph), 4] - re_chi_upup_ph(wb) 
+        return 0.0; 
 
 def im_trileg_updo_ph(wb,wf):
-	return 	U*(trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph)+ (wf+ffreq_ph), 3] + 1) - im_chi_updo_ph(wb)
+	#return 	U*(trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph)+ (wf+ffreq_ph), 3] + 1) - im_chi_updo_ph(wb)
+        return 0.0; 
 
 def im_trileg_upup_ph(wb,wf):
-	return U*trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph)+ (wf+ffreq_ph), 5] - im_chi_upup_ph(wb)
+	#return U*trileg_ph[(2*ffreq_ph)*(wb+bfreq_ph)+ (wf+ffreq_ph), 5] - im_chi_upup_ph(wb)
+        return 0.0; 
 
 # ----------define arrays to store in hdf5 file -> FROM HERE OBJECT IN THE SHIFTED NOTATION!!
 

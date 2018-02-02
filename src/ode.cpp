@@ -86,7 +86,7 @@ int main ( int argc, char * argv[])
 
       state_t state_vec_old;
       double diff; 
-      double damping = 0.0; 
+      double damping = 0.00; 
       int count = 0; 
 
       do
@@ -106,7 +106,7 @@ int main ( int argc, char * argv[])
          // Output intermediate files
     //     if( count == 1 || count % 20 == 0 )
     //        write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
-      } while( diff > 1e-9 && diff < MAX_COUPLING ); // FULL SELF-CONSISTENCY 
+      } while( diff > 1e-13 && diff < MAX_COUPLING ); // FULL SELF-CONSISTENCY 
       if( diff >= MAX_COUPLING )
       {
          cout << " DIVERGENT! " << endl << endl; 
@@ -120,7 +120,6 @@ int main ( int argc, char * argv[])
    }
 
 #elif defined ONESHOT
-   
    cout << " Starting scale-dependent PARQUET solver... "  << endl << endl;
    bool success = true; 
 
@@ -153,6 +152,7 @@ int main ( int argc, char * argv[])
     //     if( count == 1 || count % 20 == 0 )
     //        write_all( "log/iter_" + to_string(count) + ".h5", state_vec ); 
       } while(count < 1); // ONE SHOT CALCULATION 
+      //} while( diff > 1e-9 && diff < MAX_COUPLING ); // FULL SELF-CONSISTENCY 
       if( diff >= MAX_COUPLING )
       {
          cout << " DIVERGENT! " << endl << endl; 
@@ -218,10 +218,14 @@ int main ( int argc, char * argv[])
    FILE_NAME.append("_SU2"); 
 
 #ifdef METHOD2
-   FILE_NAME.append("REDU10_METH2"); 
+   FILE_NAME.append("_METH2_INVR1xCOUNT"); 
 
 #elif METHOD1
-   FILE_NAME.append("_METH1");
+   FILE_NAME.append("_METH1_INVR1xCOUNTm40_ASYR10xINVR_W0");
+#endif
+
+#ifdef CORRECTIONS
+   FILE_NAME.append("_CORR"); 
 #endif
 
 #ifdef SELFCONSISTENCY
@@ -238,7 +242,7 @@ int main ( int argc, char * argv[])
     FILE_NAME.append("_IBSE");
 #endif 
 
-   if( !success ) FILE_NAME.append("_DIVERGENT"); 
+//   if( !success ) FILE_NAME.append("_DIVERGENT"); 
 
    FILE_NAME.append(".h5"); 
 
