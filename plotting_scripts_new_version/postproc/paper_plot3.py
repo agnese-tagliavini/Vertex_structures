@@ -43,40 +43,40 @@ most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
 #------COMPARISON METHOD 1 WITH AND WITHOUT CORRECTIONS -> CONVERGENCE WITH RESPECT TO THE INVERSION RANGE 
 
-fname1 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_CORR_ED.h5"
-fname1b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNT_ASYR10xINVR_CORR_ED.h5"
+fname1 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_CORR_ED_01_FULL.h5"
+fname1b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNT_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname2 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_ED.h5"
-fname3 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm5_CORR_ED.h5"
-fname3b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm5_ASYR10xINVR_CORR_ED.h5"
+fname3 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm5_CORR_ED_01_FULL.h5"
+fname3b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm5_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname4 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm5_ED.h5"
-fname5 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm10_CORR_ED.h5"
-fname5b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm10_ASYR10xINVR_CORR_ED.h5"
+fname5 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm10_CORR_ED_01_FULL.h5"
+fname5b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm10_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname6 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm10_ED.h5"
-fname7 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm15_CORR_ED.h5"
-fname7b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm15_ASYR10xINVR_CORR_ED.h5"
+fname7 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm15_CORR_ED_01_FULL.h5"
+fname7b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm15_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname8 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm15_ED.h5"
-fname9 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_CORR_ED.h5"
-fname9b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm20_ASYR10xINVR_CORR_ED.h5"
+fname9 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_CORR_ED_01_FULL.h5"
+fname9b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm20_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname10 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_ED.h5"
-fname11 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm30_CORR_ED.h5"
-fname11b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm30_ASYR10xINVR_CORR_ED.h5"
+fname11 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm30_CORR_ED_01_FULL.h5"
+fname11b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm30_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname12 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm30_ED.h5"
-fname13 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_CORR_ED.h5"
-fname13b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_CORR_ED.h5"
+fname13 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_CORR_ED_01_FULL.h5"
+fname13b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname14 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_ED.h5"
-fname15 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm50_CORR_ED.h5"
-fname15b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm50_ASYR10xINVR_CORR_ED.h5"
+fname15 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm50_CORR_ED_01_FULL.h5"
+fname15b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm50_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname16 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm50_ED.h5"
 
-fname17 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W0_CORR_ED.h5"
-fname17b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNT_ASYR10xINVR_W0_CORR_ED.h5"
-fname18 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W0_ED.h5"
-fname19 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_W0_CORR_ED.h5"
-fname19b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm20_ASYR10xINVR_W0_CORR_ED.h5"
-fname20 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_W0_ED.h5"
-fname21 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_W0_CORR_ED.h5"
-fname21b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_W0_CORR_ED.h5"
-fname22 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_W0_ED.h5"
+fname17 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W20_CORR_ED.h5"
+fname17b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNT_ASYR10xINVR_W20_CORR_ED.h5"
+fname18 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W20_ED.h5"
+fname19 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_W20_CORR_ED.h5"
+fname19b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm20_ASYR10xINVR_W20_CORR_ED.h5"
+fname20 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_W20_ED.h5"
+fname21 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_W20_CORR_ED.h5"
+fname21b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_W20_CORR_ED.h5"
+fname22 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_W20_ED.h5"
 
 
 #------ DECIDE WHICH COMPARISON YOU WANT TO ANALYZE
@@ -254,7 +254,7 @@ DEL =   parVals[4]
 EPS =   parVals[5]
 PHI =   parVals[6]
 
-shift=0
+shift= 20
 
 #--------------------------------------GENERAL PLOT SETTINGS------------------------------------------
 
@@ -893,32 +893,32 @@ pl.figure(figsize=(12, 5))
 
 #-----Print for table 
 
-plotgamma_axis( pl.subplot(1,3,1), diff_regamma_pp1 + diff_regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp2 + diff_regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp3 + diff_regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp4 + diff_regamma_pp4[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp8 + diff_regamma_pp8[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp10 + diff_regamma_pp10[:,:,::-1,:,:,:,:,:,:,:],RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =20}_{s}$", True ) # flip sign of w_out
+plotgamma_axis( pl.subplot(1,3,1), diff_regamma_pp1 + diff_regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp2 + diff_regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp3 + diff_regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp4 + diff_regamma_pp4[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp8 + diff_regamma_pp8[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp10 + diff_regamma_pp10[:,:,::-1,:,:,:,:,:,:,:],RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =40 \frac{\pi}{\beta}}_{s}$", True ) # flip sign of w_out
 pl.xlabel(r"$\nu$", fontsize = 12)
-plotgamma_axis( pl.subplot(1,3,2), 2*diff_regamma_ph1 - diff_regamma_xph1, 2*diff_regamma_ph2 - diff_regamma_xph2, 2*diff_regamma_ph3 - diff_regamma_xph3, 2*diff_regamma_ph4- diff_regamma_xph4,2*diff_regamma_ph8- diff_regamma_xph8,2*diff_regamma_ph10 - diff_regamma_xph10, RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =20}_{d}$", False )
+plotgamma_axis( pl.subplot(1,3,2), 2*diff_regamma_ph1 - diff_regamma_xph1, 2*diff_regamma_ph2 - diff_regamma_xph2, 2*diff_regamma_ph3 - diff_regamma_xph3, 2*diff_regamma_ph4- diff_regamma_xph4,2*diff_regamma_ph8- diff_regamma_xph8,2*diff_regamma_ph10 - diff_regamma_xph10, RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =40 \frac{\pi}{\beta}}_{d}$", False )
 pl.xlabel(r"$\nu$", fontsize = 12)
-plotgamma_axis( pl.subplot(1,3,3), - diff_regamma_xph1, - diff_regamma_xph2, - diff_regamma_xph3, - diff_regamma_xph4,- diff_regamma_xph8,- diff_regamma_xph10, RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =20}_{m}$", False )
+plotgamma_axis( pl.subplot(1,3,3), - diff_regamma_xph1, - diff_regamma_xph2, - diff_regamma_xph3, - diff_regamma_xph4,- diff_regamma_xph8,- diff_regamma_xph10, RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =40 \frac{\pi}{\beta}}_{m}$", False )
 pl.xlabel(r"$\nu$", fontsize = 12)
 
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/DeltaGammas_METHOD2_axis_nu'=0_W0.png", dpi = 150)
+pl.savefig("plots/DeltaGammas_METHOD2_axis_nu'=0_W20.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
 pl.figure(figsize=(12, 5))
 
-plotgamma_axis( pl.subplot(1,3,1), diff_regamma_pp1 + diff_regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp2 + diff_regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp3 + diff_regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp4 + diff_regamma_pp4[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp8 + diff_regamma_pp8[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp10 + diff_regamma_pp10[:,:,::-1,:,:,:,:,:,:,:],RE + r"\delta \Gamma^{\nu=\nu'=, \omega =20}_{s}$", True ) # flip sign of w_out
+plotgamma_axis( pl.subplot(1,3,1), diff_regamma_pp1 + diff_regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp2 + diff_regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp3 + diff_regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp4 + diff_regamma_pp4[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp8 + diff_regamma_pp8[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp10 + diff_regamma_pp10[:,:,::-1,:,:,:,:,:,:,:],RE + r"\delta \Gamma^{\nu=\nu'=, \omega =40 \frac{\pi}{\beta}}_{s}$", True ) # flip sign of w_out
 pl.xlabel(r"$\nu$", fontsize = 12)
-plotgamma_axis( pl.subplot(1,3,2), 2*diff_regamma_ph1 - diff_regamma_xph1, 2*diff_regamma_ph2 - diff_regamma_xph2, 2*diff_regamma_ph3 - diff_regamma_xph3, 2*diff_regamma_ph4 - diff_regamma_xph4,2*diff_regamma_ph8- diff_regamma_xph8,2*diff_regamma_ph10 - diff_regamma_xph10, RE + r"\delta \Gamma^{\nu=\nu', \omega =20}_{d}$", False )
+plotgamma_axis( pl.subplot(1,3,2), 2*diff_regamma_ph1 - diff_regamma_xph1, 2*diff_regamma_ph2 - diff_regamma_xph2, 2*diff_regamma_ph3 - diff_regamma_xph3, 2*diff_regamma_ph4 - diff_regamma_xph4,2*diff_regamma_ph8- diff_regamma_xph8,2*diff_regamma_ph10 - diff_regamma_xph10, RE + r"\delta \Gamma^{\nu=\nu', \omega =40 \frac{\pi}{\beta}}_{d}$", False )
 pl.xlabel(r"$\nu$", fontsize = 12)
-plotgamma_axis( pl.subplot(1,3,3), - diff_regamma_xph1, - diff_regamma_xph2, - diff_regamma_xph3, - diff_regamma_xph4,- diff_regamma_xph8,- diff_regamma_xph10, RE + r"\delta \Gamma^{\nu=\nu', \omega =20}_{m}$", False )
+plotgamma_axis( pl.subplot(1,3,3), - diff_regamma_xph1, - diff_regamma_xph2, - diff_regamma_xph3, - diff_regamma_xph4,- diff_regamma_xph8,- diff_regamma_xph10, RE + r"\delta \Gamma^{\nu=\nu', \omega =40 \frac{\pi}{\beta}}_{m}$", False )
 pl.xlabel(r"$\nu$", fontsize = 12)
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/DeltaGammas_METHOD2__nu=nu'_W0.png", dpi = 150)
+pl.savefig("plots/DeltaGammas_METHOD2_nu=nu'_W20.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -928,32 +928,32 @@ pl.figure(figsize=(12, 5))
 #                   METHOD_1
 #=============================================================================
 #--- Plot along axis \nu'=0
-plotgamma_axis( pl.subplot(1,3,1), diff_regamma_pp1b + diff_regamma_pp1b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp2b + diff_regamma_pp2b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp3b + diff_regamma_pp3b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp4b + diff_regamma_pp4b[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp8b + diff_regamma_pp8b[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp10b + diff_regamma_pp10b[:,:,::-1,:,:,:,:,:,:,:],RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =20}_{s}$", True ) # flip sign of w_out
+plotgamma_axis( pl.subplot(1,3,1), diff_regamma_pp1b + diff_regamma_pp1b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp2b + diff_regamma_pp2b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp3b + diff_regamma_pp3b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp4b + diff_regamma_pp4b[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp8b + diff_regamma_pp8b[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp10b + diff_regamma_pp10b[:,:,::-1,:,:,:,:,:,:,:],RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =40 \frac{\pi}{\beta}}_{s}$", True ) # flip sign of w_out
 pl.xlabel(r"$\nu$", fontsize = 12)
-plotgamma_axis( pl.subplot(1,3,2), 2*diff_regamma_ph1b - diff_regamma_xph1b, 2*diff_regamma_ph2b - diff_regamma_xph2b, 2*diff_regamma_ph3b - diff_regamma_xph3b, 2*diff_regamma_ph4b- diff_regamma_xph4b,2*diff_regamma_ph8b- diff_regamma_xph8b,2*diff_regamma_ph10b - diff_regamma_xph10b, RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =20}_{d}$", False )
+plotgamma_axis( pl.subplot(1,3,2), 2*diff_regamma_ph1b - diff_regamma_xph1b, 2*diff_regamma_ph2b - diff_regamma_xph2b, 2*diff_regamma_ph3b - diff_regamma_xph3b, 2*diff_regamma_ph4b- diff_regamma_xph4b,2*diff_regamma_ph8b- diff_regamma_xph8b,2*diff_regamma_ph10b - diff_regamma_xph10b, RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =40 \frac{\pi}{\beta}}_{d}$", False )
 pl.xlabel(r"$\nu$", fontsize = 12)
-plotgamma_axis( pl.subplot(1,3,3), - diff_regamma_xph1b, - diff_regamma_xph2b, - diff_regamma_xph3b, - diff_regamma_xph4b,- diff_regamma_xph8b,- diff_regamma_xph10b, RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =20}_{m}$", False )
+plotgamma_axis( pl.subplot(1,3,3), - diff_regamma_xph1b, - diff_regamma_xph2b, - diff_regamma_xph3b, - diff_regamma_xph4b,- diff_regamma_xph8b,- diff_regamma_xph10b, RE + r"\delta \Gamma^{\nu, \nu'=\pi/\beta, \omega =40 \frac{\pi}{\beta}}_{m}$", False )
 pl.xlabel(r"$\nu$", fontsize = 12)
 
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/DeltaGammas_METHOD1_axis_nu'=0_W0.png", dpi = 150)
+pl.savefig("plots/DeltaGammas_METHOD1_axis_nu'=0_W20.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
 pl.figure(figsize=(12, 5))
 
-plotgamma_axis( pl.subplot(1,3,1), diff_regamma_pp1b + diff_regamma_pp1b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp2b + diff_regamma_pp2b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp3b + diff_regamma_pp3b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp4b + diff_regamma_pp4b[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp8b + diff_regamma_pp8b[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp10b + diff_regamma_pp10b[:,:,::-1,:,:,:,:,:,:,:],RE + r"\delta \Gamma^{\nu=\nu'=, \omega =20}_{s}$", True ) # flip sign of w_out
+plotgamma_axis( pl.subplot(1,3,1), diff_regamma_pp1b + diff_regamma_pp1b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp2b + diff_regamma_pp2b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp3b + diff_regamma_pp3b[:,:,::-1,:,:,:,:,:,:,:], diff_regamma_pp4b + diff_regamma_pp4b[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp8b + diff_regamma_pp8b[:,:,::-1,:,:,:,:,:,:,:],diff_regamma_pp10b + diff_regamma_pp10b[:,:,::-1,:,:,:,:,:,:,:],RE + r"\delta \Gamma^{\nu=\nu'=, \omega =40 \frac{\pi}{\beta}}_{s}$", True ) # flip sign of w_out
 pl.xlabel(r"$\nu$", fontsize = 12)
-plotgamma_axis( pl.subplot(1,3,2), 2*diff_regamma_ph1b - diff_regamma_xph1b, 2*diff_regamma_ph2b - diff_regamma_xph2b, 2*diff_regamma_ph3b - diff_regamma_xph3b, 2*diff_regamma_ph4b - diff_regamma_xph4b,2*diff_regamma_ph8b- diff_regamma_xph8b,2*diff_regamma_ph10b - diff_regamma_xph10b, RE + r"\delta \Gamma^{\nu=\nu', \omega =20}_{d}$", False )
+plotgamma_axis( pl.subplot(1,3,2), 2*diff_regamma_ph1b - diff_regamma_xph1b, 2*diff_regamma_ph2b - diff_regamma_xph2b, 2*diff_regamma_ph3b - diff_regamma_xph3b, 2*diff_regamma_ph4b - diff_regamma_xph4b,2*diff_regamma_ph8b- diff_regamma_xph8b,2*diff_regamma_ph10b - diff_regamma_xph10b, RE + r"\delta \Gamma^{\nu=\nu', \omega =40 \frac{\pi}{\beta}}_{d}$", False )
 pl.xlabel(r"$\nu$", fontsize = 12)
-plotgamma_axis( pl.subplot(1,3,3), - diff_regamma_xph1b, - diff_regamma_xph2b, - diff_regamma_xph3b, - diff_regamma_xph4b,- diff_regamma_xph8b,- diff_regamma_xph10b, RE + r"\delta \Gamma^{\nu=\nu', \omega =20}_{m}$", False )
+plotgamma_axis( pl.subplot(1,3,3), - diff_regamma_xph1b, - diff_regamma_xph2b, - diff_regamma_xph3b, - diff_regamma_xph4b,- diff_regamma_xph8b,- diff_regamma_xph10b, RE + r"\delta \Gamma^{\nu=\nu', \omega =40 \frac{\pi}{\beta}}_{m}$", False )
 pl.xlabel(r"$\nu$", fontsize = 12)
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/DeltaGammas_METHOD1__nu=nu'_W0.png", dpi = 150)
+pl.savefig("plots/DeltaGammas_METHOD1_nu=nu'_W20.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 

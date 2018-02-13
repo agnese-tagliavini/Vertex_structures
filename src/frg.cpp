@@ -25,6 +25,7 @@ using namespace std;
 const int POS_FERM_VERT_COUNT_EXACT = 60;
 const int POS_BOS_VERT_COUNT_EXACT = 90;
 //const int POS_FERM_VERT_COUNT_EXACT = 120;
+//const int POS_FERM_VERT_COUNT_EXACT = 200;
 //const int POS_BOS_VERT_COUNT_EXACT = 0;
 
 const int POS_FERM_VERT_COUNT_EXACT_SMALL = POS_FERM_VERT_COUNT_EXACT-REDU;
@@ -55,13 +56,16 @@ gf_chi_t chi_exact_xph(POS_BOS_CHI_COUNT_EXACT);
 
 const int POS_SIG_COUNT_EXACT = 240; 
 //const int POS_SIG_COUNT_EXACT = 480; 
+//const int POS_SIG_COUNT_EXACT = 800; 
 gf_1p_t Sig_exact(POS_SIG_COUNT_EXACT); 
 
 void read_exact()
 {
    using namespace H5;
+   //H5File input_file( "dat/H5FILES/BETA50/4SITES/reference_U1p75/PREPROC/U_1.75_BETA_50.0_FFREQ_200_BFREQ_0.h5", H5F_ACC_RDONLY );
+  //H5File input_file( "dat/H5FILES/BETA50/4SITES/reference_U1p75/PREPROC/U_1.75_BETA_50.0_FFREQ_120_BFREQ_0.h5", H5F_ACC_RDONLY );
    H5File input_file( "dat/H5FILES/BETA50/4SITES/U1p75/PREPROC/U_1.75_BETA_50.0_FFREQ_60_BFREQ_90.h5", H5F_ACC_RDONLY );
-   //H5File input_file_1("dat/H5FILES/BETA50/4SITES/U1/PREPROC/U_1.0_BETA_50.0_FFREQ_60_BFREQ_90.h5", H5F_ACC_RDONLY );
+   //H5File input_file("dat/H5FILES/BETA50/4SITES/U1/PREPROC/U_1.0_BETA_50.0_FFREQ_60_BFREQ_90.h5", H5F_ACC_RDONLY );
    cout << "Got file" << endl;
 
    Group vert_group =  input_file.openGroup("/VERT");
@@ -234,7 +238,7 @@ dcomplex asympt_GG_ph( int W, double Lam )
    return -asympt_GG_pp( W, Lam ); 
 }
 
-dcomplex FUNC_PH( int W_int, int POS_INV )
+dcomplex FUNC_PH( int W_int, int POS_INV ) //ATTENTION THERE IS A OVERALL MINUS SIGN!! DON'T FORGET TO PUT IT IN FRONT WHEN THE FUNCTION IS CALLED!!
 {
    int W = W_int; 
 

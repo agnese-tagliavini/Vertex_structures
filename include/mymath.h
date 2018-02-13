@@ -116,6 +116,7 @@ double integrate_QAGS_SIN( intFuncP_QAGS fw, void* q, double err );
 // generate_sum_func returns sumfit of a given single-variable function 
 std::vector<double> generate_tail_weights( int iMin, int tail_length, int fit_order ); 
 gf<double, 1> generate_weights( int iMin, int tail_length, int fit_order ); 
+gf<double, 2> generate_weights_asy( int iMin, int tail_length, int fit_order ); 
 gf<double, 2> generate_2d_weights( int iMin, int tail_length, int fit_order ); 
 gf<double, 2> generate_2d_weights_asy( int iMin, int tail_length, int fit_order ); 
 

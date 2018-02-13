@@ -218,10 +218,10 @@ int main ( int argc, char * argv[])
    FILE_NAME.append("_SU2"); 
 
 #ifdef METHOD2
-   FILE_NAME.append("_METH2_INVR1xCOUNT"); 
+   FILE_NAME.append("_METH2_INVR1xCOUNT_CHECKOMEGA"); 
 
 #elif METHOD1
-   FILE_NAME.append("_METH1_INVR1xCOUNTm40_ASYR10xINVR_W0");
+   FILE_NAME.append("_METH1_INVR1xCOUNTm50_ASYR10xINVR");
 #endif
 
 #ifdef CORRECTIONS
@@ -244,7 +244,8 @@ int main ( int argc, char * argv[])
 
 //   if( !success ) FILE_NAME.append("_DIVERGENT"); 
 
-   FILE_NAME.append(".h5"); 
+   //FILE_NAME.append(".h5"); 
+   FILE_NAME.append("_01_FULL.h5"); 
 
    write_all( FILE_NAME, state_vec ); 
 

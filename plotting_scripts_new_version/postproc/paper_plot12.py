@@ -28,6 +28,7 @@ import subprocess
 import math
 from agneselibrary.mymath import *
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+from scipy import optimize
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 #--------------------------------------SETTINGS ------------------------------------------
@@ -45,40 +46,41 @@ most_recently_edited = run("ls -Art dat/ | tail -n 1")
 
 #------COMPARISON METHOD 1 WITH AND WITHOUT CORRECTIONS -> CONVERGENCE WITH RESPECT TO THE INVERSION RANGE 
 
-fname1 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_CORR_ED.h5"
-fname1b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNT_ASYR10xINVR_CORR_ED.h5"
+fname1 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_CORR_ED_01_FULL.h5"
+fname1b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNT_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname2 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_ED.h5"
-fname3 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm5_CORR_ED.h5"
-fname3b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm5_ASYR10xINVR_CORR_ED.h5"
+fname3 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm5_CORR_ED_01_FULL.h5"
+fname3b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm5_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname4 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm5_ED.h5"
-fname5 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm10_CORR_ED.h5"
-fname5b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm10_ASYR10xINVR_CORR_ED.h5"
+fname5 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm10_CORR_ED_01_FULL.h5"
+fname5b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm10_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname6 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm10_ED.h5"
-fname7 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm15_CORR_ED.h5"
-fname7b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm15_ASYR10xINVR_CORR_ED.h5"
+fname7 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm15_CORR_ED_01_FULL.h5"
+fname7b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm15_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname8 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm15_ED.h5"
-fname9 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_CORR_ED.h5"
-fname9b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm20_ASYR10xINVR_CORR_ED.h5"
+fname9 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_CORR_ED_01_FULL.h5"
+fname9b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm20_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname10 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_ED.h5"
-fname11 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm30_CORR_ED.h5"
-fname11b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm30_ASYR10xINVR_CORR_ED.h5"
+fname11 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm30_CORR_ED_01_FULL.h5"
+fname11b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm30_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname12 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm30_ED.h5"
-fname13 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_CORR_ED.h5"
-fname13b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_CORR_ED.h5"
+fname13 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_CORR_ED_01_FULL.h5"
+fname13b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname14 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_ED.h5"
-fname15 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm50_CORR_ED.h5"
-fname15b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm50_ASYR10xINVR_CORR_ED.h5"
+fname15 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm50_CORR_ED_01_FULL.h5"
+fname15b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm50_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname16 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm50_ED.h5"
 
-fname17 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W0_CORR_ED.h5"
-fname17b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNT_ASYR10xINVR_W0_CORR_ED.h5"
-fname18 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W0_ED.h5"
-fname19 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_W0_CORR_ED.h5"
-fname19b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm20_ASYR10xINVR_W0_CORR_ED.h5"
-fname20 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_W0_ED.h5"
-fname21 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_W0_CORR_ED.h5"
-fname21b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_W0_CORR_ED.h5"
-fname22 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_W0_ED.h5"
+fname17 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W20_CORR_ED.h5"
+fname17b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNT_ASYR10xINVR_W20_CORR_ED.h5"
+fname18 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W20_ED.h5"
+fname19 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_W20_CORR_ED.h5"
+fname19b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm20_ASYR10xINVR_W20_CORR_ED.h5"
+fname20 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm20_W20_ED.h5"
+fname21 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_W20_CORR_ED.h5"
+fname21b = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_W20_CORR_ED.h5"
+fname22 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_W20_ED.h5"
+#fname23 = "../../dat/H5FILES/BETA50/4SITES/U1/POSTPROC/dat_U1_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W20_ED.h5"
 
 
 #------ DECIDE WHICH COMPARISON YOU WANT TO ANALYZE
@@ -151,6 +153,8 @@ if len(sys.argv) > 1:
     fname21b = str(sys.argv[1])
 if len(sys.argv) > 1:
     fname22 = str(sys.argv[1])
+#if len(sys.argv) > 1:
+#    fname23 = str(sys.argv[1])
 
 fname1 = fname1.rstrip('\n') # strip newline of fname
 f1 = h5py.File(fname1, "r")
@@ -239,6 +243,9 @@ f21b = h5py.File(fname21b, "r")
 
 fname22 = fname22.rstrip('\n') # strip newline of fname
 f22 = h5py.File(fname22, "r")
+
+#fname23 = fname23.rstrip('\n') # strip newline of fname
+#f23 = h5py.File(fname23, "r")
 
 os.system('mkdir -p log')
 os.system('mkdir -p plots')
@@ -536,6 +543,14 @@ imgamma_ph22 = vert_mul * np.array(f22["/gamma_func/IM_PH"])
 regamma_xph22 = vert_mul * np.array(f22["/gamma_func/RE_XPH"])
 imgamma_xph22 = vert_mul * np.array(f22["/gamma_func/IM_XPH"])
 
+##--- Read gamma method 2 (INVR1xVERTR-15 NOCORR)
+#regamma_pp23 = vert_mul * np.array(f23["/gamma_func/RE_PP"])
+#imgamma_pp23 = vert_mul * np.array(f23["/gamma_func/IM_PP"])
+#regamma_ph23 = vert_mul * np.array(f23["/gamma_func/RE_PH"])
+#imgamma_ph23 = vert_mul * np.array(f23["/gamma_func/IM_PH"])
+#regamma_xph23 = vert_mul * np.array(f23["/gamma_func/RE_XPH"])
+#imgamma_xph23 = vert_mul * np.array(f23["/gamma_func/IM_XPH"])
+
 #--- RANGE FERMIONIC/BOSONIC FREQUENCIES
 
 
@@ -648,18 +663,27 @@ bdim22= regamma_pp22.shape[0]
 fdim22= regamma_pp22.shape[1]
 fdimo222 = fdim22/2
 print bdim22, fdim22
+
+#bdim23= regamma_pp23.shape[0]
+#fdim23= regamma_pp23.shape[1]
+#fdimo223 = fdim23/2
+#print bdim23, fdim23
 #
 fdim_min = min([fdim1,fdim3,fdim5,fdim7,fdim9,fdim11,fdim13,fdim15,fdim17,fdim19,fdim21])
 print fdim_min
 gammagrid_plot = np.array([(2*i+1)*pi/BETA for i in range(-fdim_min/2, fdim_min/2)])
 
 
-shift= 0
+shift= 20
 #--------------------------PLOT CONVERGENCE WITH RESPECT TO INVERSION RANGE ------------------------------------------
 
 #INVROVR=[1,2,4]
 INVROVR=[20,40,60,80,90,100,110,120,160,200,240]
 
+
+def create_array_fit(arr1, arr2, arr3, arr4, arr5, arr6, arr7, arr8):
+    zarr= [ arr8[shift + (bdim9-1)/2,fdimo29,fdimo29,0,0,0,0,0,0,0], arr7[shift + (bdim7-1)/2,fdimo27,fdimo27,0,0,0,0,0,0,0], arr6[shift + (bdim5-1)/2,fdimo25,fdimo25,0,0,0,0,0,0,0], arr5[shift + (bdim3-1)/2,fdimo23,fdimo23,0,0,0,0,0,0,0], arr4[shift + (bdim1-1)/2,fdimo21,fdimo21,0,0,0,0,0,0,0], arr3[0,fdimo221, fdimo221, 0,0,0,0,0,0,0], arr2[0,fdimo219, fdimo219, 0,0,0,0,0,0,0],arr1[0,fdimo217, fdimo217, 0,0,0,0,0,0,0]]
+    return zarr
 
 def create_array(arr1, arr2, arr3, arr4, arr5, arr6, arr7, arr8, arr9, arr10, arr11):
     zarr= [ arr11[shift + (bdim15-1)/2,fdimo215,fdimo215,0,0,0,0,0,0,0], arr10[shift + (bdim13-1)/2,fdimo213,fdimo213,0,0,0,0,0,0,0],arr9[shift + (bdim11-1)/2,fdimo211,fdimo211,0,0,0,0,0,0,0],arr8[shift + (bdim9-1)/2,fdimo29,fdimo29,0,0,0,0,0,0,0], arr7[shift + (bdim7-1)/2,fdimo27,fdimo27,0,0,0,0,0,0,0], arr6[shift + (bdim5-1)/2,fdimo25,fdimo25,0,0,0,0,0,0,0], arr5[shift + (bdim3-1)/2,fdimo23,fdimo23,0,0,0,0,0,0,0], arr4[shift + (bdim1-1)/2,fdimo21,fdimo21,0,0,0,0,0,0,0], arr3[0,fdimo221, fdimo221, 0,0,0,0,0,0,0], arr2[0,fdimo219, fdimo219, 0,0,0,0,0,0,0],arr1[0,fdimo217, fdimo217, 0,0,0,0,0,0,0]]
@@ -671,11 +695,15 @@ Z_s_M1 = create_array( regamma_pp17b + regamma_pp17b[:,:,::-1,:,:,:,:,:,:,:],reg
 
 Z_s_NC = create_array( regamma_pp18 + regamma_pp18[:,:,::-1,:,:,:,:,:,:,:],regamma_pp20 + regamma_pp20[:,:,::-1,:,:,:,:,:,:,:],regamma_pp22 + regamma_pp22[:,:,::-1,:,:,:,:,:,:,:],  regamma_pp2 + regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], regamma_pp4 + regamma_pp4[:,:,::-1,:,:,:,:,:,:,:], regamma_pp6 + regamma_pp6[:,:,::-1,:,:,:,:,:,:,:], regamma_pp8 + regamma_pp8[:,:,::-1,:,:,:,:,:,:,:],regamma_pp10 + regamma_pp10[:,:,::-1,:,:,:,:,:,:,:],regamma_pp12 + regamma_pp12[:,:,::-1,:,:,:,:,:,:,:], regamma_pp14 + regamma_pp14[:,:,::-1,:,:,:,:,:,:,:],regamma_pp16 + regamma_pp16[:,:,::-1,:,:,:,:,:,:,:] ) 
 
+#ref_s = regamma_pp23 + regamma_pp23[:,:,::-1,:,:,:,:,:,:,:]
+
 Z_t_M2 = create_array( regamma_pp17 - regamma_pp17[:,:,::-1,:,:,:,:,:,:,:],regamma_pp19 - regamma_pp19[:,:,::-1,:,:,:,:,:,:,:],regamma_pp21 - regamma_pp21[:,:,::-1,:,:,:,:,:,:,:],regamma_pp1 - regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], regamma_pp3 - regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], regamma_pp5 - regamma_pp5[:,:,::-1,:,:,:,:,:,:,:], regamma_pp7 - regamma_pp7[:,:,::-1,:,:,:,:,:,:,:], regamma_pp9 - regamma_pp9[:,:,::-1,:,:,:,:,:,:,:],regamma_pp11 - regamma_pp11[:,:,::-1,:,:,:,:,:,:,:],regamma_pp13 - regamma_pp13[:,:,::-1,:,:,:,:,:,:,:],regamma_pp15 - regamma_pp15[:,:,::-1,:,:,:,:,:,:,:] ) 
 
 Z_t_M1 = create_array( regamma_pp17b - regamma_pp17b[:,:,::-1,:,:,:,:,:,:,:],regamma_pp19b - regamma_pp19b[:,:,::-1,:,:,:,:,:,:,:],regamma_pp21b - regamma_pp21b[:,:,::-1,:,:,:,:,:,:,:],regamma_pp1b - regamma_pp1b[:,:,::-1,:,:,:,:,:,:,:], regamma_pp3b - regamma_pp3b[:,:,::-1,:,:,:,:,:,:,:], regamma_pp5b - regamma_pp5b[:,:,::-1,:,:,:,:,:,:,:], regamma_pp7b - regamma_pp7b[:,:,::-1,:,:,:,:,:,:,:], regamma_pp9b - regamma_pp9b[:,:,::-1,:,:,:,:,:,:,:],regamma_pp11b - regamma_pp11b[:,:,::-1,:,:,:,:,:,:,:],regamma_pp13b - regamma_pp13b[:,:,::-1,:,:,:,:,:,:,:],regamma_pp15b - regamma_pp15b[:,:,::-1,:,:,:,:,:,:,:] ) 
 
 Z_t_NC = create_array( regamma_pp18 - regamma_pp18[:,:,::-1,:,:,:,:,:,:,:],regamma_pp20 - regamma_pp20[:,:,::-1,:,:,:,:,:,:,:],regamma_pp22 - regamma_pp22[:,:,::-1,:,:,:,:,:,:,:],regamma_pp2 - regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], regamma_pp4 - regamma_pp4[:,:,::-1,:,:,:,:,:,:,:], regamma_pp6 - regamma_pp6[:,:,::-1,:,:,:,:,:,:,:], regamma_pp8 - regamma_pp8[:,:,::-1,:,:,:,:,:,:,:], regamma_pp10 - regamma_pp10[:,:,::-1,:,:,:,:,:,:,:],regamma_pp12 - regamma_pp12[:,:,::-1,:,:,:,:,:,:,:],regamma_pp14 - regamma_pp14[:,:,::-1,:,:,:,:,:,:,:],regamma_pp16 - regamma_pp16[:,:,::-1,:,:,:,:,:,:,:] )
+
+#ref_t  = regamma_pp23 - regamma_pp23[:,:,::-1,:,:,:,:,:,:,:]
 
 Z_d_M2 = create_array( 2*regamma_ph17 - regamma_xph17,2*regamma_ph19 - regamma_xph19,2*regamma_ph21 - regamma_xph21,2*regamma_ph1 - regamma_xph1, 2*regamma_ph3 - regamma_xph3, 2*regamma_ph5 - regamma_xph5, 2*regamma_ph7 - regamma_xph7,2*regamma_ph9 - regamma_xph9,2*regamma_ph11 - regamma_xph11,2*regamma_ph13 - regamma_xph13,2*regamma_ph15 - regamma_xph15 )
 
@@ -683,22 +711,74 @@ Z_d_M1 = create_array( 2*regamma_ph17b - regamma_xph17b,2*regamma_ph19b - regamm
 
 Z_d_NC = create_array( 2*regamma_ph18 - regamma_xph18,2*regamma_ph20 - regamma_xph20,2*regamma_ph22 - regamma_xph22,2*regamma_ph2 - regamma_xph2, 2*regamma_ph4 - regamma_xph4, 2*regamma_ph6 - regamma_xph6, 2*regamma_ph8 - regamma_xph8,2*regamma_ph10 - regamma_xph10,2*regamma_ph12 - regamma_xph12,2*regamma_ph14 - regamma_xph14,2*regamma_ph16 - regamma_xph16 )
 
+#ref_d  = 2*regamma_ph23 - regamma_xph23
+
 Z_m_M2 = create_array(- regamma_xph17,- regamma_xph19,- regamma_xph21,- regamma_xph1, - regamma_xph3, - regamma_xph5, - regamma_xph7,- regamma_xph9,- regamma_xph11,- regamma_xph13,- regamma_xph15 )
 
 Z_m_M1 = create_array(- regamma_xph17b,- regamma_xph19b,- regamma_xph21b,- regamma_xph1b, - regamma_xph3b, - regamma_xph5b, - regamma_xph7b,- regamma_xph9b,- regamma_xph11b,- regamma_xph13b,- regamma_xph15b )
 
 Z_m_NC = create_array(- regamma_xph18,- regamma_xph20,- regamma_xph22,- regamma_xph2, - regamma_xph4, - regamma_xph6, - regamma_xph8,- regamma_xph10,- regamma_xph12,- regamma_xph14,- regamma_xph16 )
 
+#ref_m = - regamma_xph23
 
 fig = pl.figure()
 
+# ----- FIT ----
+
+X = np.array([80,90,100, 110, 120, 160, 200, 240])
+
+Ys = create_array_fit( regamma_pp18 + regamma_pp18[:,:,::-1,:,:,:,:,:,:,:],regamma_pp20 + regamma_pp20[:,:,::-1,:,:,:,:,:,:,:],regamma_pp22 + regamma_pp22[:,:,::-1,:,:,:,:,:,:,:],  regamma_pp2 + regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], regamma_pp4 + regamma_pp4[:,:,::-1,:,:,:,:,:,:,:], regamma_pp6 + regamma_pp6[:,:,::-1,:,:,:,:,:,:,:], regamma_pp8 + regamma_pp8[:,:,::-1,:,:,:,:,:,:,:],regamma_pp10 + regamma_pp10[:,:,::-1,:,:,:,:,:,:,:] ) 
+
+Yt = create_array_fit( regamma_pp18 - regamma_pp18[:,:,::-1,:,:,:,:,:,:,:],regamma_pp20 - regamma_pp20[:,:,::-1,:,:,:,:,:,:,:],regamma_pp22 - regamma_pp22[:,:,::-1,:,:,:,:,:,:,:],regamma_pp2 - regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], regamma_pp4 - regamma_pp4[:,:,::-1,:,:,:,:,:,:,:], regamma_pp6 - regamma_pp6[:,:,::-1,:,:,:,:,:,:,:], regamma_pp8 - regamma_pp8[:,:,::-1,:,:,:,:,:,:,:], regamma_pp10 - regamma_pp10[:,:,::-1,:,:,:,:,:,:,:] )
+
+Yd = create_array_fit( 2*regamma_ph18 - regamma_xph18,2*regamma_ph20 - regamma_xph20,2*regamma_ph22 - regamma_xph22,2*regamma_ph2 - regamma_xph2, 2*regamma_ph4 - regamma_xph4, 2*regamma_ph6 - regamma_xph6, 2*regamma_ph8 - regamma_xph8,2*regamma_ph10 - regamma_xph10 )
+
+Ym = create_array_fit(- regamma_xph18,- regamma_xph20,- regamma_xph22,- regamma_xph2, - regamma_xph4, - regamma_xph6, - regamma_xph8,- regamma_xph10 )
+
+
+# STARTING FITTING
+print "Starting fitting!"
+
+fitfunc = lambda p, x: p[0] + p[1]/ x + p[2]/x**2
+errfunc = lambda p, x, y: fitfunc(p, x) - y
+
+#FIT S
+p0 = [Z_s_M2[10]-0.5,0,0]
+
+ps,success = optimize.leastsq(errfunc, p0[:], args=(X, Ys))
+Fitx = np.linspace(X.min(), X.max(), 100)
+Fity_s = fitfunc(ps, Fitx)
+
+print ps[0]
+#FIT T
+p0 = [Z_t_M2[10],0,0]
+
+pt,success = optimize.leastsq(errfunc, p0[:], args=(X, Yt))
+Fitx = np.linspace(X.min(), X.max(), 100)
+Fity_t = fitfunc(pt, Fitx)
+
+#FIT D
+p0 = [Z_d_M2[10],0,0]
+
+pd,success = optimize.leastsq(errfunc, p0[:], args=(X, Yd))
+Fitx = np.linspace(X.min(), X.max(), 100)
+Fity_d = fitfunc(pd, Fitx)
+
+#FIT T
+p0 = [Z_m_M2[10],0,0]
+
+pm,success = optimize.leastsq(errfunc, p0[:], args=(X, Ym))
+Fitx = np.linspace(X.min(), X.max(), 100)
+Fity_m = fitfunc(pm, Fitx)
+
 #---  Helper functions (include translation from  nambu to physical CAUTION : USING TIME REVERSAL SYMM) 
 
-def plotgamma_conv_axis( use_pl, arr1, arr2, arr3, string, legend ):
+def plotgamma_conv_axis( use_pl, arr1, arr2, arr3, ref,  string, legend ):
     pl.plot( INVROVR, arr1, marker = 'o', linestyle='-',linewidth =1.2, color='b', ms=3, mew=0.5, label = "M1")
     pl.plot( INVROVR, arr2, marker = 's', linestyle='-',linewidth =1.2, color='g', ms=3, mew=0.5, label = "M2")
     pl.plot( INVROVR, arr3, marker = 'd', linestyle='-',linewidth =1.2, color='r', ms=3, mew=0.5, label = "NC")
-    pl.axhline(y=arr2[10], linewidth=1.5, color = 'k', label = "EX")
+    #pl.plot( Fitx, ref, linestyle='-',linewidth =0.8, color='k', label = "FIT")
+    pl.axhline(ref[0], linewidth=1.5, color = 'k', label = "EX")
     use_pl.set_title( string , fontsize=12 )
     if(legend):
         pl.legend(prop={'size':7})
@@ -716,10 +796,13 @@ def plotgamma_conv_axis( use_pl, arr1, arr2, arr3, string, legend ):
     #pl.setp(inset)
     return
 
-def plotgamma_conv_axis_small( use_pl, arr1, arr2, string, legend ):
+def plotgamma_conv_axis_small( use_pl, arr1, arr2, ref, string, legend ):
     pl.plot( INVROVR, arr1, marker = 'o', linestyle='-',linewidth =1.2, color='b', ms=3, mew=0.5, label = "M1")
     pl.plot( INVROVR, arr2, marker = 's', linestyle='-',linewidth =1.2, color='g', ms=3, mew=0.5, label = "M2")
-    pl.axhline(y=arr2[10], linewidth=1.5, color = 'k', label = "EX")
+    #pl.plot( Fitx, ref, linestyle='-',linewidth =0.8, color='k', label = "FIT")
+    pl.axhline(ref[0], linewidth=1.5, color = 'k', label = "EX")
+    #pl.axhline(y=ref[0,fdimo223, fdimo223, 0,0,0,0,0,0,0], linewidth=1.5, color = 'k', label = "EX")
+    #pl.axhline(y=arr2[10], linewidth=1.5, color = 'k', label = "EX")
     use_pl.set_title( string , fontsize=10 )
     if(legend):
         pl.legend(prop={'size':6})
@@ -733,7 +816,7 @@ ax2 = fig.add_subplot(2, 2, 2)
 ax3 = fig.add_subplot(2, 2, 3)
 ax4 = fig.add_subplot(2, 2, 4)
 #--- Plot along axis \nu'=0
-plotgamma_conv_axis(pl.subplot(2,2,1), Z_s_M1, Z_s_M2, Z_s_NC, RE + r"\Gamma^{\nu=\nu'=\pi/\beta, \omega =0}_{s}$", False)
+plotgamma_conv_axis(pl.subplot(2,2,1), Z_s_M1, Z_s_M2, Z_s_NC, ps, RE + r"\Gamma^{\nu=\nu' = \frac{\pi}{\beta}, \omega =40 \frac{\pi}{\beta}}_{s}$", False)
 
 #try to create inset for first plot 
 #axins1 = zoomed_inset_axes(ax1, 1.0, loc=4)
@@ -744,10 +827,10 @@ axins1.axhline(y=Z_s_M2[10], linewidth=1.5, color = 'k', label = "EX")
 pl.xticks(visible=False)
 pl.yticks(visible=True, fontsize = 7)
 
-plotgamma_conv_axis(pl.subplot(2,2,2), Z_t_M1, Z_t_M2, Z_t_NC, RE + r"\Gamma^{\nu=\nu'=\pi/\beta, \omega =0 }_{t}$", True)
+plotgamma_conv_axis(pl.subplot(2,2,2), Z_t_M1, Z_t_M2, Z_t_NC, pt, RE + r"\Gamma^{\nu=\nu' = \frac{\pi}{\beta}, \omega =40 \frac{\pi}{\beta}}_{t}$", True)
 ax2.get_yaxis().get_major_formatter().set_useOffset(False)
 
-plotgamma_conv_axis(pl.subplot(2,2,3), Z_d_M1, Z_d_M2, Z_d_NC, RE + r"\Gamma^{\nu=\nu'=\pi/\beta, \omega =0}_{d}$", False)
+plotgamma_conv_axis(pl.subplot(2,2,3), Z_d_M1, Z_d_M2, Z_d_NC, pd, RE + r"\Gamma^{\nu=\nu' = \frac{\pi}{\beta}, \omega =40 \frac{\pi}{\beta}}_{d}$", False)
 pl.xlabel(r"N$_{\text{inv}}$", fontsize = 10)
 axins3 = inset_axes(ax3, 0.80, 0.80 , loc=4 ,bbox_to_anchor=(0.42, 0.12), bbox_transform=ax3.figure.transFigure) # no zoom
 axins3.plot(INVROVR, Z_d_M1,  marker = 'o', linestyle='-',linewidth =1.2, color='b', ms=3, mew=0.5)
@@ -756,7 +839,7 @@ axins3.axhline(y=Z_d_M2[10], linewidth=1.5, color = 'k', label = "EX")
 pl.xticks(visible=False)
 pl.yticks(visible=True, fontsize = 7)
 
-plotgamma_conv_axis(pl.subplot(2,2,4), Z_m_M1, Z_m_M2, Z_m_NC, RE + r"\Gamma^{\nu=\nu'=\pi/\beta, \omega =0}_{m}$", False)
+plotgamma_conv_axis(pl.subplot(2,2,4), Z_m_M1, Z_m_M2, Z_m_NC, pm, RE + r"\Gamma^{\nu=\nu' = \frac{\pi}{\beta}, \omega =40 \frac{\pi}{\beta}}_{m}$", False)
 pl.xlabel(r"N$_{\text{inv}}$", fontsize = 10)
 axins4 = inset_axes(ax4, 0.80, 0.80 , loc=4 ,bbox_to_anchor=(0.95, 0.12), bbox_transform=ax4.figure.transFigure) # no zoom
 axins4.plot(INVROVR, Z_m_M1,  marker = 'o', linestyle='-',linewidth =1.2, color='b', ms=3, mew=0.5)
@@ -767,7 +850,7 @@ pl.yticks(visible=True, fontsize = 7)
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/Gammas_conv_W0.png", dpi = 200)
+pl.savefig("plots/Gammas_conv_W20.png", dpi = 200)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 
@@ -778,17 +861,17 @@ ax2 = fig.add_subplot(2, 2, 2)
 ax3 = fig.add_subplot(2, 2, 3)
 ax4 = fig.add_subplot(2, 2, 4)
 
-plotgamma_conv_axis_small(pl.subplot(2,2,1), Z_s_M1, Z_s_M2, RE + r"\Gamma^{\nu=\nu'=\pi/\beta, \omega =0}_{s}$", False)
-plotgamma_conv_axis_small(pl.subplot(2,2,2), Z_t_M1, Z_t_M2, RE + r"\Gamma^{\nu=\nu'=\pi/\beta, \omega =0}_{t}$", True)
+plotgamma_conv_axis_small(pl.subplot(2,2,1), Z_s_M1, Z_s_M2,ps, RE + r"\Gamma^{\nu=\nu' = \frac{\pi}{\beta}, \omega =40 \frac{\pi}{\beta}}_{s}$", False)
+plotgamma_conv_axis_small(pl.subplot(2,2,2), Z_t_M1, Z_t_M2,pt,  RE + r"\Gamma^{\nu=\nu' = \frac{\pi}{\beta}, \omega =40 \frac{\pi}{\beta}}_{t}$", True)
 ax2.get_yaxis().get_major_formatter().set_useOffset(False)
-plotgamma_conv_axis_small(pl.subplot(2,2,3), Z_d_M1, Z_d_M2, RE + r"\Gamma^{\nu=\nu'=\pi/\beta, \omega =0}_{d}$", False)
+plotgamma_conv_axis_small(pl.subplot(2,2,3), Z_d_M1, Z_d_M2,pd,  RE + r"\Gamma^{\nu=\nu' = \frac{\pi}{\beta}, \omega =40 \frac{\pi}{\beta}}_{d}$", False)
 pl.xlabel(r"N$_{\text{inv}}$", fontsize = 9)
-plotgamma_conv_axis_small(pl.subplot(2,2,4), Z_m_M1, Z_m_M2, RE + r"\Gamma^{\nu=\nu'=\pi/\beta, \omega =40 \frac{\pi}{\beta}}_{m}$", False)
+plotgamma_conv_axis_small(pl.subplot(2,2,4), Z_m_M1, Z_m_M2,pm, RE + r"\Gamma^{\nu=\nu' = \frac{\pi}{\beta}, \omega =40 \frac{\pi}{\beta}}_{m}$", False)
 pl.xlabel(r"N$_{\text{inv}}$", fontsize = 9)
 pl.tight_layout()
 
 #--- Save to file
-pl.savefig("plots/Gammas_conv_METHOD1_METHOD2_W0.png", dpi = 150)
+pl.savefig("plots/Gammas_conv_METHOD1_METHOD2_W20.png", dpi = 150)
 pl.figure(dpi=100) # Reset dpi to default
 pl.clf()
 

@@ -19,11 +19,13 @@ const double LN_10 = 2.30258509299;				///< Natural log of 10
 const int REDU = 0; 
 const int COUNT = 60-REDU; 
 //const int COUNT = 120-REDU; 
+//const int COUNT = 200-REDU; 
 
 // ----- SE dimensions
 
 const int POS_FFREQ_COUNT_SIG = 240;				///< Amount of positive frequencies in self-energy grid
 //const int POS_FFREQ_COUNT_SIG = 480;				///< Amount of positive frequencies in self-energy grid
+//const int POS_FFREQ_COUNT_SIG = 800;				///< Amount of positive frequencies in self-energy grid
 const int FFREQ_COUNT_SIG = 2 * POS_FFREQ_COUNT_SIG;		///< Amount of frequencies in self-energy grid
 
 // ----- phi dimensions
@@ -93,9 +95,13 @@ const int POS_PLOT_RANGE_VERT = POS_PLOT_RANGE_PHI; 		///< Amount of positive fr
 
 //------ Inversion ranges Bethe-Salpeter equations
 
+#ifdef METHOD2
 const int  POS_INV_RANGE = COUNT; 
-const int  POS_ASY_RANGE = 10 * POS_INV_RANGE;	 
-
+const int  POS_ASY_RANGE = 600;//2 * POS_INV_RANGE;	 
+#else
+const int  POS_INV_RANGE = COUNT; 
+const int  POS_ASY_RANGE = 600;//10 * POS_INV_RANGE;	 
+#endif
 const int TAIL_LENGTH_ASY = POS_ASY_RANGE/10;
 const int FIT_ORDER_ASY = 4; 					///< Fit tail function has exponents one lower than this constant
 

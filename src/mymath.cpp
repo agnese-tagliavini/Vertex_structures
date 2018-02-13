@@ -324,6 +324,22 @@ gf<double, 1> generate_weights( int iMin, int tail_length, int fit_order )
    return weight_vec; 
 }
 
+gf<double, 2> generate_weights_asy( int iMin, int tail_length, int fit_order )
+{
+   std::vector<double> tail_weights = generate_tail_weights( iMin, tail_length, fit_order ); 
+
+   gf<double, 2> weight_vec_asy( boost::extents[ffreq(POS_ASY_RANGE)][ffreq(POS_ASY_RANGE)]); 
+   weight_vec_asy.init( []( const gf<double, 2>::idx_t& idx ){ if(idx(0) == idx(1)){return 1.0;} else{return 0.0;}} ); 
+
+   for( int i = 0; i < tail_length; ++i )
+   {
+      weight_vec_asy[iMin - POS_INV_RANGE + i][iMin - POS_INV_RANGE + i] = tail_weights[i]; 
+      weight_vec_asy[-iMin + POS_INV_RANGE - i - 1][-iMin + POS_INV_RANGE - i - 1]  = tail_weights[i]; 
+   }
+   
+   return weight_vec_asy; 
+}
+
 gf<double, 2> generate_2d_weights( int iMin, int tail_length, int fit_order )
 {
    std::vector<double> tail_weights = generate_tail_weights( iMin, tail_length, fit_order ); 

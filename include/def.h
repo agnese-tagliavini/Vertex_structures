@@ -22,8 +22,11 @@ using MatQN = Eigen::Matrix<dcomplex, QN_COUNT, QN_COUNT, Eigen::RowMajor>;	///<
 using MatQNQN = Eigen::Matrix<dcomplex, QN_COUNT*QN_COUNT, QN_COUNT*QN_COUNT, Eigen::RowMajor>;	///< Complex matrix representing the discrete quantum number structure of two-particle function
 
 using MapXcd = Eigen::Map< Eigen::Matrix< dcomplex, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor >  >; 
-using MapXcdvec = Eigen::Map< Eigen::Matrix< dcomplex, Eigen::Dynamic, 1 >  >; 
+using MapXd = Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor >  >; 
+using MapXdvec = Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, 1 > >; 
 
+using MapArrXcd = Eigen::Map< Eigen::Array< dcomplex, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor >  >; 
+using MapArrXd =  Eigen::Map< Eigen::Array< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor >  >; 
 
 #define INSERT_COPY_AND_ASSIGN(X) 					\
 X( const X & gf_obj ):    						\

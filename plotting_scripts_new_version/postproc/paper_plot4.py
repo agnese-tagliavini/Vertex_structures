@@ -27,6 +27,9 @@ import sys
 import subprocess
 import math
 from agneselibrary.mymath import *
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+from scipy import optimize
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 #--------------------------------------SETTINGS ------------------------------------------
 #if -1, change overall vertex sign (switch definition)
@@ -44,8 +47,8 @@ most_recently_edited = run("ls -Art dat/ | tail -n 1")
 #------COMPARISON METHOD 1 WITH AND WITHOUT CORRECTIONS -> CONVERGENCE WITH RESPECT TO THE INVERSION RANGE 
 
 fname0 = "../../dat/H5FILES/BETA50/4SITES/U1p75/POSTPROC/dat_U1p75_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNT_W0_CORR_ED.h5"
-fname1 = "../../dat/H5FILES/BETA50/4SITES/U1p75/POSTPROC/dat_U1p75_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_CORR_ED.h5"
-fname2 = "../../dat/H5FILES/BETA50/4SITES/U1p75/POSTPROC/dat_U1p75_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_CORR_ED.h5"
+fname1 = "../../dat/H5FILES/BETA50/4SITES/U1p75/POSTPROC/dat_U1p75_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_CORR_ED_01_FULL.h5"
+fname2 = "../../dat/H5FILES/BETA50/4SITES/U1p75/POSTPROC/dat_U1p75_Beta50_PFCB1000_PARQ_SU2_METH1_INVR1xCOUNTm40_ASYR10xINVR_CORR_ED_01_FULL.h5"
 fname3 = "../../dat/H5FILES/BETA50/4SITES/U1p75/POSTPROC/dat_U1p75_Beta50_PFCB1000_PARQ_SU2_METH2_INVR1xCOUNTm40_ED.h5"
 
 #------ DECIDE WHICH COMPARISON YOU WANT TO ANALYZE
@@ -372,13 +375,68 @@ def plotgamma_diag1( use_pl, arr0, arr1, arr2, arr3, string, legend, noxticks):
 
     return
 
-fig = pl.figure(figsize=cm2inch(6.0,20.0))
-ax = plotgamma_diag1( pl.subplot(4,1,1), regamma_pp0 + regamma_pp0[:,:,::-1,:,:,:,:,:,:,:],regamma_pp1 + regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], regamma_pp2 + regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], regamma_pp3 + regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu=\nu', \omega =0 \frac{\pi}{\beta}}_{s}$", True, True ) # flip sign of w_out
-plotgamma_diag1( pl.subplot(4,1,2), regamma_pp0 - regamma_pp0[:,:,::-1,:,:,:,:,:,:,:],regamma_pp1 - regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], regamma_pp2 - regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], regamma_pp3 - regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu= \nu', \omega =0 \frac{\pi}{\beta}}_{t}$", False, True ) # flip sign of w_out
-plotgamma_diag1( pl.subplot(4,1,3), 2*regamma_ph0 - regamma_xph0,2*regamma_ph1 - regamma_xph1, 2*regamma_ph2 - regamma_xph2, 2*regamma_ph3 - regamma_xph3, RE + r"\Gamma^{\nu=\nu', \omega =0 \frac{\pi}{\beta}}_{d}$", False, True )
-#pl.xlabel(r"$\nu$", fontsize = 10)
-plotgamma_diag1( pl.subplot(4,1,4), - regamma_xph0,- regamma_xph1, - regamma_xph2,- regamma_xph3, RE + r"\Gamma^{\nu=\nu', \omega =0 \frac{\pi}{\beta}}_{m}$", False, False )
+fig = pl.figure(figsize=cm2inch(12.0,12.0))
+
+ax1 = fig.add_subplot(2, 2, 1)
+ax2 = fig.add_subplot(2, 2, 2)
+ax3 = fig.add_subplot(2, 2, 3)
+ax4 = fig.add_subplot(2, 2, 4)
+
+plotgamma_diag1( pl.subplot(2,2,1), regamma_pp0 + regamma_pp0[:,:,::-1,:,:,:,:,:,:,:],regamma_pp1 + regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], regamma_pp2 + regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], regamma_pp3 + regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu=\nu', \omega =0}_{s}$", False, False ) # flip sign of w_out
+
+gam_m1_s = regamma_pp1 + regamma_pp1[:,:,::-1,:,:,:,:,:,:,:]
+gam_m2_s = regamma_pp2 + regamma_pp2[:,:,::-1,:,:,:,:,:,:,:]
+gam_ex_s = regamma_pp3 + regamma_pp3[:,:,::-1,:,:,:,:,:,:,:]
+
+diff_m1_pp = np.array([gam_m1_s[shift + (bdim1-1)/2,n+fdimo21,n+fdimo21,0,0,0,0,0,0,0]for n in range(0,fdim_min/2)])-np.array([ gam_ex_s[shift + (bdim3-1)/2, n+fdimo23,n+fdimo23,0,0,0,0,0,0,0] for n in range(0,fdim_min/2)])
+diff_m2_pp = np.array([gam_m2_s[shift + (bdim2-1)/2,n+fdimo22,n+fdimo22,0,0,0,0,0,0,0]for n in range(0,fdim_min/2)])-np.array([ gam_ex_s[shift + (bdim3-1)/2, n+fdimo23,n+fdimo23,0,0,0,0,0,0,0] for n in range(0,fdim_min/2)])
+
+#try to create inset for first plot 
+#axins1 = zoomed_inset_axes(ax1, 1.0, loc=4)
+axins1 = inset_axes(ax1, 0.80, 0.80 , loc=4 ,bbox_to_anchor=(0.46, 0.62), bbox_transform=ax1.figure.transFigure) # no zoom
+axins1.plot(gammagrid_plotsmall, diff_m1_pp,  marker = 'o', linestyle='-',linewidth =1.2, color='b', ms=3, mew=0.5)
+axins1.plot(gammagrid_plotsmall, diff_m2_pp,  marker = 's', linestyle='-',linewidth =1.2, color='g', ms=3, mew=0.5)
+pl.xticks(visible=True, fontsize = 6)
+pl.yticks(visible=True, fontsize = 6)
+
+plotgamma_diag1( pl.subplot(2,2,2), regamma_pp0 - regamma_pp0[:,:,::-1,:,:,:,:,:,:,:],regamma_pp1 - regamma_pp1[:,:,::-1,:,:,:,:,:,:,:], regamma_pp2 - regamma_pp2[:,:,::-1,:,:,:,:,:,:,:], regamma_pp3 - regamma_pp3[:,:,::-1,:,:,:,:,:,:,:], RE + r"\Gamma^{\nu= \nu', \omega =0}_{t}$", True, False ) # flip sign of w_out
+
+plotgamma_diag1( pl.subplot(2,2,3), 2*regamma_ph0 - regamma_xph0,2*regamma_ph1 - regamma_xph1, 2*regamma_ph2 - regamma_xph2, 2*regamma_ph3 - regamma_xph3, RE + r"\Gamma^{\nu=\nu', \omega =0}_{d}$", False, False )
 pl.xlabel(r"$\nu$", fontsize = 10)
+
+axins3 = inset_axes(ax3, 0.80, 0.80 , loc=4 ,bbox_to_anchor=(0.47, 0.14), bbox_transform=ax3.figure.transFigure) # no zoom
+gam_m1_d = 2*regamma_ph1 - regamma_xph1
+gam_m2_d = 2*regamma_ph2 - regamma_xph2
+gam_ex_d = 2*regamma_ph3 - regamma_xph3
+
+diff_m1_d = np.array([gam_m1_d[shift + (bdim1-1)/2,n+fdimo21,n+fdimo21,0,0,0,0,0,0,0]for n in range(0,fdim_min/2)])-np.array([ gam_ex_d[shift + (bdim3-1)/2, n+fdimo23,n+fdimo23,0,0,0,0,0,0,0] for n in range(0,fdim_min/2)])
+diff_m2_d = np.array([gam_m2_d[shift + (bdim2-1)/2,n+fdimo22,n+fdimo22,0,0,0,0,0,0,0]for n in range(0,fdim_min/2)])-np.array([ gam_ex_d[shift + (bdim3-1)/2, n+fdimo23,n+fdimo23,0,0,0,0,0,0,0] for n in range(0,fdim_min/2)])
+
+#try to create inset for first plot 
+#axins1 = zoomed_inset_axes(ax1, 1.0, loc=4)
+axins3.plot(gammagrid_plotsmall, diff_m1_d,  marker = 'o', linestyle='-',linewidth =1.2, color='b', ms=3, mew=0.5)
+axins3.plot(gammagrid_plotsmall, diff_m2_d,  marker = 's', linestyle='-',linewidth =1.2, color='g', ms=3, mew=0.5)
+pl.xticks(visible=True, fontsize = 6)
+pl.yticks(visible=True, fontsize = 6)
+
+
+plotgamma_diag1( pl.subplot(2,2,4), - regamma_xph0,- regamma_xph1, - regamma_xph2,- regamma_xph3, RE + r"\Gamma^{\nu=\nu', \omega =0}_{m}$", False, False )
+pl.xlabel(r"$\nu$", fontsize = 10)
+axins4 = inset_axes(ax4, 0.80, 0.80 , loc=4 ,bbox_to_anchor=(0.96, 0.22), bbox_transform=ax4.figure.transFigure) # no zoom
+
+gam_m1_m = - regamma_xph1
+gam_m2_m = - regamma_xph2
+gam_ex_m = - regamma_xph3
+
+diff_m1_m = np.array([gam_m1_m[shift + (bdim1-1)/2,n+fdimo21,n+fdimo21,0,0,0,0,0,0,0]for n in range(0,fdim_min/2)])-np.array([ gam_ex_m[shift + (bdim3-1)/2, n+fdimo23,n+fdimo23,0,0,0,0,0,0,0] for n in range(0,fdim_min/2)])
+diff_m2_m = np.array([gam_m2_m[shift + (bdim2-1)/2,n+fdimo22,n+fdimo22,0,0,0,0,0,0,0]for n in range(0,fdim_min/2)])-np.array([ gam_ex_m[shift + (bdim3-1)/2, n+fdimo23,n+fdimo23,0,0,0,0,0,0,0] for n in range(0,fdim_min/2)])
+
+#try to create inset for first plot 
+#axins1 = zoomed_inset_axes(ax1, 1.0, loc=4)
+axins4.plot(gammagrid_plotsmall, diff_m1_m,  marker = 'o', linestyle='-',linewidth =1.2, color='b', ms=3, mew=0.5)
+axins4.plot(gammagrid_plotsmall, diff_m2_m,  marker = 's', linestyle='-',linewidth =1.2, color='g', ms=3, mew=0.5)
+pl.xticks(visible=True, fontsize = 6)
+pl.yticks(visible=True, fontsize = 6)
 
 pl.tight_layout()
 
@@ -393,10 +451,12 @@ def plotgamma_axis_s( use_pl,  arr1, string, legend ):
     zarr1 = np.array([ arr1[0,n+fdimo20-fdim_min/2,fdimo20,0,0,0,0,0,0,0] for n in range(0,fdim_min)])
     zarr4 = np.array([ arr1[0,n+fdimo20,fdimo20,0,0,0,0,0,0,0] for n in range(-fdim_trio2, -fdim_min/2)])
     zarr5 = np.array([ arr1[0,n+fdimo20,fdimo20,0,0,0,0,0,0,0] for n in range(fdim_min/2, fdim_trio2)])
-    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2, color='r', ms=3, mew=0.5, label=r"ED(small)")
-    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label= "ED(large)")
-    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label="_nolegend_")
-    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2, color='k', label=r"ASY")
+    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2, color='k', ms=3, mew=0.5, label=r"ED")
+    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='k', ms=3, mew=0.5, label= "_nolegend_")
+    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='k', ms=3, mew=0.5, label="_nolegend_")
+    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2, color='r', label=r"ASY")
+    pl.axvline(-2.5, linestyle = '--', linewidth= 0.8, color = '#808080')
+    pl.axvline(2.5, linestyle = '--', linewidth= 0.8, color = '#808080')
     pl.xlim([-5.0, 5.0])
     use_pl.set_title( string , fontsize=12 )
     if(legend):
@@ -409,10 +469,12 @@ def plotgamma_axis_t( use_pl, arr1, string, legend ):
     zarr1 = np.array([ arr1[0,n+fdimo20-fdim_min/2,fdimo20,0,0,0,0,0,0,0] for n in range(0,fdim_min)])
     zarr4 = np.array([ arr1[0,n+fdimo20,fdimo20,0,0,0,0,0,0,0] for n in range(-fdim_trio2, -fdim_min/2)])
     zarr5 = np.array([ arr1[0,n+fdimo20,fdimo20,0,0,0,0,0,0,0] for n in range(fdim_min/2, fdim_trio2)])
-    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2, color='r', ms=3, mew=0.5, label=r"ED(small)")
-    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label= "ED(large)")
-    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label="_nolegend_")
-    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2, color='k', label=r"ASY")
+    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2, color='k', ms=3, mew=0.5, label=r"EX")
+    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='k', ms=3, mew=0.5, label= "_nolegend_")
+    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='k', ms=3, mew=0.5, label="_nolegend_")
+    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2, color='r', label=r"ASY")
+    pl.axvline(-2.5, linestyle = '--', linewidth= 0.8, color = '#808080')
+    pl.axvline(2.5, linestyle = '--', linewidth= 0.8, color = '#808080')
     pl.xlim([-5.0, 5.0])
     use_pl.set_title( string , fontsize=12 )
     if(legend):
@@ -424,10 +486,12 @@ def plotgamma_axis_d( use_pl, arr1, string, legend ):
     zarr1 = np.array([ arr1[0,n+fdimo20-fdim_min/2,fdimo20,0,0,0,0,0,0,0] for n in range(0,fdim_min)])
     zarr4 = np.array([ arr1[0,n+fdimo20,fdimo20,0,0,0,0,0,0,0] for n in range(-fdim_trio2, -fdim_min/2)])
     zarr5 = np.array([ arr1[0,n+fdimo20,fdimo20,0,0,0,0,0,0,0] for n in range(fdim_min/2, fdim_trio2)])
-    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2, color='r', ms=3, mew=0.5, label=r"ED(small)")
-    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label= "ED(large)")
-    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label="_nolegend_")
-    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2, color='k', label=r"ASY")
+    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2, color='k', ms=3, mew=0.5, label=r"ED")
+    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='k', ms=3, mew=0.5,  label= "_nolegend_")
+    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='k', ms=3, mew=0.5, label="_nolegend_")
+    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2, color='r', label=r"ASY")
+    pl.axvline(-2.5, linestyle = '--', linewidth= 0.8, color = '#808080')
+    pl.axvline(2.5, linestyle = '--', linewidth= 0.8, color = '#808080')
     pl.xlim([-5.0, 5.0])
     use_pl.set_title( string , fontsize=12 )
     if(legend):
@@ -440,10 +504,12 @@ def plotgamma_axis_m( use_pl, arr1, string, legend ):
     zarr1 = np.array([ arr1[0,n+fdimo20-fdim_min/2,fdimo20,0,0,0,0,0,0,0] for n in range(0,fdim_min)])
     zarr4 = np.array([ arr1[0,n+fdimo20,fdimo20,0,0,0,0,0,0,0] for n in range(-fdim_trio2, -fdim_min/2)])
     zarr5 = np.array([ arr1[0,n+fdimo20,fdimo20,0,0,0,0,0,0,0] for n in range(fdim_min/2, fdim_trio2)])
-    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2, color='r', ms=3, mew=0.5, label=r"ED(small)")
-    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label= "ED(large)")
-    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label="_nolegend_")
-    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2, color='k', label=r"ASY")
+    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2, color='k', ms=3, mew=0.5, label=r"ED(small)")
+    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color= 'k', ms=3, mew=0.5,  label= "_nolegend_")
+    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='k', ms=3, mew=0.5,  label="_nolegend_")
+    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2, color='r', label=r"ASY")
+    pl.axvline(-2.5, linestyle = '--', linewidth= 0.8, color = '#808080')
+    pl.axvline(2.5, linestyle = '--', linewidth= 0.8, color = '#808080')
     pl.xlim([-5.0, 5.0])
     use_pl.set_title( string , fontsize=12 )
     if(legend):
@@ -452,11 +518,11 @@ def plotgamma_axis_m( use_pl, arr1, string, legend ):
     return
 
 fig = pl.figure(figsize=cm2inch(12.0,12.0))
-plotgamma_axis_s( pl.subplot(2,2,1), revert_pp0 + revert_pp0[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{\nu,\nu'=\pi/\beta, \omega = 0 }_{s}$", False ) # flip sign of w_out
-plotgamma_axis_t( pl.subplot(2,2,2), revert_pp0 - revert_pp0[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{\nu,\nu'=\pi/\beta, \omega = 0 }_{t}$", True ) # flip sign of w_out
-plotgamma_axis_d( pl.subplot(2,2,3), 2*revert_ph0 - revert_xph0, RE + r"F^{\nu,\nu'=\pi/\beta, \omega =0 }_{d}$", False )
+plotgamma_axis_s( pl.subplot(2,2,1), revert_pp0 + revert_pp0[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{\nu,\nu' = \frac{\pi}{\beta}, \omega =0 }_{s}$", False ) # flip sign of w_out
+plotgamma_axis_t( pl.subplot(2,2,2), revert_pp0 - revert_pp0[:,:,::-1,:,:,:,:,:,:,:], RE + r"F^{\nu,\nu' = \frac{\pi}{\beta}, \omega =0 }_{t}$", True ) # flip sign of w_out
+plotgamma_axis_d( pl.subplot(2,2,3), 2*revert_ph0 - revert_xph0, RE + r"F^{\nu,\nu' = \frac{\pi}{\beta}, \omega =0 }_{d}$", False )
 pl.xlabel(r"$\nu$", fontsize = 10)
-plotgamma_axis_m( pl.subplot(2,2,4), -revert_xph0, RE + r"F^{\nu,\nu'=\pi/\beta, \omega =0}_{m}$", False )
+plotgamma_axis_m( pl.subplot(2,2,4), -revert_xph0, RE + r"F^{\nu,\nu' = \frac{\pi}{\beta}, \omega =0}_{m}$", False )
 pl.xlabel(r"$\nu$", fontsize = 10)
 
 pl.tight_layout()
@@ -481,11 +547,13 @@ def plotgamma_axis_s( use_pl,  arr1, arr2,arr3, string, legend ):
     zarr1 = np.array([ arr1[0,n+fdimo20-fdim_min/2,n+fdimo20-fdim_min/2,0,0,0,0,0,0,0] for n in range(0,fdim_min)])
     zarr4 = np.array([ arr1[0,n+fdimo20,n+fdimo20,0,0,0,0,0,0,0] for n in range(-fdim_trio2, -fdim_min/2)])
     zarr5 = np.array([ arr1[0,n+fdimo20,n+fdimo20,0,0,0,0,0,0,0] for n in range(fdim_min/2, fdim_trio2)])
-    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2,color='r', ms=3, mew=0.5, label=r"EX(small)")
-    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label= "EX(large)")
-    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label="_nolegend_")
-    pl.plot( gammagrid_plot2, zarr2, marker = 'None', linestyle='--', linewidth=1.2,color='k', label=r"ASY ")
-    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2,color='b', label=r"ASY+$\lambda$")
+    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2,color='k', ms=3, mew=0.5, label=r"EX")
+    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color= 'k', ms=3, mew=0.5, label= "_nolegend_")
+    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='k', ms=3, mew=0.5, label="_nolegend_")
+    pl.plot( gammagrid_plot2, zarr2, marker = 'None', linestyle='-', linewidth=1.2,color='r', label=r"ASY ")
+    pl.axvline(-2.5*math.sqrt(2), linestyle = '--', linewidth= 0.8, color = '#808080')
+    pl.axvline(2.5*math.sqrt(2), linestyle = '--', linewidth= 0.8, color = '#808080')
+    #pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2,color='b', label=r"ASY+$\lambda$")
     pl.xlim([-7.0, 7.0])
     use_pl.set_title( string , fontsize=12 )
     if(legend):
@@ -499,11 +567,13 @@ def plotgamma_axis_t( use_pl, arr1, arr2,arr3, string, legend ):
     zarr1 = np.array([ arr1[0,n+fdimo20-fdim_min/2,n+fdimo20-fdim_min/2,0,0,0,0,0,0,0] for n in range(0,fdim_min)])
     zarr4 = np.array([ arr1[0,n+fdimo20,n+fdimo20,0,0,0,0,0,0,0] for n in range(-fdim_trio2, -fdim_min/2)])
     zarr5 = np.array([ arr1[0,n+fdimo20,n+fdimo20,0,0,0,0,0,0,0] for n in range(fdim_min/2, fdim_trio2)])
-    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2,color='r', ms=3, mew=0.5, label=r"EX(small)")
-    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label= "EX(large)")
-    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label="_nolegend_")
-    pl.plot( gammagrid_plot2, zarr2, marker = 'None', linestyle='--', linewidth=1.2,color='k', label=r"ASY ")
-    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2,color='b', label=r"ASY+$\lambda$")
+    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2,color='k', ms=3, mew=0.5, label=r"EX")
+    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color= 'k', ms=3, mew=0.5,  label= "_nolegend_")
+    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='k', ms=3, mew=0.5,  label="_nolegend_")
+    pl.plot( gammagrid_plot2, zarr2, marker = 'None', linestyle='-', linewidth=1.2,color='r', label=r"ASY ")
+    #pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2,color='b', label=r"ASY+$\lambda$")
+    pl.axvline(-2.5*math.sqrt(2), linestyle = '--', linewidth= 0.8, color = '#808080')
+    pl.axvline(2.5*math.sqrt(2), linestyle = '--', linewidth= 0.8, color = '#808080')
     pl.xlim([-7.0, 7.0])
     use_pl.set_title( string , fontsize=12 )
     if(legend):
@@ -516,11 +586,13 @@ def plotgamma_axis_d( use_pl, arr1, arr2,arr3, string, legend ):
     zarr1 = np.array([ arr1[0,n+fdimo20-fdim_min/2,n+fdimo20-fdim_min/2,0,0,0,0,0,0,0] for n in range(0,fdim_min)])
     zarr4 = np.array([ arr1[0,n+fdimo20,n+fdimo20,0,0,0,0,0,0,0] for n in range(-fdim_trio2, -fdim_min/2)])
     zarr5 = np.array([ arr1[0,n+fdimo20,n+fdimo20,0,0,0,0,0,0,0] for n in range(fdim_min/2, fdim_trio2)])
-    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-',linewidth=1.2, color='r', ms=3, mew=0.5, label=r"EX(small)")
-    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label= "EX(large)")
-    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label="_nolegend_")
-    pl.plot( gammagrid_plot2, zarr2, marker = 'None', linestyle='--', linewidth=1.2,color='k', label=r"ASY ")
-    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2,color='b', label=r"ASY+$\lambda$")
+    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-',linewidth=1.2, color='k', ms=3, mew=0.5, label=r"EX")
+    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2,  color='k', ms=3, mew=0.5,  label= "_nolegend_")
+    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='k', ms=3, mew=0.5,  label="_nolegend_")
+    pl.plot( gammagrid_plot2, zarr2, marker = 'None', linestyle='-', linewidth=1.2,color='r', label=r"ASY ")
+    #pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2,color='b', label=r"ASY+$\lambda$")
+    pl.axvline(-2.5*math.sqrt(2), linestyle = '--', linewidth= 0.8, color = '#808080')
+    pl.axvline(2.5*math.sqrt(2), linestyle = '--', linewidth= 0.8, color = '#808080')
     pl.xlim([-7.0, 7.0])
     use_pl.set_title( string , fontsize=12 )
     if(legend):
@@ -534,11 +606,13 @@ def plotgamma_axis_m( use_pl, arr1, arr2,arr3, string, legend ):
     zarr1 = np.array([ arr1[0,n+fdimo20-fdim_min/2,n+fdimo20-fdim_min/2,0,0,0,0,0,0,0] for n in range(0,fdim_min)])
     zarr4 = np.array([ arr1[0,n+fdimo20,n+fdimo20,0,0,0,0,0,0,0] for n in range(-fdim_trio2, -fdim_min/2)])
     zarr5 = np.array([ arr1[0,n+fdimo20,n+fdimo20,0,0,0,0,0,0,0] for n in range(fdim_min/2, fdim_trio2)])
-    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2,color='r', ms=3, mew=0.5, label=r"EX(small)")
-    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label= "ED(large)")
-    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='#FA8072', ms=3, mew=0.5, markerfacecolor='None', label="_nolegend_")
-    pl.plot( gammagrid_plot2, zarr2, marker = 'None', linestyle='--', linewidth=1.2,color='k', label=r"ASY ")
-    pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2,color='b', label=r"ASY+$\lambda$")
+    pl.plot( gammagrid_plotsmall2, zarr1, marker = 'o', linestyle='-', linewidth=1.2,color='k', ms=3, mew=0.5, label=r"EX(small)")
+    pl.plot( extend_gammagrid_left, zarr4, marker = 'o', linestyle='-', linewidth=1.2, color= 'k', ms=3, mew=0.5,  label= "_nolegend_")
+    pl.plot( extend_gammagrid_right, zarr5, marker = 'o', linestyle='-', linewidth=1.2 ,color='k', ms=3, mew=0.5,  label="_nolegend_")
+    pl.plot( gammagrid_plot2, zarr2, marker = 'None', linestyle='-', linewidth=1.2,color='r', label=r"ASY ")
+    #pl.plot( gammagrid_plot2, zarr0, marker = 'None', linestyle='-', linewidth=1.2,color='b', label=r"ASY+$\lambda$")
+    pl.axvline(-2.5*math.sqrt(2), linestyle = '--', linewidth= 0.8, color = '#808080')
+    pl.axvline(2.5*math.sqrt(2), linestyle = '--', linewidth= 0.8, color = '#808080')
     pl.xlim([-7.0, 7.0])
     use_pl.set_title( string , fontsize=12 )
     if(legend):
